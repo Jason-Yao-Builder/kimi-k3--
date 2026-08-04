@@ -4,13 +4,9 @@ export const calcEffectiveWindow = (alpha, threshold = 0.2) => Math.ceil(
   Math.log(threshold) / Math.log(alpha),
 );
 
-const parseHex = (color) => color.match(/[a-f\d]{2}/gi).map((value) => Number.parseInt(value, 16));
-const toHex = (value) => Math.round(value).toString(16).padStart(2, "0");
-
 export const blendToGray = (color, times) => {
   const amount = Math.min(1, Math.max(0, times * 0.15));
-  const gray = 153;
-  return `#${parseHex(color).map((channel) => toHex(channel + (gray - channel) * amount)).join("")}`;
+  return `color-mix(in srgb, ${color} ${(1 - amount) * 100}%, var(--muted))`;
 };
 
 export const applyErase = (cells, kRows, beta) => cells.map((cell, index) => (
@@ -22,14 +18,14 @@ export const applyWrite = (cells, kRows, color, beta) => cells.map((cell, index)
 ));
 
 export const buildStepCells = (step, beta = 0.8) => {
-  let cells = Array.from({ length: 36 }, () => ({ color: "#d8dcd5", opacity: 0.3 }));
-  cells = applyWrite(cells, [0, 1], "#255f85", 0.72);
+  let cells = Array.from({ length: 36 }, () => ({ color: "var(--line)", opacity: 0.3 }));
+  cells = applyWrite(cells, [0, 1], "var(--blue)", 0.72);
   cells = cells.map((cell, index) => Math.floor(index / 6) >= 2 && Math.floor(index / 6) <= 3 && index % 6 >= 2 && index % 6 <= 3
-    ? { color: "#256d52", opacity: 0.72 } : cell);
+    ? { color: "var(--green)", opacity: 0.72 } : cell);
   cells = cells.map((cell, index) => Math.floor(index / 6) >= 4 && index % 6 >= 4
-    ? { color: "#d84f35", opacity: 0.68 } : cell);
+    ? { color: "var(--accent)", opacity: 0.68 } : cell);
   if (step === 2) cells = cells.map((cell, index) => index < 18 ? { ...cell, color: blendToGray(cell.color, 3) } : cell);
-  if (step >= 3) cells = applyWrite(applyErase(cells, [0, 1], beta), [0, 1], "#255f85", beta);
+  if (step >= 3) cells = applyWrite(applyErase(cells, [0, 1], beta), [0, 1], "var(--blue)", beta);
   return cells;
 };
 

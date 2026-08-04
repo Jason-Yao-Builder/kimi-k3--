@@ -332,7 +332,7 @@ const buildEvolutionExperience = (state, onChange) => {
     return cell;
   });
   const legend = element("div", "kdam-memory-legend");
-  [["#255f85", "定义通道"], ["#256d52", "语义通道"], ["#d84f35", "结构通道"]].forEach(([color, label]) => {
+  [["var(--blue)", "定义通道"], ["var(--green)", "语义通道"], ["var(--accent)", "结构通道"]].forEach(([color, label]) => {
     const item = element("span", "", label);
     item.style.setProperty("--legend-color", color);
     legend.append(item);
@@ -390,13 +390,13 @@ const buildEvolutionExperience = (state, onChange) => {
     beta.readout.textContent = `${beta.label} = ${state.evolutionBeta.toFixed(2)}`;
     cells.forEach((cell, index) => {
       const row = Math.floor(index / 8);
-      const base = row < 3 ? "#255f85" : row < 6 ? "#256d52" : "#d84f35";
+      const base = row < 3 ? "var(--blue)" : row < 6 ? "var(--green)" : "var(--accent)";
       const channelAlpha = row < 3 ? state.evolutionAlphaDefinition
         : row < 6 ? state.evolutionAlphaSemantic : state.evolutionAlphaStructure;
       const decayAlpha = channelWise ? channelAlpha : state.evolutionAlpha;
       const retention = decayAlpha ** state.evolutionDistance;
       const conflict = index % 8 < 3 && ["deltanet", "kda"].includes(model.id);
-      cell.style.background = conflict ? `color-mix(in srgb, ${base} ${(1 - state.evolutionBeta) * 100}%, #d84f35)` : base;
+      cell.style.background = conflict ? `color-mix(in srgb, ${base} ${(1 - state.evolutionBeta) * 100}%, var(--accent))` : base;
       cell.style.opacity = String(Math.max(0.08, Math.min(1, retention + (row >= 6 ? 0.28 : 0))));
       cell.classList.toggle("erased", conflict && state.evolutionBeta > 0.65);
     });

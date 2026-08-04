@@ -27,7 +27,7 @@
 }
 
 .kv-cache-solutions[data-key-active="true"] .kvcs-cards {
-  outline: clamp(0.06rem, 0.12cqw, 0.12rem) solid rgb(37 95 133 / 38%);
+  outline: clamp(0.06rem, 0.12cqw, 0.12rem) solid var(--focus-soft);
   outline-offset: clamp(0.08rem, 0.15cqw, 0.2rem);
 }
 

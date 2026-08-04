@@ -4,6 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f3f4ef" />
+    <script>
+      (() => {
+        const storageKey = "kimi-k3:appearance:v1";
+        const validThemes = new Set(["system", "light", "dark"]);
+        const validFontSizes = new Set(["small", "medium", "large"]);
+        let stored = {};
+
+        try {
+          stored = JSON.parse(localStorage.getItem(storageKey) || "{}") || {};
+        } catch {
+          stored = {};
+        }
+
+        const themeMode = validThemes.has(stored.theme) ? stored.theme : "system";
+        const fontSize = validFontSizes.has(stored.fontSize) ? stored.fontSize : "medium";
+        const systemTheme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        const theme = themeMode === "system" ? systemTheme : themeMode;
+
+        document.documentElement.dataset.themeMode = themeMode;
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.fontSize = fontSize;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
     <link rel="icon" href="data:," />
     <title>Kimi K3 · KV Cache</title>
     <link rel="stylesheet" href="./app/styles.css" />
@@ -33,6 +57,39 @@
           <button class="icon-button mobile-only" id="menu-button" aria-label="展开目录" title="展开目录">☰</button>
           <div class="breadcrumb" id="breadcrumb"></div>
           <div class="toolbar-actions">
+            <div class="appearance-control" id="appearance-control">
+              <button
+                class="icon-button appearance-button"
+                id="appearance-button"
+                type="button"
+                aria-label="显示设置"
+                aria-controls="appearance-panel"
+                aria-expanded="false"
+                title="显示设置"
+              >Aa</button>
+              <div class="appearance-panel" id="appearance-panel" aria-label="显示设置" hidden>
+                <div class="appearance-panel-heading">
+                  <strong>显示设置</strong>
+                  <span>主题与字号</span>
+                </div>
+                <div class="appearance-setting-group" role="group" aria-labelledby="theme-setting-label">
+                  <span class="appearance-setting-label" id="theme-setting-label">主题</span>
+                  <div class="appearance-segments">
+                    <button type="button" data-theme-choice="system" aria-pressed="false">跟随系统</button>
+                    <button type="button" data-theme-choice="light" aria-pressed="false">日间</button>
+                    <button type="button" data-theme-choice="dark" aria-pressed="false">夜间</button>
+                  </div>
+                </div>
+                <div class="appearance-setting-group" role="group" aria-labelledby="font-size-setting-label">
+                  <span class="appearance-setting-label" id="font-size-setting-label">字号</span>
+                  <div class="appearance-segments">
+                    <button type="button" data-font-size-choice="small" aria-pressed="false">小</button>
+                    <button type="button" data-font-size-choice="medium" aria-pressed="false">中</button>
+                    <button type="button" data-font-size-choice="large" aria-pressed="false">大</button>
+                  </div>
+                </div>
+              </div>
+            </div>
             <button class="text-button edit-mode-button" id="edit-mode-button" aria-pressed="false">编辑</button>
             <button class="text-button" id="overview-button">总览</button>
             <button class="icon-button" id="fullscreen-button" aria-label="全屏" title="全屏">⛶</button>
@@ -73,6 +130,6 @@
     </div>
 
     <div class="zoom-backdrop" id="zoom-backdrop" hidden></div>
-    <script type="module" src="./app/main.js?build=20260805-post34"></script>
+    <script type="module" src="./app/main.js?build=20260805-post34-appearance"></script>
   </body>
 </html>

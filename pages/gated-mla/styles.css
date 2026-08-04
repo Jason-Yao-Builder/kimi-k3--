@@ -27,7 +27,7 @@
 }
 
 .gated-mla[data-key-active="true"] .gmla-viewport {
-  outline: clamp(0.06rem, 0.12cqw, 0.12rem) solid rgb(37 95 133 / 38%);
+  outline: clamp(0.06rem, 0.12cqw, 0.12rem) solid var(--focus-soft);
   outline-offset: clamp(0.08rem, 0.15cqw, 0.2rem);
 }
 
@@ -162,7 +162,7 @@
 }
 
 .gmla-h100-label { fill: var(--green); }
-.gmla-origin-note { fill: var(--blue); font-family: var(--font-mono); font-size: 8px; font-weight: 800; }
+.gmla-origin-note { fill: var(--blue); font-family: var(--font-mono); font-size: var(--fixed-font-8); font-weight: 800; }
 .gmla-growth-line { fill: none; stroke-width: 2.4; stroke-dasharray: 1; }
 .gmla-growth-line.mha { stroke: var(--accent); }
 .gmla-growth-line.mqa { stroke: var(--blue); }
@@ -452,41 +452,41 @@
 .gmla-position-svg text { font-family: var(--font-mono); }
 .gmla-position-svg .semantic { fill: var(--blue); }
 .gmla-position-svg .position { fill: var(--accent); }
-.gmla-position-svg .operator { fill: var(--ink); font-size: 18px; font-weight: 800; }
+.gmla-position-svg .operator { fill: var(--ink); font-size: var(--fixed-font-18); font-weight: 800; }
 .gmla-position-svg .label,
 .gmla-position-svg .caption,
 .gmla-position-svg .cache-label,
 .gmla-position-svg .axis-label,
-.gmla-position-svg .cache-row-label { fill: var(--muted); font-size: 8px; }
-.gmla-position-svg .failure { fill: var(--accent); font-size: 20px; font-weight: 900; }
-.gmla-position-svg .failure-note { fill: var(--accent); font-size: 7px; }
+.gmla-position-svg .cache-row-label { fill: var(--muted); font-size: var(--fixed-font-8); }
+.gmla-position-svg .failure { fill: var(--accent); font-size: var(--fixed-font-20); font-weight: 900; }
+.gmla-position-svg .failure-note { fill: var(--accent); font-size: var(--fixed-font-7); }
 .gmla-position-svg .rope-arc { fill: none; stroke: var(--blue); stroke-width: 2; }
 .gmla-position-svg .rope-guide { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; }
 .gmla-position-svg .rope-point.s { fill: var(--blue); }
 .gmla-position-svg .rope-point.t { fill: var(--ink); }
 .gmla-position-svg .relative-arc { fill: none; stroke: var(--green); stroke-width: 1.5; }
 .gmla-position-svg .relative-label,
-.gmla-position-svg .formula.green { fill: var(--green); font-size: 8px; font-weight: 800; }
-.gmla-position-svg .formula { fill: var(--ink); font-size: 8px; }
+.gmla-position-svg .formula.green { fill: var(--green); font-size: var(--fixed-font-8); font-weight: 800; }
+.gmla-position-svg .formula { fill: var(--ink); font-size: var(--fixed-font-8); }
 .gmla-position-svg .divider,
 .gmla-position-svg .axis { stroke: var(--line-strong); stroke-width: 1; }
-.gmla-position-svg .path-label { fill: var(--ink); font-size: 7px; font-weight: 700; }
-.gmla-position-svg .path-mark { font-size: 10px; font-weight: 900; }
+.gmla-position-svg .path-label { fill: var(--ink); font-size: var(--fixed-font-7); font-weight: 700; }
+.gmla-position-svg .path-mark { font-size: var(--fixed-font-10); font-weight: 900; }
 .gmla-position-svg .path-mark.bad { fill: var(--accent); }
 .gmla-position-svg .path-mark.good { fill: var(--green); }
-.gmla-position-svg .path-note { fill: var(--muted); font-size: 6px; }
-.gmla-position-svg .not-equal { fill: var(--accent); font-size: 18px; font-weight: 900; }
+.gmla-position-svg .path-note { fill: var(--muted); font-size: var(--fixed-font-6); }
+.gmla-position-svg .not-equal { fill: var(--accent); font-size: var(--fixed-font-18); font-weight: 900; }
 .gmla-position-svg .latent-bar { fill: var(--surface); stroke: var(--line-strong); stroke-width: 0.8; }
 .gmla-position-svg .position-bar { fill: var(--accent); stroke: var(--accent); stroke-width: 0.8; }
-.gmla-position-svg .position-cost { fill: var(--accent); font-size: 6px; font-weight: 800; }
+.gmla-position-svg .position-cost { fill: var(--accent); font-size: var(--fixed-font-6); font-weight: 800; }
 .gmla-position-svg .decay-area { fill: var(--green-soft); opacity: 0.7; }
 .gmla-position-svg .decay-line { fill: none; stroke: var(--green); stroke-width: 2.4; stroke-dasharray: 1; }
 .gmla-position-svg .decay-point { fill: var(--green); }
 .gmla-position-svg .decay-point.middle { fill: var(--surface); stroke: var(--green); stroke-width: 1.5; }
 .gmla-position-svg .decay-point.far { fill: var(--muted); }
 .gmla-position-svg .guide { stroke: var(--green); stroke-width: 0.8; stroke-dasharray: 3 2; }
-.gmla-position-svg .weight-label { fill: var(--green); font-size: 7px; font-weight: 800; }
-.gmla-position-svg .nope-note { fill: var(--green); font-size: 7px; font-weight: 800; }
+.gmla-position-svg .weight-label { fill: var(--green); font-size: var(--fixed-font-7); font-weight: 800; }
+.gmla-position-svg .nope-note { fill: var(--green); font-size: var(--fixed-font-7); font-weight: 800; }
 .gmla-position-svg .position-bar.removed { transform-box: fill-box; transform-origin: left center; }
 
 .gmla-nope-gate-pane {

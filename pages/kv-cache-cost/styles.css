@@ -29,7 +29,7 @@
 }
 
 .kv-cache-cost[data-key-active="true"] .kvc-lab {
-  outline: clamp(0.06rem, 0.12cqw, 0.12rem) solid rgb(37 95 133 / 38%);
+  outline: clamp(0.06rem, 0.12cqw, 0.12rem) solid var(--focus-soft);
   outline-offset: clamp(0.08rem, 0.15cqw, 0.2rem);
 }
 
@@ -180,7 +180,7 @@
 }
 
 .kv-cache-cost[data-over-capacity="true"] .kvc-decode-panel {
-  background: rgb(216 79 53 / 8%);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
 .kvc-wait-metric,

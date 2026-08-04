@@ -62,7 +62,7 @@ const buildProblemPane = (state, onChange) => {
     tick.setAttribute("text-anchor", "middle");
   });
   const originNote = addText(chart, 49, 123, "t=0：全部为 0 GB", "gmla-origin-note");
-  originNote.setAttribute("style", "fill: var(--blue); font-family: var(--font-mono); font-size: 7px; font-weight: 800;");
+  originNote.setAttribute("style", "fill: var(--blue); font-family: var(--font-mono); font-size: var(--fixed-font-7); font-weight: 800;");
   const h100Y = yFromGb(80);
   chart.append(svgElement("line", { x1: "44", y1: h100Y, x2: "328", y2: h100Y, class: "gmla-h100-line" }));
   const h100Label = addText(chart, 322, 122, "H100 单卡 80 GB", "gmla-h100-label");

@@ -2,6 +2,24 @@ import { deck, pageRenderers, pageStyles } from "../deck.js?build=20260805-post3
 import { PresentationEngine } from "../core/engine/presentation-engine.js?build=20260804-scrollguard";
 import { validateDeck } from "../core/engine/validate-deck.js";
 import { createBlockRegistry } from "../shared/components/registry.js";
+import { initAppearanceController } from "./appearance-controller.js";
+
+const stageElement = document.querySelector("#stage");
+
+const syncPresentationScale = () => {
+  const scale = Math.min(1, stageElement.clientWidth / 1280);
+  stageElement.style.setProperty("--presentation-scale", scale.toFixed(5));
+};
+
+new ResizeObserver(syncPresentationScale).observe(stageElement);
+syncPresentationScale();
+
+initAppearanceController({
+  control: document.querySelector("#appearance-control"),
+  button: document.querySelector("#appearance-button"),
+  panel: document.querySelector("#appearance-panel"),
+  themeColor: document.querySelector('meta[name="theme-color"]'),
+});
 
 pageStyles.forEach((href) => {
   const link = document.createElement("link");
@@ -25,7 +43,7 @@ if (errors.length) {
 document.title = deck.meta.title;
 
 const engine = new PresentationEngine(deck, {
-  stage: document.querySelector("#stage"),
+  stage: stageElement,
   stageWrap: document.querySelector("#stage-wrap"),
   nav: document.querySelector("#slide-nav"),
   filters: document.querySelector("#filter-list"),

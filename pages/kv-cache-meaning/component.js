@@ -27,7 +27,7 @@ const renderVectorDiagram = (meaning, animate) => {
     finance: { x: 314, y: 66 },
   };
   const selected = points[meaning];
-  const color = meaning === "river" ? "#255f85" : "#256d52";
+  const color = meaning === "river" ? "var(--blue)" : "var(--green)";
   const svg = svgElement("svg", {
     class: `semantic-vector-svg selected-${meaning}`,
     viewBox: "0 0 360 150",
@@ -36,9 +36,9 @@ const renderVectorDiagram = (meaning, animate) => {
   });
   const defs = svgElement("defs");
   [
-    ["gray", "#9aa09a"],
-    ["blue", "#255f85"],
-    ["green", "#256d52"],
+    ["gray", "var(--muted)"],
+    ["blue", "var(--blue)"],
+    ["green", "var(--green)"],
   ].forEach(([id, fill]) => {
     const marker = svgElement("marker", { id: `arrow-${id}`, viewBox: "0 0 10 10", refX: "9", refY: "5", markerWidth: "5", markerHeight: "5", orient: "auto-start-reverse" });
     marker.append(svgElement("path", { d: "M 0 0 L 10 5 L 0 10 z", fill }));

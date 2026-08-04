@@ -15,7 +15,7 @@
 
 .latent-moe:focus { outline: 0; }
 .latent-moe[data-key-active="true"] .lmoe-viewport {
-  outline: clamp(0.06rem, 0.1cqw, 0.1rem) solid rgb(37 95 133 / 38%);
+  outline: clamp(0.06rem, 0.1cqw, 0.1rem) solid var(--focus-soft);
   outline-offset: clamp(0.08rem, 0.14cqw, 0.14rem);
 }
 

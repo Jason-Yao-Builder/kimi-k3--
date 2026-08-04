@@ -33,7 +33,7 @@
 }
 
 .kv-cache-demo[data-key-active="true"] .kv-lab {
-  outline: 2px solid rgb(37 95 133 / 38%);
+  outline: 2px solid var(--focus-soft);
   outline-offset: 2px;
 }
 
@@ -127,6 +127,24 @@
   padding: clamp(9px, 1.25cqw, 18px);
 }
 
+:root[data-font-size="large"] .semantic-panel,
+:root[data-font-size="large"] .compute-column {
+  padding: clamp(7px, 0.9cqw, 13px);
+}
+
+:root[data-font-size="large"] .sentence-switch {
+  margin-block: clamp(5px, 0.65cqw, 9px);
+}
+
+:root[data-font-size="large"] .semantic-sentence {
+  margin-bottom: clamp(4px, 0.55cqw, 8px);
+}
+
+:root[data-font-size="large"] .attention-flow {
+  height: clamp(120px, 12.5cqw, 160px);
+  padding: clamp(6px, 0.7cqw, 10px);
+}
+
 .lab-column-heading {
   display: flex;
   gap: var(--space-2);
@@ -151,7 +169,7 @@
   height: clamp(135px, 14cqw, 180px);
   padding: clamp(8px, 0.9cqw, 13px);
   border-left: var(--stroke-strong) solid var(--blue);
-  background: #f7f9fa;
+  background: var(--surface-subtle);
 }
 
 .key-products {
@@ -211,7 +229,7 @@
   margin-top: clamp(7px, 0.8cqw, var(--space-3));
   overflow: hidden;
   border-bottom: var(--stroke-hairline) solid var(--line);
-  background: #fafbfa;
+  background: var(--surface-subtle);
 }
 
 .vector-plane::before,
@@ -227,12 +245,12 @@
 }
 
 .vector-axis {
-  stroke: #8e958e;
+  stroke: var(--muted);
   stroke-width: 1.2;
 }
 
 .vector-ghost {
-  stroke: #c3c8c3;
+  stroke: var(--line-strong);
   stroke-width: 1.6;
   stroke-linecap: round;
 }
@@ -412,7 +430,7 @@
   left: 31%;
   padding: 2px var(--space-1);
   background: var(--ink);
-  color: white;
+  color: var(--ink-inverse);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   transition: left 380ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -502,7 +520,7 @@
 }
 
 .attention-column.cached .attention-cell {
-  background: #cbd0cc;
+  background: var(--grid);
 }
 
 .attention-column.new .attention-cell {
@@ -582,7 +600,7 @@
 .cache-length-bar i {
   flex: 1;
   min-width: 1px;
-  background: #cbd0cc;
+  background: var(--grid);
 }
 
 .cache-length-bar i.new {
