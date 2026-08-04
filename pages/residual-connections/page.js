@@ -14,7 +14,7 @@ export const residualConnectionsPage = {
       { number: "2", label: "模型架构", target: "residual-connections" },
       { number: "2.2", label: "残差连接", target: "residual-connections", current: true },
     ],
-    edges: [],
+    edges: [{ type: "next", target: "latent-moe" }],
     blocks: [{
       type: "residual-connections",
       id: "residual-connections-lab",

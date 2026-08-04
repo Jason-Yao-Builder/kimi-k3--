@@ -1,7 +1,7 @@
-import { renderKdaMechanism } from "./component.js";
+import { renderKdaMechanism } from "./component.js?build=20260804-kda-query-arrow";
 
 export const kdaMechanismPage = {
-  style: new URL("./styles.css", import.meta.url).href,
+  style: new URL("./styles.css?build=20260804-kda-query-arrow", import.meta.url).href,
   renderers: { "kda-mechanism": renderKdaMechanism },
   slide: {
     id: "kda-mechanism",
@@ -24,7 +24,7 @@ export const kdaMechanismPage = {
         "核心机制：KDA 用固定状态矩阵 S 递归更新，先按通道衰减、再擦除键方向冲突、最后写入新值；显存从随 token 增长的 O(n) 降为 O(1)，代价是固定状态必然有损。",
         "互补关系：KDA 擅长位置感知的局部连续状态，Gated MLA 保留可按内容精确寻址的长程 latent；K3 用 3:1 层比组合两者，以低显存承担近程建模，用周期性全局检索校正远程信息。",
       ],
-      source: "Kimi K3 Technical Report §2.1.1 Eq.(1)(2)(6)；Yang et al. 2024 (Delta Rule)",
+      source: "Kimi K3 Technical Report §2.1.1 Eq.(1)(2)(5)(6)；Yang et al. 2024 (Delta Rule)",
     }],
   },
 };

@@ -1,5 +1,5 @@
-import { deck, pageRenderers, pageStyles } from "../deck.js?build=20260731-2";
-import { PresentationEngine } from "../core/engine/presentation-engine.js";
+import { deck, pageRenderers, pageStyles } from "../deck.js?build=20260804-kda-query-arrow";
+import { PresentationEngine } from "../core/engine/presentation-engine.js?build=20260804-scrollguard";
 import { validateDeck } from "../core/engine/validate-deck.js";
 import { createBlockRegistry } from "../shared/components/registry.js";
 

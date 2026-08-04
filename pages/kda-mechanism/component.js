@@ -1,15 +1,66 @@
 import { element, svgElement } from "../../shared/dom/element.js";
+import { MOTION } from "../../shared/design/tokens.js";
 import {
   TOKEN_ALPHA_PROFILES,
   buildStepCells,
   calcEffectiveWindow,
   calcRetention,
 } from "./logic.js";
+import { KDA_CONNECTIONS } from "./connections.js";
 
 const STEP_NAMES = ["朴素写入", "问题暴露", "Delta 修复", "查询", "输出门控"];
+const WRITE_STEPS = [
+  {
+    title: "投影出五个信号",
+    formulas: [
+      ["qₜ, kₜ = L₂Norm(Swish(ShortConv(Wq/k·xₜ)))", "blue"],
+      ["vₜ = Swish(ShortConv(Wv·xₜ))", "green"],
+      ["βₜ = Sigmoid(Wβ·xₜ) ∈ (0,1)", "accent"],
+      ["gₜ = gmin·Sigmoid(eᴬ·zₜ),  αₜ = exp(gₜ) ∈ (e⁻⁵,1)", "blue"],
+      ["gateₜ = Sigmoid(Wg·xₜ)", "purple"],
+    ],
+    intuition: "xₜ 分裂成五种角色，各司其职。",
+    why: "没有这步，状态矩阵没有读写地址，也没有遗忘控制。",
+  },
+  {
+    title: "问题暴露：朴素累加",
+    formulas: [
+      ["朴素写入：Sₜ = Sₜ₋₁ + kₜvₜᵀ", "accent"],
+      ["若 k₂ ≈ k₁  →  Sₜᵀq 同时含 v₁、v₂", "accent"],
+    ],
+    intuition: "相似的 key 会互相干扰，召回时无法区分。",
+    why: "看见这个失败，才有 Delta Rule 写前擦除的动机。",
+  },
+  {
+    title: "Delta 修复：衰减 + 擦除 + 写入",
+    formulas: [
+      ["Sₜ = (I−βₜkₜkₜᵀ)·Diag(αₜ)·Sₜ₋₁ + βₜkₜvₜᵀ", "master"],
+      ["① Diag(αₜ)·Sₜ₋₁    衰减：旧信息按通道衰减", "blue"],
+      ["② (I−βₜkₜkₜᵀ)·[①]    擦除：清除 kₜ 方向残留", "accent"],
+      ["③ + βₜkₜvₜᵀ    写入：当前 token 写入状态", "green"],
+    ],
+    intuition: "先腾出位置，再写入新内容。",
+    why: "没有擦除，同方向 key 的历史内容会和新内容叠加混淆。",
+  },
+  {
+    title: "状态查询",
+    formulas: [["õₜ = Sₜᵀ·qₜ", "green"]],
+    intuition: "用关键词 qₜ 从状态数据库里召回相关历史。",
+    why: "像搜索引擎关键词匹配，读出是历史内容的加权混合。",
+  },
+  {
+    title: "输出门控",
+    formulas: [
+      ["yₜ = Wₒ[Sigmoid(Wg·xₜ) ⊙ RMSNorm(õₜ)]", "purple"],
+      ["Wg ∈ ℝᵈˣᵈ：全秩感知 xₜ 的完整维度", "master"],
+    ],
+    intuition: "召回的内容不全有用，门控按当前输入筛选。",
+    why: "像搜索结果召回后再筛一道；低秩门控会丢失部分输入信息。",
+  },
+];
 const TABS = [
   ["evolution", "① 演进路径"],
-  ["write", "② 记事本写入"],
+  ["write", "② 计算过程"],
   ["decay", "③ 衰减机制"],
   ["hybrid", "④ 混合架构"],
 ];
@@ -25,7 +76,7 @@ const animateIn = (node) => {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const start = performance.now();
   const tick = (now) => {
-    const progress = Math.min(1, (now - start) / 180);
+    const progress = Math.min(1, (now - start) / MOTION.fast);
     node.style.opacity = String(progress);
     node.style.transform = `translateX(${(1 - progress) * 10}px)`;
     if (progress < 1) requestAnimationFrame(tick);
@@ -38,7 +89,7 @@ const pulse = (node) => {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const start = performance.now();
   const tick = (now) => {
-    const progress = Math.min(1, (now - start) / 250);
+    const progress = Math.min(1, (now - start) / MOTION.step);
     node.style.opacity = String(0.6 + 0.4 * progress);
     if (progress < 1) requestAnimationFrame(tick);
   };
@@ -81,8 +132,8 @@ const buildArchitectureSvg = (step) => {
     line(x + 40, 294, x + 40, 273, [id]);
     architectureNode(svg, { x, y: 246, width: 80, height: 27, label: "Linear", id }, active);
     line(x + 40, 246, x + 40, 231, [id]);
-    architectureNode(svg, { x, y: 204, width: 80, height: 27, label: id === "kq" ? "Conv + L₂" : id === "alpha" ? "exp(−exp)" : id === "beta" || id === "gate" ? "Sigmoid" : label, id }, active);
-    addSvgText(svg, x + 40, 197, label, "kdam-branch-label");
+    architectureNode(svg, { x, y: 204, width: 80, height: 27, label: id === "kq" ? "Conv + L₂" : id === "alpha" ? "gmin·σ(eᴬz)" : id === "beta" || id === "gate" ? "Sigmoid" : label, id }, active);
+    addSvgText(svg, x + 40, 197, id === "alpha" ? "α=exp(g)" : label, "kdam-branch-label");
   });
   svg.append(svgElement("rect", { x: "44", y: "83", width: "334", height: "88", rx: "5", class: "kdam-core" }));
   addSvgText(svg, 211, 101, "Kimi Delta Attention", "kdam-core-title");
@@ -98,6 +149,88 @@ const buildArchitectureSvg = (step) => {
   architectureNode(svg, { x: 185, y: 3, width: 150, height: 24, label: "Linear → yₜ", id: "out" }, active);
   line(290, 25, 290, 27, ["out"]);
   if (step === 2) addSvgText(svg, 108, 112, "⚠ 键冲突", "kdam-conflict-text");
+  return svg;
+};
+
+const buildWriteFlowSvg = (step) => {
+  const svg = svgElement("svg", {
+    class: "kdam-write-flow", viewBox: "0 0 700 550", role: "img",
+    "aria-label": `KDA 记事本写入 Step ${step} 数据流`, "data-step": String(step),
+  });
+  const defs = svgElement("defs");
+  const marker = svgElement("marker", { id: "kdam-flow-arrow", viewBox: "0 0 10 10", refX: "8", refY: "5", markerWidth: "5", markerHeight: "5", orient: "auto-start-reverse" });
+  marker.append(svgElement("path", { d: "M 0 0 L 10 5 L 0 10 z" }));
+  defs.append(marker);
+  svg.append(defs);
+  const stateClass = (steps, base) => `${base} ${steps.includes(step) ? "active" : "muted"}`;
+  const path = (d, steps, extra = "") => {
+    const attrs = { d, class: stateClass(steps, `kdam-flow-line ${extra}`) };
+    if (steps.includes(step)) attrs["marker-end"] = "url(#kdam-flow-arrow)";
+    svg.append(svgElement("path", attrs));
+  };
+  const node = (x, y, width, height, title, subtitle, steps, extra = "") => {
+    const group = svgElement("g", { class: stateClass(steps, `kdam-flow-node ${extra}`) });
+    const subtitleLines = Array.isArray(subtitle) ? subtitle : subtitle ? [subtitle] : [];
+    group.append(
+      svgElement("rect", { x, y, width, height, rx: "4" }),
+      svgElement("text", { x: x + width / 2, y: y + (subtitleLines.length > 1 ? height / 2 - 12 : subtitleLines.length ? height / 2 - 4 : height / 2 + 4), "text-anchor": "middle", class: "title" }, title),
+    );
+    subtitleLines.forEach((line, index) => group.append(svgElement("text", {
+      x: x + width / 2, y: y + height / 2 + 8 + index * 14, "text-anchor": "middle", class: "subtitle",
+    }, line)));
+    svg.append(group);
+    return group;
+  };
+
+  node(280, 505, 140, 34, "输入 xₜ ∈ ℝᵈ", "", [1, 5], "input");
+  path("M350 505 V490 H70 V475", [1]);
+  path("M350 490 H208 V475", [1]);
+  path("M350 490 V475", [1]);
+  path("M350 490 H492 V475", [1]);
+  path("M350 490 H630 V475", [1]);
+
+  node(3, 405, 134, 70, "qₜ / kₜ", ["Linear · ShortConv", "Swish · L₂Norm"], [1, 3, 4], "projection qk");
+  node(141, 405, 134, 70, "vₜ", ["Linear · ShortConv", "Swish"], [1, 3], "projection value");
+  node(283, 405, 134, 70, "αₜ = exp(gₜ)", ["低秩投影 + bias", "gmin·σ(eᴬz)"], [1, 3], "projection alpha");
+  node(425, 405, 134, 70, "βₜ", ["Linear", "Sigmoid"], [1, 3], "projection beta");
+  node(563, 405, 134, 70, "gateₜ", ["Linear", "Sigmoid"], [1, 5], "projection gate");
+
+  path("M70 405 V392 H270 V380", [2, 3], "to-update");
+  path("M208 405 V388 H330 V380", [2, 3], "to-update");
+  path("M350 405 V384 H390 V380", [3], "to-update");
+  path("M492 405 V388 H450 V380", [3], "to-update");
+  node(18, 303, 118, 42, "旧状态 Sₜ₋₁", "", [3], "state-small");
+  path("M136 324 H185", [3], "to-update");
+  const updateNode = node(185, 265, 330, 115, "状态更新", "", [2, 3], "state-update");
+  updateNode.querySelector(".title").setAttribute("y", "284");
+  node(560, 303, 118, 42, "新状态 Sₜ", "", [3, 4], "state-small");
+  path("M515 324 H560", [3], "from-update");
+
+  if (step === 2) {
+    addSvgText(svg, 350, 305, "朴素累加：Sₜ = Sₜ₋₁ + kₜvₜᵀ", "kdam-update-line conflict");
+    addSvgText(svg, 350, 336, "k₂ ≈ k₁  →  查询同时混入 v₁、v₂", "kdam-update-line conflict strong");
+    addSvgText(svg, 350, 360, "没有擦除：同方向内容持续叠加", "kdam-update-line conflict");
+  } else {
+    addSvgText(svg, 350, 300, "① Diag(αₜ)·Sₜ₋₁    ← 衰减旧状态", `kdam-update-line decay ${step === 3 ? "active" : "muted"}`);
+    addSvgText(svg, 350, 329, "② (I−βₜkₜkₜᵀ)·[①]    ← 擦除冲突", `kdam-update-line erase ${step === 3 ? "active" : "muted"}`);
+    addSvgText(svg, 350, 358, "③ + βₜkₜvₜᵀ    ← 写入新内容", `kdam-update-line write ${step === 3 ? "active" : "muted"}`);
+  }
+
+  path("M70 405 V215 H250", [4], "to-read");
+  path("M619 303 V215 H450", [4], "to-read");
+  node(250, 188, 200, 54, "Sₜᵀ·qₜ → õₜ", "状态读取", [4], "read");
+
+  path("M350 188 V170 H190 V150", [5], "to-output");
+  path("M630 405 V127 H600", [5], "to-output gate-route");
+  node(100, 105, 180, 45, "RMSNorm(õₜ)", "", [5], "output-stage");
+  node(420, 105, 180, 45, "Sigmoid(Wg·xₜ)", "gate", [5], "output-stage");
+  addSvgText(svg, 350, 133, "⊙", `kdam-flow-product ${step === 5 ? "active" : "muted"}`);
+  path("M280 127 H335", [5], "to-output");
+  path("M420 127 H365", [5], "to-output");
+  path("M350 115 V94", [5], "to-output");
+  node(280, 60, 140, 34, "Wₒ[gate ⊙ õₜ]", "", [5], "output-stage");
+  path("M350 60 V49", [5], "to-output");
+  node(280, 15, 140, 34, "输出 yₜ ∈ ℝᵈ", "", [5], "output");
   return svg;
 };
 
@@ -402,52 +535,44 @@ const buildWritePane = (state, onChange) => {
   return pane;
 };
 
-const WRITE_FORMULAS = [
-  ["朴素写入", "Sₜ = Sₜ₋₁ + kₜvₜᵀ", "建立键到值的关联"],
-  ["冲突暴露", "k₂ ≈ k₁ ⇒ Sᵀq 同时含 v₁、v₂", "直接累加会混合相近键的答案"],
-  ["Delta 修复", "Sₜ = (I−βₜkₜkₜᵀ)Diag(αₜ)Sₜ₋₁ + βₜkₜvₜᵀ", "衰减旧状态 · 擦除冲突 · 写入新值"],
-  ["状态查询", "õₜ = Sₜᵀqₜ", "用查询向量从固定状态读出历史"],
-  ["输出门控", "yₜ = Wₒ[Sigmoid(Wg xₜ) ⊙ RMSNorm(õₜ)]", "当前输入决定哪些历史通道可以通过"],
-];
-
 const buildWriteExperience = (state, onChange) => {
   const pane = element("section", "kdam-write-pane kdam-write-experience");
   const module = element("section", "kdam-kda-module");
   const heading = element("div", "kdam-module-heading");
-  const stepName = element("span", "", `Step ${state.step} · ${STEP_NAMES[state.step - 1]}`);
-  heading.append(element("strong", "", "Kimi Delta Attention · 架构"), stepName);
+  const stepName = element("span", "", `Step ${state.step} · ${WRITE_STEPS[state.step - 1].title}`);
+  heading.append(element("strong", "", "KDA 记事本写入 · 五步完整流程"), stepName);
   const body = element("div", "kdam-module-body");
   const architecture = element("div", "kdam-architecture-host");
   body.append(architecture);
   module.append(heading, body);
-  const rail = element("div", "kdam-step-rail");
-  const labels = element("div", "kdam-step-labels");
-  STEP_NAMES.forEach((label, index) => labels.append(element("span", index + 1 === state.step ? "active" : "", `${index + 1} ${label}`)));
-  const slider = element("input", "kdam-step-slider");
-  Object.assign(slider, { type: "range", min: "0", max: "100", step: "1", value: String(state.sliderPct) });
-  rail.append(labels, slider);
-  pane.append(module, rail);
+  const progress = element("div", "kdam-write-progress");
+  const dots = [];
+  WRITE_STEPS.forEach((item, index) => {
+    const button = element("button", index + 1 === state.step ? "active" : "", String(index + 1));
+    button.type = "button";
+    button.setAttribute("aria-label", `跳转到 Step ${index + 1}：${item.title}`);
+    button.setAttribute("aria-current", index + 1 === state.step ? "step" : "false");
+    progress.append(button);
+    dots.push(button);
+  });
+  pane.append(module, progress);
 
   const paint = (animate = false) => {
-    architecture.replaceChildren(buildArchitectureSvg(state.step));
-    labels.querySelectorAll("span").forEach((label, index) => label.classList.toggle("active", index + 1 === state.step));
-    stepName.textContent = `Step ${state.step} · ${STEP_NAMES[state.step - 1]}`;
+    architecture.replaceChildren(buildWriteFlowSvg(state.step));
+    dots.forEach((dot, index) => {
+      dot.classList.toggle("active", index + 1 === state.step);
+      dot.setAttribute("aria-current", index + 1 === state.step ? "step" : "false");
+    });
+    stepName.textContent = `Step ${state.step} · ${WRITE_STEPS[state.step - 1].title}`;
     if (animate) pulse(architecture);
   };
-  slider.addEventListener("input", () => {
-    state.sliderPct = Number(slider.value);
-    const next = Math.min(5, Math.max(1, Math.round(state.sliderPct / 25) + 1));
-    if (next !== state.step) {
-      state.step = next;
-      paint(true);
-      onChange();
-    }
-  });
-  slider.addEventListener("change", () => {
-    state.sliderPct = (state.step - 1) * 25;
-    slider.value = String(state.sliderPct);
+  dots.forEach((dot, index) => dot.addEventListener("click", () => {
+    if (state.step === index + 1) return;
+    state.step = index + 1;
+    state.sliderPct = index * 25;
+    paint(true);
     onChange();
-  });
+  }));
   paint();
   return pane;
 };
@@ -758,25 +883,36 @@ const buildWriteSide = (state) => {
 
 const buildWriteExplanationSide = (state, onChange) => {
   const side = element("aside", "kdam-side kdam-write-explanation");
-  side.append(element("strong", "kdam-side-title", "五步公式 · 随进度高亮"));
+  side.append(element("strong", "kdam-side-title", "五步公式 · 点击同步数据流"));
   const list = element("div", "kdam-write-step-list");
-  WRITE_FORMULAS.forEach(([title, formula, note], index) => {
-    const row = element("button", index + 1 === state.step ? "active" : "");
-    row.type = "button";
-    row.setAttribute("aria-current", index + 1 === state.step ? "step" : "false");
-    row.append(
+  WRITE_STEPS.forEach((item, index) => {
+    const active = index + 1 === state.step;
+    const card = element("section", `kdam-write-step-card ${active ? "active" : "collapsed"}`);
+    const trigger = element("button", "kdam-write-step-trigger");
+    trigger.type = "button";
+    trigger.setAttribute("aria-expanded", String(active));
+    trigger.setAttribute("aria-current", active ? "step" : "false");
+    trigger.append(
       element("span", "kdam-write-step-number", `Step ${index + 1}`),
-      element("strong", "", title),
-      element("p", "", formula),
-      element("small", "", note),
+      element("strong", "", item.title),
+      element("span", "kdam-write-step-toggle", active ? "−" : "+"),
     );
-    row.addEventListener("click", () => {
+    const details = element("div", "kdam-write-step-details");
+    const formulas = element("div", "kdam-write-formulas");
+    item.formulas.forEach(([formula, tone]) => formulas.append(element("code", tone, formula)));
+    const intuition = element("p", "kdam-write-intuition");
+    intuition.append(element("strong", "", "直觉"), element("em", "", item.intuition));
+    const why = element("p", "kdam-write-why");
+    why.append(element("strong", "", "为什么需要"), element("span", "", item.why));
+    details.append(formulas, intuition, why);
+    trigger.addEventListener("click", () => {
       if (state.step === index + 1) return;
       state.step = index + 1;
       state.sliderPct = index * 25;
       onChange();
     });
-    list.append(row);
+    card.append(trigger, details);
+    list.append(card);
   });
   side.append(list);
   return side;
@@ -870,6 +1006,9 @@ export const renderKdaMechanism = (block, context) => {
   const claims = element("ul", "kdam-claims");
   block.claims.forEach((claim) => claims.append(element("li", "", claim)));
   const viewport = element("div", "kdam-viewport");
+  const connection = element("button", "page-connection-link", `← ${KDA_CONNECTIONS.architecture.label}`);
+  connection.type = "button";
+  connection.addEventListener("click", () => context.navigate(KDA_CONNECTIONS.architecture.target));
   const persist = () => {
     context.setValue(block.id, {
       activeTab: state.activeTab,
@@ -941,6 +1080,6 @@ export const renderKdaMechanism = (block, context) => {
     return true;
   };
   renderView();
-  root.append(claims, viewport, element("p", "kdam-source", `来源：${block.source}`));
+  root.append(connection, claims, viewport, element("p", "kdam-source", `来源：${block.source}`));
   return root;
 };

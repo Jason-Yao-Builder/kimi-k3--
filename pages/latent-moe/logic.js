@@ -5,6 +5,12 @@ export const ARCH_PARAMS = {
   N: 896,
   K: 16,
   sharedExperts: 2,
+  layers: 93,
+};
+
+export const MODEL_PARAMS = {
+  total: 2.78e12,
+  activated: 104.2e9,
 };
 
 export const calcActivatedWeights = () => {
@@ -19,6 +25,31 @@ export const calcActivatedWeights = () => {
     wUp,
     shared,
     total: wDown + routedExperts + wUp + shared,
+  };
+};
+
+export const calcComparisonWeights = () => {
+  const { d, l, m, K, sharedExperts, layers } = ARCH_PARAMS;
+  const fullWidthMoe = {
+    routedExperts: K * 3 * d * m,
+    shared: sharedExperts * 3 * d * m,
+  };
+  fullWidthMoe.total = fullWidthMoe.routedExperts + fullWidthMoe.shared;
+  const latentMoe = calcActivatedWeights();
+  const fixedActivated = MODEL_PARAMS.activated - layers * latentMoe.total;
+  return {
+    denseModel: { total: MODEL_PARAMS.total },
+    fullWidthMoe: {
+      ...fullWidthMoe,
+      allLayers: layers * fullWidthMoe.total,
+      modelTotal: fixedActivated + layers * fullWidthMoe.total,
+    },
+    latentMoe: {
+      ...latentMoe,
+      allLayers: layers * latentMoe.total,
+      modelTotal: MODEL_PARAMS.activated,
+    },
+    fixedActivated,
   };
 };
 
@@ -40,3 +71,9 @@ export const QB_EXAMPLE = {
 };
 
 export const formatMillions = (value) => `${(value / 1e6).toFixed(1)}M`;
+
+export const formatParameters = (value) => {
+  if (value >= 1e12) return `${(value / 1e12).toFixed(2)}T`;
+  if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`;
+  return formatMillions(value);
+};

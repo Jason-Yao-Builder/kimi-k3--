@@ -15,7 +15,7 @@ export const latentMoePage = {
       { number: "2.3", label: "LatentMoE", target: "latent-moe" },
       { number: "2.3.1", label: "Stable LatentMoE", target: "latent-moe", current: true },
     ],
-    edges: [{ type: "next", target: "kda-mechanism" }],
+    edges: [{ type: "next", target: "quantile-balancing" }],
     blocks: [{
       type: "latent-moe",
       id: "latent-moe-lab",

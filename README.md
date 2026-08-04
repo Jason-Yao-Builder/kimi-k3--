@@ -1,6 +1,6 @@
-# v2test：页面隔离架构实验
+# v2.1test：共享设计系统重构
 
-由 `v1_test` 复制并重构，验证页面独立维护、共享组件复用和全局引擎统一调度。
+由 `v2test` 复制并重构，在页面隔离架构之上统一字体、符号、视觉变量和常用交互模式。开工前先读 `AGENTS.md`。
 
 ## 最重要的路径规则
 
@@ -17,17 +17,28 @@
 ## 启动
 
 ```bash
-cd v2test
+cd v2.1test
 npm start
 ```
 
-浏览器访问 `http://localhost:4190`。项目没有第三方依赖，`npm start` 只是调用系统 Python 静态服务器。
+浏览器访问 `http://localhost:4194`。项目没有第三方依赖，`npm start` 只是调用系统 Python 静态服务器。
 
 协议检查：
 
 ```bash
 npm run check
 ```
+
+## 设计系统
+
+- `themes/default/tokens.css`：字体角色、最小字号、语义颜色、间距、描边、圆角、控件、符号和动画变量。
+- `shared/styles/base.css`：全局界面骨架与通用面板、表格、控件、标签、公式、图例样式。
+- `shared/design/tokens.js`：需要在 JS 中读取的动画和图表常量。
+- `pages/*/styles.css`：仅保留页面专属布局、SVG 坐标关系和领域视觉编码。
+
+全局最小字号为 `11px`。可见 HTML 与 SVG 文本必须使用 `--text-xs` 至 `--text-display`；公式、代码、数值和图表标签使用 `--font-mono`，正文和操作文本使用 `--font-sans`。
+
+全局层管理跨页面一致的规则，页面层管理内容、公式、数据、SVG 几何和领域交互。只有至少两个页面共享且语义一致的模式才进入 `shared`。
 
 ## 编辑模式
 
@@ -123,7 +134,7 @@ Deck
 ## 目录
 
 ```text
-v2test/
+v2.1test/
 ├─ index.html
 ├─ app/                  启动与全局样式装配
 ├─ core/                 引擎、导航、状态和编辑器

@@ -63,11 +63,17 @@ export class PresentationEngine {
     this.refs.next.addEventListener("click", () => this.navigate(1));
     this.refs.overviewButton.addEventListener("click", () => this.toggleOverview());
     this.refs.fullscreen.addEventListener("click", () => this.toggleFullscreen());
+    document.addEventListener("fullscreenchange", () => this.syncFullscreenButton());
+    document.addEventListener("webkitfullscreenchange", () => this.syncFullscreenButton());
+    this.syncFullscreenButton();
     this.refs.menu.addEventListener("click", () => document.body.classList.toggle("sidebar-open"));
     this.refs.backdrop.addEventListener("click", () => this.closeZoom());
     this.refs.stageWrap.addEventListener("wheel", (event) => this.onWheel(event), { passive: false });
     this.refs.stageWrap.addEventListener("pointerdown", (event) => this.onPointerDown(event));
     this.refs.stageWrap.addEventListener("pointerup", (event) => this.onPointerUp(event));
+    this.refs.stageWrap.addEventListener("pointercancel", () => {
+      this.pointer = null;
+    });
     document.addEventListener("keydown", (event) => this.onKeyDown(event));
     window.addEventListener("hashchange", () => {
       this.state.hiddenTags.clear();
@@ -180,6 +186,7 @@ export class PresentationEngine {
       updateTrack: (id, patch) => this.updateTrack(id, patch),
       getValue: (id, fallback) => this.getValue(id, fallback),
       setValue: (id, value) => this.setValue(id, value),
+      navigate: (id) => this.goto(id),
       toggleZoom: (node) => this.toggleZoom(node),
       activateTrack: (id) => this.activateTrack(id),
       persist: () => this.persistUrl(),
@@ -241,16 +248,19 @@ export class PresentationEngine {
     let lastSection = "";
     const navigationSlides = [...this.mainRoute, ...this.deck.slides.filter((slide) => slide.detour)];
     navigationSlides.forEach((slide) => {
-      if (slide.section !== lastSection) {
-        this.refs.nav.append(create("p", "nav-section", slide.section));
-        lastSection = slide.section;
+      const navSection = slide.navSection || slide.section;
+      const navTitle = slide.navTitle || slide.title;
+      const navLabel = slide.navLabel || slide.role;
+      if (navSection !== lastSection) {
+        this.refs.nav.append(create("p", "nav-section", navSection));
+        lastSection = navSection;
       }
       const hidden = (slide.tags || []).some((tag) => this.state.hiddenTags.has(tag));
       const button = create("button", "nav-item");
       button.type = "button";
       button.dataset.active = String(slide.id === this.state.activeId);
       button.dataset.hidden = String(hidden);
-      button.innerHTML = `<span></span><strong>${slide.title}</strong><small>${slide.role}</small>`;
+      button.innerHTML = `<span></span><strong>${navTitle}</strong><small>${navLabel}</small>`;
       button.title = hidden ? "已从主路径隐藏，仍可手动查看" : slide.title;
       button.addEventListener("click", () => this.goto(slide.id));
       this.refs.nav.append(button);
@@ -330,8 +340,22 @@ export class PresentationEngine {
   }
 
   async toggleFullscreen() {
-    if (document.fullscreenElement) await document.exitFullscreen();
-    else await document.documentElement.requestFullscreen();
+    const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fullscreenElement) {
+      const exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exitFullscreen) await exitFullscreen.call(document);
+      return;
+    }
+    const requestFullscreen = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen;
+    if (requestFullscreen) await requestFullscreen.call(document.documentElement);
+  }
+
+  syncFullscreenButton() {
+    const active = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+    const label = active ? "退出全屏" : "全屏";
+    this.refs.fullscreen.setAttribute("aria-label", label);
+    this.refs.fullscreen.title = label;
+    this.refs.fullscreen.setAttribute("aria-pressed", String(active));
   }
 
   toggleZoom(node) {
@@ -355,12 +379,27 @@ export class PresentationEngine {
     return Boolean(track?.trackNavigate?.(direction));
   }
 
+  isInsideScrollRegion(target, horizontal = false) {
+    if (!(target instanceof Element)) return false;
+    const overflowProperty = horizontal ? "overflowX" : "overflowY";
+    const scrollSize = horizontal ? "scrollWidth" : "scrollHeight";
+    const clientSize = horizontal ? "clientWidth" : "clientHeight";
+    let node = target;
+    while (node && node !== this.refs.stageWrap) {
+      const overflow = getComputedStyle(node)[overflowProperty];
+      if (["auto", "scroll", "overlay"].includes(overflow) && node[scrollSize] > node[clientSize] + 1) return true;
+      node = node.parentElement;
+    }
+    return false;
+  }
+
   onWheel(event) {
     if (this.editor.active) return;
     if (this.state.overview || document.body.classList.contains("zoom-active")) return;
     if (event.target.matches("input, button") || event.target.closest("button")) return;
     const horizontal = Math.abs(event.deltaX) > Math.abs(event.deltaY);
     const track = event.target.closest("[data-track]");
+    if (this.isInsideScrollRegion(event.target, horizontal)) return;
     if (horizontal) {
       event.preventDefault();
       if (track) this.tryTrackNavigate(track, Math.sign(event.deltaX));
@@ -380,6 +419,10 @@ export class PresentationEngine {
       this.pointer = null;
       return;
     }
+    if (event.target.closest("p, li, h1, h2, h3, h4, h5, h6, blockquote, pre, code, td, th, dt, dd, figcaption")) {
+      this.pointer = null;
+      return;
+    }
     const track = event.target.closest("[data-track]");
     if (track) this.activateTrack(track.dataset.track);
     else this.clearActiveTrack();
@@ -393,6 +436,10 @@ export class PresentationEngine {
   onPointerUp(event) {
     if (this.editor.active) return;
     if (!this.pointer) return;
+    if (window.getSelection()?.type === "Range") {
+      this.pointer = null;
+      return;
+    }
     const dx = event.clientX - this.pointer.x;
     const dy = event.clientY - this.pointer.y;
     const track = this.pointer.track;

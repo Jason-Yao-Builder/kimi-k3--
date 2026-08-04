@@ -15,7 +15,7 @@ export const kvCacheSolutionsPage = {
       { number: "2.1", label: "KDA", target: "kv-cache" },
       { number: "2.1.4", label: "KV Cache 的解法", target: "kv-cache-solutions", current: true },
     ],
-    edges: [{ type: "next", target: "gated-mla" }],
+    edges: [{ type: "next", target: "architecture-evolution" }],
     blocks: [{
       type: "kv-cache-solutions",
       id: "kv-cache-solutions-lab",

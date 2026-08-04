@@ -1,4 +1,5 @@
 import { element, svgElement } from "../../shared/dom/element.js";
+import { MOTION } from "../../shared/design/tokens.js";
 import { calcKvStats, capacityTokens, logSliderToTokens, tokensToLogSlider } from "./logic.js";
 
 const LAYER_COUNT = 93;
@@ -72,7 +73,7 @@ const animateCache = (visual, from, to, state) => {
   if (reducedMotion) return paint(to);
   const startedAt = performance.now();
   const tick = (now) => {
-    const progress = Math.min(1, (now - startedAt) / 180);
+    const progress = Math.min(1, (now - startedAt) / MOTION.fast);
     paint(Math.exp(Math.log(from) + (Math.log(to) - Math.log(from)) * easeOut(progress)));
     if (progress < 1) state.cacheFrame = requestAnimationFrame(tick);
   };

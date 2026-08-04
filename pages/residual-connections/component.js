@@ -1,4 +1,5 @@
 import { element, svgElement } from "../../shared/dom/element.js";
+import { MOTION } from "../../shared/design/tokens.js";
 import {
   ATTNRES_LABELS,
   LAYER_LABELS,
@@ -481,14 +482,14 @@ export const renderResidualConnections = (block, context) => {
     const offset = direction > 0 ? "7%" : "-7%";
     const outgoing = activePane.animate(
       [{ transform: "translateX(0)", opacity: 1 }, { transform: `translateX(${-direction * 7}%)`, opacity: 0 }],
-      { duration: 280, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "forwards" },
+      { duration: MOTION.normal, easing: MOTION.easing, fill: "forwards" },
     );
     nextPane.style.transform = `translateX(${offset})`;
     nextPane.style.opacity = "0";
     body.append(nextPane);
     const incoming = nextPane.animate(
       [{ transform: `translateX(${offset})`, opacity: 0 }, { transform: "translateX(0)", opacity: 1 }],
-      { duration: 360, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "forwards" },
+      { duration: MOTION.emphasis, easing: MOTION.easing, fill: "forwards" },
     );
     activePane = nextPane;
     Promise.allSettled([outgoing.finished, incoming.finished]).then(() => {

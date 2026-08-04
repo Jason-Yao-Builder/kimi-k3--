@@ -1,4 +1,5 @@
 import { element, svgElement } from "../../shared/dom/element.js";
+import { MOTION } from "../../shared/design/tokens.js";
 import {
   CHANNEL_LABELS,
   GATE_PROFILE,
@@ -7,20 +8,20 @@ import {
   calcMhaCache,
   calcMlaCache,
 } from "./logic.js";
+import { GATED_MLA_CONNECTIONS } from "./connections.js";
 
 const TABS = [
   ["problem", "① KV 爆炸"],
   ["prior", "② 前人方案"],
   ["mla", "③ MLA 核心"],
-  ["nope-gate", "④ NoPE 与门控"],
-  ["division", "⑤ 与 KDA 分工"],
+  ["nope-gate", "④ NoPE"],
 ];
 
 const animateIn = (node) => {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const start = performance.now();
   const tick = (now) => {
-    const progress = Math.min(1, (now - start) / 180);
+    const progress = Math.min(1, (now - start) / MOTION.fast);
     node.style.opacity = String(progress);
     node.style.transform = `translateX(${(1 - progress) * 10}px)`;
     if (progress < 1) requestAnimationFrame(tick);
@@ -35,39 +36,55 @@ const addText = (svg, x, y, value, className = "gmla-svg-label") => {
   return node;
 };
 
+const CHART_MAX_GB = 5000;
+const yFromGb = (value) => 132 - (value / CHART_MAX_GB) * 117;
+
 const seriesPath = (maxAtMillion) => {
-  const lengths = [1000, 10000, 100000, 1000000];
-  return lengths.map((length, index) => {
-    const x = 44 + index * 92;
-    const value = maxAtMillion * length / 1000000;
-    const y = 132 - (value / 4571) * 110;
-    return `${index ? "L" : "M"}${x} ${y.toFixed(2)}`;
-  }).join(" ");
+  return `M44 132 L326 ${yFromGb(maxAtMillion).toFixed(2)}`;
 };
 
 const buildProblemPane = (state, onChange) => {
   const pane = element("section", "gmla-problem-pane");
-  pane.append(element("p", "gmla-intro", "生成第 t 个 token 时，每层都要保留全部历史 token 的 K/V；长度增加，cache 同步线性增长。"));
+  pane.append(element("p", "gmla-intro", "横、纵轴均按真实数值线性计量：固定架构下 KV cache = 每 token 固定开销 × token 数，因此三条线都从 0 GB 线性增长。"));
   const chart = svgElement("svg", { class: "gmla-growth-chart", viewBox: "0 0 360 158", role: "img", "aria-label": "MHA MQA MLA 的 KV cache 增长曲线" });
   chart.append(
     svgElement("line", { x1: "44", y1: "15", x2: "44", y2: "132", class: "gmla-axis" }),
     svgElement("line", { x1: "44", y1: "132", x2: "328", y2: "132", class: "gmla-axis" }),
+    svgElement("circle", { cx: "44", cy: "132", r: "3.2", class: "gmla-origin-dot" }),
   );
-  ["1K", "10K", "100K", "1M"].forEach((label, index) => addText(chart, 37 + index * 92, 149, label, "gmla-axis-label"));
-  const h100Y = 132 - (80 / 4571) * 110;
+  [[1000, "1K"], [2000, "2K"], [3000, "3K"], [4000, "4K"], [5000, "5K"]].forEach(([value, label]) => {
+    const y = yFromGb(value);
+    chart.append(svgElement("line", { x1: "44", y1: y, x2: "328", y2: y, class: "gmla-grid-line" }));
+    addText(chart, 38, y + 3, label, "gmla-y-axis-label");
+  });
+  [[0, "0"], [250000, "250K"], [500000, "500K"], [750000, "750K"], [1000000, "1M"]].forEach(([value, label]) => {
+    const tick = addText(chart, 44 + (284 * value) / 1000000, 149, label, "gmla-axis-label");
+    tick.setAttribute("text-anchor", "middle");
+  });
+  const originNote = addText(chart, 49, 123, "t=0：全部为 0 GB", "gmla-origin-note");
+  originNote.setAttribute("style", "fill: var(--blue); font-family: var(--font-mono); font-size: 7px; font-weight: 800;");
+  const h100Y = yFromGb(80);
   chart.append(svgElement("line", { x1: "44", y1: h100Y, x2: "328", y2: h100Y, class: "gmla-h100-line" }));
-  addText(chart, 190, h100Y - 5, "H100 单卡上限 80 GB", "gmla-h100-label");
+  const h100Label = addText(chart, 322, 122, "H100 单卡 80 GB", "gmla-h100-label");
+  h100Label.setAttribute("text-anchor", "end");
   const series = [
-    ["mha", 4571, "标准 MHA · 4,571 GB"],
-    ["mqa", 49, "MQA · 49 GB"],
-    ["mla", 571, "MLA · 571 GB"],
-  ].map(([id, value, label]) => {
+    ["mha", 4571, "标准 MHA · 4,571 GB", 20],
+    ["mqa", 49, "MQA · 49 GB", 108],
+    ["mla", 571, "MLA · 571 GB", 97],
+  ].map(([id, value, label, labelY]) => {
     const path = svgElement("path", { d: seriesPath(value), class: `gmla-growth-line ${id}`, pathLength: "1" });
     chart.append(path);
-    addText(chart, id === "mha" ? 230 : 252, id === "mha" ? 28 : id === "mla" ? 112 : 126, label, `gmla-series-label ${id}`);
+    if (id !== "mha") {
+      const tone = id === "mqa" ? "var(--blue)" : "var(--green)";
+      const leader = svgElement("line", { x1: "326", y1: yFromGb(value).toFixed(2), x2: "317", y2: labelY - 3 });
+      leader.setAttribute("style", `stroke: ${tone}; stroke-width: 0.8; stroke-dasharray: 2 2;`);
+      chart.append(leader);
+    }
+    const seriesLabel = addText(chart, 322, labelY, label, `gmla-series-label ${id}`);
+    seriesLabel.setAttribute("text-anchor", "end");
     return path;
   });
-  const warning = addText(chart, 221, 48, "⚠ 无法装入单卡", "gmla-chart-warning");
+  const warning = addText(chart, 214, 77, "⚠ 无法装入单卡", "gmla-chart-warning");
   pane.append(chart);
   const cards = element("div", "gmla-number-cards");
   [
@@ -156,35 +173,77 @@ const buildPriorPane = (state, onChange) => {
   return pane;
 };
 
-const buildMlaPane = (state, onChange) => {
+const buildMlaPane = (state) => {
   const pane = element("section", "gmla-mla-pane");
-  pane.append(element("p", "gmla-mla-intro", "存什么和用什么可以分开：先把 xₜ 压成低维 cₜ，cache 只存 cₜ；计算 attention 时再展开 K/V。"));
-  const svg = svgElement("svg", { class: "gmla-mla-flow", viewBox: "0 0 360 150", role: "img", "aria-label": "MLA 压缩存储与推理时展开流程" });
-  const input = svgElement("g", { class: "gmla-flow-stage", "data-stage": "1" });
-  input.append(svgElement("rect", { x: "10", y: "36", width: "78", height: "72", class: "gmla-hidden-box" }));
-  for (let index = 0; index < 8; index += 1) input.append(svgElement("line", { x1: 18 + index * 9, x2: 18 + index * 9, y1: "45", y2: "78", class: "gmla-hidden-line" }));
-  input.append(svgElement("text", { x: "49", y: "91", "text-anchor": "middle", class: "gmla-flow-text" }, "xₜ · d=7168"));
-  const compress = svgElement("g", { class: "gmla-flow-stage", "data-stage": "2" });
-  compress.append(
-    svgElement("path", { d: "M96 36 L143 57 L143 87 L96 108 Z", class: "gmla-compress-shape" }),
-    svgElement("rect", { x: "147", y: "57", width: "22", height: "30", class: "gmla-latent-box" }),
-    svgElement("text", { x: "132", y: "126", "text-anchor": "middle", class: "gmla-flow-text" }, "cₜ = Wc·xₜ"),
+  pane.append(element("p", "gmla-mla-intro", "历史 token 只常驻低维 latent；当前 token 到来时才展开 K/V、计算全局注意力，再用门控筛掉不该进入输出通道的信息。"));
+  const svg = svgElement("svg", { class: "gmla-mla-flow", viewBox: "0 0 620 270", role: "img", "aria-label": "Gated MLA 的历史 KV 重建、当前查询、注意力与门控流程" });
+  const defs = svgElement("defs");
+  const marker = svgElement("marker", { id: "gmla-flow-arrow", markerWidth: "7", markerHeight: "7", refX: "6", refY: "3.5", orient: "auto" });
+  marker.append(svgElement("path", { d: "M0 0 L7 3.5 L0 7 Z", class: "gmla-arrow-head" }));
+  defs.append(marker);
+  svg.append(defs);
+  const stage = (...ids) => `gmla-flow-stage${ids.includes(state.mlaStep) ? " is-active" : ""}`;
+  const arrow = (x1, y1, x2, y2, className = "gmla-flow-arrow-line", parent = svg) => parent.append(svgElement("line", { x1, y1, x2, y2, class: className, "marker-end": "url(#gmla-flow-arrow)" }));
+  const history = svgElement("g", { class: "gmla-history-stack" });
+  ["τ−2", "τ−1", "τ"].forEach((token, index) => {
+    const y = 32 + index * 52;
+    history.append(svgElement("rect", { x: "18", y, width: "58", height: "31", rx: "3", class: "gmla-history-token" }));
+    history.append(svgElement("text", { x: "47", y: y + 20, "text-anchor": "middle", class: "gmla-flow-text" }, `x${token}`));
+    arrow(77, y + 15, 103, y + 15);
+    const compress = svgElement("g", { class: stage(1) });
+    compress.append(svgElement("path", { d: `M104 ${y} L130 ${y + 7} L130 ${y + 24} L104 ${y + 31} Z`, class: "gmla-compress-shape" }));
+    history.append(compress);
+    arrow(131, y + 15, 145, y + 15);
+    history.append(svgElement("rect", { x: "146", y: y + 5, width: "20", height: "21", rx: "2", class: "gmla-latent-box" }));
+    history.append(svgElement("text", { x: "156", y: y - 4, "text-anchor": "middle", class: "gmla-latent-label" }, "c"));
+    arrow(167, y + 15, 190, y + 15);
+    const expand = svgElement("g", { class: stage(2) });
+    expand.append(svgElement("path", { d: `M190 ${y + 7} L210 ${y} L210 ${y + 31} L190 ${y + 24} Z`, class: "gmla-expand-shape" }));
+    expand.append(svgElement("rect", { x: "214", y, width: "30", height: "13", rx: "2", class: "gmla-kv-box key" }));
+    expand.append(svgElement("rect", { x: "214", y: y + 18, width: "30", height: "13", rx: "2", class: "gmla-kv-box value" }));
+    expand.append(svgElement("text", { x: "229", y: y + 10, "text-anchor": "middle", class: "gmla-kv-label" }, "k"));
+    expand.append(svgElement("text", { x: "229", y: y + 28, "text-anchor": "middle", class: "gmla-kv-label" }, "v"));
+    history.append(expand);
+  });
+  svg.append(history);
+  const cache = svgElement("g", { class: stage(1) });
+  cache.append(svgElement("text", { x: "145", y: "11", "text-anchor": "end", class: "gmla-cache-only" }, "缓存 c"));
+  svg.append(cache);
+  const query = svgElement("g", { class: stage(3) });
+  query.append(svgElement("rect", { x: "500", y: "28", width: "75", height: "32", rx: "3", class: "gmla-current-token" }));
+  query.append(svgElement("text", { x: "537", y: "49", "text-anchor": "middle", class: "gmla-flow-text" }, "新 xₜ"));
+  arrow(537, 61, 537, 84, "gmla-flow-arrow-line", query);
+  query.append(svgElement("rect", { x: "504", y: "86", width: "67", height: "26", rx: "3", class: "gmla-query-matrix" }));
+  query.append(svgElement("text", { x: "537", y: "103", "text-anchor": "middle", class: "gmla-flow-text" }, "Wq"));
+  arrow(537, 113, 537, 132, "gmla-flow-arrow-line", query);
+  query.append(svgElement("circle", { cx: "537", cy: "144", r: "15", class: "gmla-query-dot" }));
+  query.append(svgElement("text", { x: "537", y: "149", "text-anchor": "middle", class: "gmla-kv-label" }, "qₜ"));
+  svg.append(query);
+  const attention = svgElement("g", { class: stage(3) });
+  attention.append(svgElement("path", { d: "M245 47 C366 47 410 142 495 144", class: "gmla-attention-wire", "marker-end": "url(#gmla-flow-arrow)" }));
+  attention.append(svgElement("path", { d: "M245 99 C360 99 405 144 495 144", class: "gmla-attention-wire", "marker-end": "url(#gmla-flow-arrow)" }));
+  attention.append(svgElement("path", { d: "M245 151 C354 151 403 146 495 144", class: "gmla-attention-wire", "marker-end": "url(#gmla-flow-arrow)" }));
+  attention.append(svgElement("rect", { x: "345", y: "169", width: "120", height: "30", rx: "3", class: "gmla-softmax-box" }));
+  attention.append(svgElement("text", { x: "405", y: "189", "text-anchor": "middle", class: "gmla-flow-text" }, "softmax → ΣaV"));
+  arrow(537, 160, 465, 183, "gmla-attention-wire", attention);
+  svg.append(attention);
+  const attentionOutput = svgElement("g", { class: stage(3, 4) });
+  attentionOutput.append(
+    svgElement("rect", { x: "480", y: "169", width: "58", height: "30", rx: "3", class: "gmla-attention-output" }),
+    svgElement("text", { x: "509", y: "189", "text-anchor": "middle", class: "gmla-flow-text" }, "õₜ"),
   );
-  const cache = svgElement("g", { class: "gmla-flow-stage", "data-stage": "3" });
-  cache.append(
-    svgElement("text", { x: "158", y: "42", "text-anchor": "middle", class: "gmla-cache-only" }, "只存这里 ↓"),
-    svgElement("text", { x: "158", y: "139", "text-anchor": "middle", class: "gmla-flow-subtext" }, "d_latent=3584"),
-  );
-  const expand = svgElement("g", { class: "gmla-flow-stage", "data-stage": "4" });
-  expand.append(
-    svgElement("path", { d: "M177 57 L214 36 L214 108 L177 87 Z", class: "gmla-expand-shape" }),
-    svgElement("rect", { x: "220", y: "36", width: "127", height: "72", class: "gmla-rebuild-box" }),
-    svgElement("line", { x1: "220", y1: "72", x2: "347", y2: "72", class: "gmla-rebuild-divider" }),
-    svgElement("text", { x: "283", y: "60", "text-anchor": "middle", class: "gmla-flow-text" }, "kτ = Wk·cτ"),
-    svgElement("text", { x: "283", y: "93", "text-anchor": "middle", class: "gmla-flow-text" }, "vτ = Wv·cτ"),
-    svgElement("text", { x: "283", y: "126", "text-anchor": "middle", class: "gmla-flow-subtext" }, "实时重建 · 不常驻"),
-  );
-  svg.append(input, compress, cache, expand);
+  svg.append(attentionOutput);
+  const gate = svgElement("g", { class: stage(4) });
+  gate.append(svgElement("path", { d: "M575 44 C608 77 608 226 582 234", class: "gmla-gate-wire", "marker-end": "url(#gmla-flow-arrow)" }));
+  gate.append(svgElement("rect", { x: "480", y: "224", width: "102", height: "30", rx: "3", class: "gmla-gate-box" }));
+  gate.append(svgElement("text", { x: "531", y: "244", "text-anchor": "middle", class: "gmla-flow-text" }, "σ(Wg·xₜ)"));
+  gate.append(svgElement("circle", { cx: "509", cy: "212", r: "9", class: "gmla-product-node" }));
+  gate.append(svgElement("text", { x: "509", y: "216", "text-anchor": "middle", class: "gmla-product-label" }, "⊙"));
+  gate.append(svgElement("path", { d: "M509 199 L509 203", class: "gmla-gate-wire", "marker-end": "url(#gmla-flow-arrow)" }));
+  gate.append(svgElement("path", { d: "M531 224 L517 218", class: "gmla-gate-wire", "marker-end": "url(#gmla-flow-arrow)" }));
+  gate.append(svgElement("path", { d: "M518 212 L566 212", class: "gmla-gate-wire", "marker-end": "url(#gmla-flow-arrow)" }));
+  gate.append(svgElement("text", { x: "576", y: "216", "text-anchor": "start", class: "gmla-output-label" }, "yₜ"));
+  svg.append(gate);
   pane.append(svg);
   const ratio = element("div", "gmla-ratio-bars");
   const mha = element("div", "gmla-ratio-row danger");
@@ -192,29 +251,7 @@ const buildMlaPane = (state, onChange) => {
   const mla = element("div", "gmla-ratio-row success");
   mla.append(element("span", "", "MLA"), element("i"), element("strong", "", "3,584 数/token · 约 6.9×"));
   ratio.append(mha, mla);
-  pane.append(ratio, element("p", "gmla-mla-conclusion", "全序列 softmax attention 不变；改变的只是 cache 中存什么。"));
-  const stages = Array.from(svg.querySelectorAll(".gmla-flow-stage"));
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) state.animStage = 4;
-  else {
-    state.animStage = 0;
-    stages.forEach((node) => node.style.opacity = "0.15");
-    ratio.style.opacity = "0";
-    const start = performance.now();
-    let previous = -1;
-    const tick = (now) => {
-      if (!pane.isConnected) return;
-      const stage = Math.min(4, Math.floor((now - start) / 250) + 1);
-      if (stage !== previous) {
-        previous = stage;
-        state.animStage = stage;
-        stages.forEach((node) => node.style.opacity = Number(node.dataset.stage) <= stage ? "1" : "0.15");
-        ratio.style.opacity = stage >= 4 ? "1" : "0";
-        onChange();
-      }
-      if (stage < 4) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }
+  pane.append(ratio, element("p", "gmla-mla-conclusion", "softmax 只在历史位置之间归一化注意力权重；Sigmoid 门控是逐通道 0–1 缩放，不要求通道总和为 1。"));
   return pane;
 };
 
@@ -234,35 +271,10 @@ const gateColumn = (token, profile) => {
   return { column, barNodes };
 };
 
-const buildNopeGatePane = (state, onChange) => {
-  const pane = element("section", "gmla-nope-gate-pane");
-  const nope = element("section", "gmla-nope-panel");
-  const nopeCopy = element("div", "gmla-nope-copy");
-  nopeCopy.append(
-    element("strong", "gmla-panel-title", "NoPE：压缩与旋转不可交换"),
-    element("p", "", "RoPE 要逐头旋转 K；但 latent 展开 Wk·cτ 与旋转操作不可交换。K3 直接移除 MLA 的位置编码，由 KDA 的递归衰减承担顺序感知。"),
-  );
-  const compare = element("div", "gmla-nope-compare");
-  const deepseek = element("div", "gmla-nope-row complex");
-  deepseek.append(element("span", "", "DeepSeek-V2"), element("i", "", "latent"), element("b", "", "+ 位置 K cache"));
-  const k3 = element("div", "gmla-nope-row clean");
-  k3.append(element("span", "", "K3 NoPE"), element("i", "", "latent 单路"), element("b", "", "位置由 KDA 承担"));
-  compare.append(deepseek, k3);
-  nope.append(nopeCopy, compare);
-  const fold = element("button", "gmla-nope-fold", state.nopePanelOpen ? "收起工程收益" : "展开工程收益");
-  fold.type = "button";
-  const foldBody = element("p", "gmla-nope-benefit", "上下文从 128K 扩到 1M 时，MLA 权重无需修改，也不必重调 RoPE frequency base 或 YaRN 插值。");
-  foldBody.hidden = !state.nopePanelOpen;
-  fold.addEventListener("click", () => {
-    state.nopePanelOpen = !state.nopePanelOpen;
-    fold.textContent = state.nopePanelOpen ? "收起工程收益" : "展开工程收益";
-    foldBody.hidden = !state.nopePanelOpen;
-    onChange();
-  });
-  nope.append(fold, foldBody);
-  const gate = element("section", "gmla-gate-panel");
+const buildGatePanel = (state, compact = false) => {
+  const gate = element("section", `gmla-gate-panel${compact ? " compact" : ""}`);
   gate.append(
-    element("strong", "gmla-panel-title", "输出门控：同一份全局读出，按当前 token 角色过滤"),
+    element("strong", "gmla-panel-title", "输出门控：按当前 token 的任务角色过滤"),
     element("p", "gmla-gate-rule", "Sigmoid(Wg · xₜ) 逐通道生成门值"),
   );
   const columns = element("div", "gmla-gate-columns");
@@ -270,27 +282,201 @@ const buildNopeGatePane = (state, onChange) => {
   const print = gateColumn("print", GATE_PROFILE.print);
   columns.append(brace.column, print.column);
   gate.append(columns);
-  pane.append(nope, gate);
-  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    state.gateValues = [...GATE_PROFILE.brace];
+    brace.barNodes.forEach((node, index) => node.style.setProperty("--gate", String(GATE_PROFILE.brace[index])));
+    print.barNodes.forEach((node, index) => node.style.setProperty("--gate", String(GATE_PROFILE.print[index])));
+    return gate;
+  }
+  const start = performance.now();
+  const tick = (now) => {
+    if (!gate.isConnected) return;
+    const elapsed = now - start;
+    const braceProgress = Math.min(1, elapsed / 600);
+    const printProgress = Math.min(1, Math.max(0, elapsed - 200) / 600);
+    brace.barNodes.forEach((node, index) => {
+      const value = 0.5 + (GATE_PROFILE.brace[index] - 0.5) * braceProgress;
+      node.style.setProperty("--gate", String(value));
+    });
+    print.barNodes.forEach((node, index) => {
+      const value = 0.5 + (GATE_PROFILE.print[index] - 0.5) * printProgress;
+      node.style.setProperty("--gate", String(value));
+    });
+    state.gateValues = GATE_PROFILE.brace.map((target) => 0.5 + (target - 0.5) * braceProgress);
+    if (printProgress < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+  return gate;
+};
+
+const buildAbsolutePositionVisual = () => {
+  const svg = svgElement("svg", { class: "gmla-position-svg absolute", viewBox: "0 0 240 120", role: "img", "aria-label": "绝对位置编码把语义与位置向量直接相加" });
+  const defs = svgElement("defs");
+  const mix = svgElement("linearGradient", { id: "gmla-absolute-mix", x1: "0%", y1: "0%", x2: "100%", y2: "0%" });
+  mix.append(svgElement("stop", { offset: "0%", "stop-color": "var(--blue)" }), svgElement("stop", { offset: "100%", "stop-color": "var(--accent)" }));
+  defs.append(mix);
+  svg.append(defs,
+    svgElement("rect", { x: "18", y: "25", width: "32", height: "58", rx: "3", class: "semantic" }),
+    svgElement("rect", { x: "72", y: "25", width: "32", height: "58", rx: "3", class: "position" }),
+    svgElement("text", { x: "61", y: "58", class: "operator", "text-anchor": "middle" }, "+"),
+    svgElement("rect", { x: "132", y: "25", width: "42", height: "58", rx: "3", fill: "url(#gmla-absolute-mix)" }),
+    svgElement("text", { x: "34", y: "100", class: "label", "text-anchor": "middle" }, "语义 eₜ"),
+    svgElement("text", { x: "88", y: "100", class: "label", "text-anchor": "middle" }, "位置 pₜ"),
+    svgElement("text", { x: "153", y: "100", class: "label", "text-anchor": "middle" }, "xₜ=eₜ+pₜ"),
+    svgElement("text", { x: "190", y: "53", class: "failure" }, "✕"),
+    svgElement("text", { x: "182", y: "70", class: "failure-note" }, ">训练长度：OOD"),
+  );
+  return svg;
+};
+
+const buildRopePositionVisual = () => {
+  const svg = svgElement("svg", { class: "gmla-position-svg rope", viewBox: "0 0 240 176", role: "img", "aria-label": "RoPE 相对位置旋转与 MLA 不可交换冲突" });
+  svg.append(
+    svgElement("path", { d: "M154 106 A100 100 0 0 0 102 49", class: "rope-arc", transform: "translate(0 -35)" }),
+    svgElement("line", { x1: "60", y1: "140", x2: "154", y2: "106", class: "rope-guide", transform: "translate(0 -35)" }),
+    svgElement("line", { x1: "60", y1: "140", x2: "102", y2: "49", class: "rope-guide", transform: "translate(0 -35)" }),
+    svgElement("circle", { cx: "154", cy: "106", r: "5", class: "rope-point s", transform: "translate(0 -35)" }),
+    svgElement("circle", { cx: "102", cy: "49", r: "5", class: "rope-point t", transform: "translate(0 -35)" }),
+    svgElement("text", { x: "162", y: "109", class: "label", transform: "translate(0 -35)" }, "kₛ"),
+    svgElement("text", { x: "109", y: "45", class: "label", transform: "translate(0 -35)" }, "qₜ"),
+    svgElement("path", { d: "M107 123 A50 50 0 0 0 81 95", class: "relative-arc", transform: "translate(0 -35)" }),
+    svgElement("text", { x: "105", y: "91", class: "relative-label", "text-anchor": "middle", transform: "translate(0 -35)" }, "θ(t−s)"),
+    svgElement("text", { x: "178", y: "73", class: "formula", transform: "translate(0 -35)" }, "qₜᵀkₛ"),
+    svgElement("text", { x: "178", y: "89", class: "formula green", transform: "translate(0 -35)" }, "∝ cos θ(t−s)"),
+    svgElement("text", { x: "49", y: "117", class: "path-label", "text-anchor": "middle" }, "R(θ)·[Wk·cₜ]"),
+    svgElement("text", { x: "95", y: "117", class: "path-mark bad" }, "✕"),
+    svgElement("text", { x: "119", y: "119", class: "not-equal", "text-anchor": "middle" }, "≠"),
+    svgElement("text", { x: "174", y: "117", class: "path-label", "text-anchor": "middle" }, "Wk·[R(θ)·cₜ]"),
+    svgElement("text", { x: "222", y: "117", class: "path-mark good" }, "✓"),
+    svgElement("text", { x: "49", y: "129", class: "caption", "text-anchor": "middle" }, "想要的形式"),
+    svgElement("text", { x: "174", y: "129", class: "caption", "text-anchor": "middle" }, "实际能做到的"),
+    svgElement("text", { x: "49", y: "138", class: "path-note", "text-anchor": "middle" }, "先展开 K 再旋转"),
+    svgElement("text", { x: "174", y: "138", class: "path-note", "text-anchor": "middle" }, "先旋转 latent"),
+    svgElement("text", { x: "181", y: "146", class: "position-cost" }, "+位置 K cache"),
+    svgElement("rect", { x: "6", y: "147", width: "171", height: "9", class: "latent-bar" }),
+    svgElement("rect", { x: "181", y: "147", width: "53", height: "9", class: "position-bar" }),
+    svgElement("text", { x: "6", y: "171", class: "cache-label" }, "latent + 额外位置 K cache"),
+  );
+  return svg;
+};
+
+const buildNopePositionVisual = () => {
+  const svg = svgElement("svg", { class: "gmla-position-svg nope", viewBox: "0 0 240 160", role: "img", "aria-label": "KDA 衰减隐式编码距离并省去位置 K cache" });
+  svg.append(
+    svgElement("line", { x1: "25", y1: "82", x2: "220", y2: "82", class: "axis" }),
+    svgElement("line", { x1: "25", y1: "82", x2: "25", y2: "15", class: "axis" }),
+    svgElement("path", { d: "M25 20 C55 29 78 45 103 60 C132 76 172 81 218 82 L218 82 L25 82 Z", class: "decay-area" }),
+    svgElement("path", { d: "M25 20 C55 29 78 45 103 60 C132 76 172 81 218 82", class: "decay-line", pathLength: "1" }),
+    svgElement("circle", { cx: "25", cy: "20", r: "4", class: "decay-point" }),
+    svgElement("circle", { cx: "103", cy: "60", r: "4", class: "decay-point middle" }),
+    svgElement("circle", { cx: "208", cy: "82", r: "3", class: "decay-point far" }),
+    svgElement("line", { x1: "103", y1: "60", x2: "103", y2: "82", class: "guide" }),
+    svgElement("text", { x: "31", y: "17", class: "weight-label" }, "≈1.0"),
+    svgElement("text", { x: "108", y: "57", class: "weight-label" }, "αᵐ"),
+    svgElement("text", { x: "214", y: "75", class: "weight-label", "text-anchor": "end" }, "≈0"),
+    svgElement("text", { x: "117", y: "96", class: "axis-label", "text-anchor": "middle" }, "token 距离 d"),
+    svgElement("text", { x: "13", y: "49", class: "axis-label", transform: "rotate(-90 13 49)", "text-anchor": "middle" }, "αᵈ"),
+    svgElement("text", { x: "11", y: "119", class: "cache-row-label" }, "DeepSeek V2"),
+    svgElement("rect", { x: "75", y: "110", width: "102", height: "13", class: "latent-bar" }),
+    svgElement("rect", { x: "181", y: "110", width: "42", height: "13", class: "position-bar" }),
+    svgElement("text", { x: "11", y: "143", class: "cache-row-label" }, "K3 NoPE"),
+    svgElement("rect", { x: "75", y: "134", width: "102", height: "13", class: "latent-bar" }),
+    svgElement("rect", { x: "181", y: "134", width: "42", height: "13", class: "position-bar removed" }),
+    svgElement("text", { x: "181", y: "158", class: "nope-note" }, "位置由 KDA 承担"),
+  );
+  return svg;
+};
+
+const POSITION_COLUMNS = [
+  {
+    id: "absolute", year: "2017", title: "绝对位置编码", subtitle: "Transformer · Sinusoidal", tone: "danger",
+    issue: "位置直接加入 embedding：语义与位置发生耦合。",
+    mechanisms: ["xₜ=eₜ+pₜ，位置向量直接污染语义空间", "Q/K 内积同时混合内容相似度与绝对位置", "训练外位置属于 OOD，长度外推可靠性显著下降", "语义与位置无法再被独立操作"],
+    question: "如何让位置进入 attention，却不污染语义空间？", formula: "xₜ = eₜ + pₜ", visual: buildAbsolutePositionVisual,
+  },
+  {
+    id: "rope", year: "2021", title: "RoPE", subtitle: "RoFormer · 旋转位置编码", tone: "neutral",
+    issue: "旋转 Q/K，让内积只依赖相对距离 t−s。",
+    mechanisms: ["不改 embedding；对 Q/K 施加 R(θ·pos)", "qₜᵀkₛ=qᵀR(θ(t−s))k", "旋转具有周期性，超长距离可能出现相位混淆", "MLA 展开与逐头旋转不可交换，需额外位置 K cache"],
+    question: "能否彻底去掉位置编码，不再增加 cache？", formula: "qₜᵀkₛ = qᵀR(θ(t−s))k", visual: buildRopePositionVisual,
+  },
+  {
+    id: "nope", year: "2026", title: "NoPE", subtitle: "Kimi K3 · KDA 隐式位置", tone: "success",
+    issue: "KDA 的逐通道衰减 αₜ 让距离自然表现为遗忘。",
+    mechanisms: ["Sₜ=Diag(αₜ)(I−βₜkₜkₜᵀ)Sₜ₋₁+βₜkₜvₜᵀ", "αₜ∈(0,1)ᵈᵏ，每个通道独立决定保留率", "历史影响力沿路径连乘 ∏α，距离越远贡献越小", "Gated MLA 完全 NoPE，不旋转、不挂位置 K cache"],
+    question: "遗忘即位置：模型只需知道已经遗忘了多少。", formula: "影响力 ∝ ∏ᵢ₌ₛ₊₁ᵗ αᵢ", visual: buildNopePositionVisual,
+  },
+];
+
+const buildNopeGatePane = (state, onChange) => {
+  const pane = element("section", "gmla-position-pane");
+  pane.id = "nope-position-encoding";
+  const claims = element("ul", "gmla-position-claims");
+  [
+    "绝对位置编码直接叠加语义与位置；训练长度之外属于分布外位置，外推可靠性显著下降。",
+    "RoPE 用旋转将内积改写为相对距离，但周期性与 MLA 展开/旋转不可交换带来超长上下文和额外 cache 问题。",
+    "K3 用 KDA 的逐通道衰减 αₜ 隐式承载距离，使 Gated MLA 可以完全 NoPE。",
+  ].forEach((claim) => claims.append(element("li", "", claim)));
+  const timeline = element("div", "gmla-position-timeline");
+  const columnNodes = [];
+  POSITION_COLUMNS.forEach((item) => {
+    const column = element("section", `gmla-position-column ${item.tone}`);
+    column.tabIndex = 0;
+    column.dataset.column = item.id;
+    const time = element("div", "gmla-position-time");
+    time.append(element("i"), element("span", "", item.year));
+    const heading = element("header", "gmla-position-heading");
+    heading.append(element("h2", "", item.title), element("small", "", item.subtitle));
+    const issue = element("p", "gmla-position-issue", item.issue);
+    const mechanism = element("ul", "gmla-position-mechanism");
+    item.mechanisms.forEach((line) => mechanism.append(element("li", "", line)));
+    const visual = item.visual();
+    const question = element("p", "gmla-position-question", `→ ${item.question}`);
+    const formula = element("code", "gmla-position-formula", item.formula);
+    column.append(time, heading, issue, mechanism, formula, visual, question);
+    const select = () => {
+      state.nopeActiveCol = state.nopeActiveCol === item.id ? null : item.id;
+      columnNodes.forEach((node) => {
+        node.classList.toggle("selected", node.dataset.column === state.nopeActiveCol);
+        node.classList.toggle("deemphasized", Boolean(state.nopeActiveCol) && node.dataset.column !== state.nopeActiveCol);
+      });
+      onChange();
+    };
+    column.addEventListener("click", select);
+    column.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      select();
+    });
+    columnNodes.push(column);
+    timeline.append(column);
+  });
+  columnNodes.forEach((node) => {
+    node.classList.toggle("selected", node.dataset.column === state.nopeActiveCol);
+    node.classList.toggle("deemphasized", Boolean(state.nopeActiveCol) && node.dataset.column !== state.nopeActiveCol);
+  });
+  pane.append(claims, timeline);
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduced) {
+    columnNodes.forEach((node) => { node.style.opacity = "0"; node.style.transform = "translateY(10px)"; });
     const start = performance.now();
+    const curve = pane.querySelector(".decay-line");
+    const removed = pane.querySelector(".position-bar.removed");
+    if (curve) curve.style.strokeDashoffset = "1";
     const tick = (now) => {
       if (!pane.isConnected) return;
       const elapsed = now - start;
-      const braceProgress = Math.min(1, elapsed / 600);
-      const printProgress = Math.min(1, Math.max(0, elapsed - 200) / 600);
-      brace.barNodes.forEach((node, index) => {
-        const value = 0.5 + (GATE_PROFILE.brace[index] - 0.5) * braceProgress;
-        node.style.setProperty("--gate", String(value));
+      columnNodes.forEach((node, index) => {
+        const progress = Math.min(1, Math.max(0, elapsed - index * 100) / 220);
+        node.style.opacity = String(progress);
+        node.style.transform = `translateY(${(1 - progress) * 10}px)`;
       });
-      print.barNodes.forEach((node, index) => {
-        const value = 0.5 + (GATE_PROFILE.print[index] - 0.5) * printProgress;
-        node.style.setProperty("--gate", String(value));
-      });
-      state.gateValues = GATE_PROFILE.brace.map((target) => 0.5 + (target - 0.5) * braceProgress);
-      if (printProgress < 1) requestAnimationFrame(tick);
+      if (curve) curve.style.strokeDashoffset = String(1 - Math.min(1, Math.max(0, elapsed - 200) / 600));
+      if (removed) removed.style.transform = `scaleX(${1 - Math.min(1, Math.max(0, elapsed - 500) / 400)})`;
+      if (elapsed < 900) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-  } else state.gateValues = [...GATE_PROFILE.brace];
+  } else pane.querySelector(".position-bar.removed")?.setAttribute("style", "transform:scaleX(0)");
   return pane;
 };
 
@@ -383,15 +569,20 @@ const buildPriorSide = (state) => {
   return side;
 };
 
-const appendFormulaDerivation = (side, activeStage = 4) => {
+const appendFormulaDerivation = (side, activeStage = 4, onSelect) => {
   const derivation = element("div", "gmla-formula-derivation");
   [
     [1, "压缩并缓存", "cₜ = Wc · xₜ"],
     [2, "推理时展开", "kτ = Wk·cτ，vτ = Wv·cτ"],
-    [4, "全局 softmax attention · NoPE", "a₍ₜ,τ₎ = softmax(qₜᵀkτ / √dₖ)，τ ≤ t\nõₜ = Σ a₍ₜ,τ₎·vτ"],
-    [4, "全秩输出门控", "yₜ = Wₒ[Sigmoid(Wg·xₜ) ⊙ õₜ]"],
+    [3, "全局 attention", "õₜ = Σ softmax(qₜᵀkτ / √dₖ)·vτ"],
+    [4, "全秩门控输出", "yₜ = Wₒ[σ(Wg·xₜ) ⊙ õₜ]"],
   ].forEach(([stage, label, formula], index) => {
-    const line = element("div", `gmla-formula-line ${activeStage >= stage ? "active" : ""}`);
+    const line = element(onSelect ? "button" : "div", `gmla-formula-line ${activeStage === stage ? "active" : ""}`);
+    if (onSelect) {
+      line.type = "button";
+      line.setAttribute("aria-pressed", String(activeStage === stage));
+      line.addEventListener("click", () => onSelect(stage));
+    }
     line.append(element("span", "", `0${index + 1} · ${label}`), element("strong", "", formula));
     derivation.append(line);
   });
@@ -408,24 +599,35 @@ const appendFormulaDerivation = (side, activeStage = 4) => {
   side.append(derivation, notes);
 };
 
-const buildMlaSide = (state) => {
+const buildMlaSide = (state, onSelect) => {
   const side = element("aside", "gmla-side gmla-mla-side");
-  side.append(element("p", "gmla-side-kicker", "K3 Gated MLA · 完整公式"));
-  appendFormulaDerivation(side, state.animStage);
+  const rationale = element("section", "gmla-gate-rationale");
+  const facts = element("div", "gmla-apple-context");
+  [
+    ["历史 01", "苹果的愿景是：创造改变世界的产品"],
+    ["历史 02", "苹果的营收是：硬件与服务共同贡献"],
+    ["历史 03", "苹果的供应链是：连接零部件与全球制造"],
+    ["新 token", "苹果的成本结构"],
+  ].forEach(([label, copy]) => {
+    const row = element("p");
+    row.append(element("span", "", label), element("b", "", copy));
+    facts.append(row);
+  });
+  rationale.append(
+    element("strong", "", "为什么 Gated MLA 必须有 Gate？"),
+    element("p", "gmla-gate-premise", "相关性召回不等于当前任务真正有用；attention 负责找相关信息，Gate 再决定哪些通道可以进入输出。"),
+    facts,
+    element("p", "gmla-attention-example", "仅用 attention：四段都含“苹果”，因此愿景、营收、供应链都会被召回。"),
+    element("p", "gmla-gate-example", "加入 Gate：压低“愿景”通道，保留与成本直接相关的营收和供应链信息。"),
+  );
+  side.append(element("p", "gmla-side-kicker", "K3 Gated MLA · 四步路径"), rationale);
+  appendFormulaDerivation(side, state.mlaStep, onSelect);
+  side.append(buildGatePanel(state, true));
   return side;
 };
 
 const buildNopeGateSide = () => {
-  const side = element("aside", "gmla-side gmla-nope-side");
-  side.append(element("p", "gmla-side-kicker", "K3 Gated MLA · 完整公式"));
-  appendFormulaDerivation(side);
-  const rank = element("div", "gmla-rank-note");
-  rank.append(
-    element("strong", "", "为什么 Wg 必须全秩？"),
-    element("p", "", "低秩门控只能感知 xₜ 的小子空间；全秩 Wg 综合全部 7168 维信息决定每个输出通道是否放行。"),
-  );
-  side.append(rank);
-  return side;
+  return element("aside", "gmla-side gmla-nope-side");
 };
 
 const buildDivisionSide = (state) => {
@@ -444,9 +646,9 @@ const buildDivisionSide = (state) => {
   return side;
 };
 
-const buildSide = (state) => state.activeTab === "problem" ? buildProblemSide()
+const buildSide = (state, onMlaStep) => state.activeTab === "problem" ? buildProblemSide()
   : state.activeTab === "prior" ? buildPriorSide(state)
-    : state.activeTab === "mla" ? buildMlaSide(state)
+    : state.activeTab === "mla" ? buildMlaSide(state, onMlaStep)
       : state.activeTab === "nope-gate" ? buildNopeGateSide() : buildDivisionSide(state);
 
 export const renderGatedMla = (block, context) => {
@@ -459,6 +661,8 @@ export const renderGatedMla = (block, context) => {
     gateValues: Array.isArray(stored.gateValues) ? stored.gateValues.slice(0, 8) : Array(8).fill(0.5),
     nopePanelOpen: Boolean(stored.nopePanelOpen),
     selectedPrior: ["mha", "mqa", "gqa"].includes(stored.selectedPrior) ? stored.selectedPrior : "mha",
+    mlaStep: Math.min(4, Math.max(1, Number(stored.mlaStep) || 1)),
+    nopeActiveCol: ["absolute", "rope", "nope"].includes(stored.nopeActiveCol) ? stored.nopeActiveCol : null,
   };
   const root = element("article", "block gated-mla");
   root.dataset.track = block.id;
@@ -467,12 +671,17 @@ export const renderGatedMla = (block, context) => {
   const claims = element("ul", "gmla-claims");
   block.claims.forEach((claim) => claims.append(element("li", "", claim)));
   const viewport = element("div", "gmla-viewport");
+  const connection = element("button", "page-connection-link", `← ${GATED_MLA_CONNECTIONS.architecture.label}`);
+  connection.type = "button";
+  connection.addEventListener("click", () => context.navigate(GATED_MLA_CONNECTIONS.architecture.target));
   const persist = () => {
     context.setValue(block.id, {
       activeTab: state.activeTab,
       tokenCount: state.tokenCount,
       nopePanelOpen: state.nopePanelOpen,
       selectedPrior: state.selectedPrior,
+      mlaStep: state.mlaStep,
+      nopeActiveCol: state.nopeActiveCol,
     });
     context.persist();
   };
@@ -483,16 +692,20 @@ export const renderGatedMla = (block, context) => {
     const panelHost = element("div", "gmla-panel-host");
     const sideHost = element("div", "gmla-side-host");
     const renderSide = () => {
-      const side = buildSide(state);
+      const side = buildSide(state, (stage) => {
+        state.mlaStep = stage;
+        renderTab();
+      });
       sideHost.replaceChildren(side);
       animateIn(side);
       persist();
     };
     const renderTab = () => {
-      state.animStage = 0;
+      state.animStage = state.activeTab === "mla" ? state.mlaStep : 0;
+      main.classList.toggle("gmla-nope-main", state.activeTab === "nope-gate");
       const pane = state.activeTab === "problem" ? buildProblemPane(state, renderSide)
         : state.activeTab === "prior" ? buildPriorPane(state, renderSide)
-          : state.activeTab === "mla" ? buildMlaPane(state, renderSide)
+          : state.activeTab === "mla" ? buildMlaPane(state)
             : state.activeTab === "nope-gate" ? buildNopeGatePane(state, renderSide) : buildDivisionPane(state, renderSide);
       panelHost.replaceChildren(pane);
       tabs.querySelectorAll("button").forEach((button) => button.classList.toggle("active", button.dataset.tab === state.activeTab));
@@ -516,6 +729,7 @@ export const renderGatedMla = (block, context) => {
     renderTab();
   };
   renderView();
-  root.append(claims, viewport, element("p", "gmla-source", `来源：${block.source}`));
+  root.append(connection, claims, viewport);
+  if (block.source) root.append(element("p", "gmla-source", `来源：${block.source}`));
   return root;
 };

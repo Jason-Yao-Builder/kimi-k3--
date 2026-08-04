@@ -1,4 +1,5 @@
 import { element } from "../../shared/dom/element.js";
+import { MOTION } from "../../shared/design/tokens.js";
 import { cacheFormula, phaseMeta, restorePhase } from "./logic.js";
 
 const makeButton = (glyph, label, onClick) => {
@@ -212,7 +213,7 @@ export const renderKvCacheProblem = (block, context) => {
     if (animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       pane.animate(
         [{ transform: `translateX(${direction * 7}%)`, opacity: 0 }, { transform: "translateX(0)", opacity: 1 }],
-        { duration: 360, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+        { duration: MOTION.emphasis, easing: MOTION.easing },
       );
     }
   };

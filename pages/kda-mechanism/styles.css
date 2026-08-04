@@ -10,7 +10,7 @@
 
 .slide-kda-mechanism .slide-header h1,
 .slide-kda-mechanism .hierarchy-item strong {
-  font-size: clamp(1.18rem, 2.25cqw, 2.15rem);
+  font-size: var(--text-lg);
 }
 
 .slide-kda-mechanism .slide-body {
@@ -44,7 +44,7 @@
   position: relative;
   padding-left: clamp(0.65rem, 0.9cqw, 0.85rem);
   font-family: Georgia, "Times New Roman", var(--font-sans);
-  font-size: clamp(0.52rem, 0.73cqw, 0.7rem);
+  font-size: var(--text-xs);
   line-height: 1.25;
 }
 
@@ -96,7 +96,7 @@
 .kdam-tabs button {
   height: clamp(1.55rem, 2.2cqw, 2rem);
   padding: 0 clamp(0.55rem, 0.85cqw, 0.78rem);
-  font-size: clamp(0.5rem, 0.68cqw, 0.64rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-panel-host,
@@ -110,7 +110,7 @@
   margin: 0;
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: clamp(0.42rem, 0.55cqw, 0.52rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-write-pane {
@@ -128,7 +128,7 @@
   border-bottom: clamp(0.06rem, 0.1cqw, 0.1rem) solid var(--line);
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: clamp(0.48rem, 0.66cqw, 0.62rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-data-flow span.active {
@@ -147,7 +147,7 @@
   min-height: 0;
   place-items: center;
   overflow: hidden;
-  background: #fafbf8;
+  background: var(--surface-subtle);
 }
 
 .kdam-matrix-label {
@@ -157,7 +157,7 @@
   margin: 0;
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: clamp(0.46rem, 0.62cqw, 0.58rem);
+  font-size: var(--text-xs);
   transform: translateX(-50%);
 }
 
@@ -180,7 +180,7 @@
   background: var(--surface);
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: clamp(0.4rem, 0.52cqw, 0.5rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-token.active {
@@ -230,7 +230,7 @@
   border-left: clamp(0.12rem, 0.18cqw, 0.16rem) solid var(--blue);
   color: var(--blue);
   font-family: var(--font-mono);
-  font-size: clamp(0.45rem, 0.62cqw, 0.58rem);
+  font-size: var(--text-xs);
   line-height: 1.35;
 }
 
@@ -240,7 +240,7 @@
   bottom: clamp(0.45rem, 0.7cqw, 0.62rem);
   color: var(--green);
   font-family: var(--font-mono);
-  font-size: clamp(0.45rem, 0.62cqw, 0.58rem);
+  font-size: var(--text-xs);
   font-weight: 800;
 }
 
@@ -275,7 +275,7 @@
   gap: clamp(0.18rem, 0.28cqw, 0.25rem);
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: clamp(0.44rem, 0.58cqw, 0.55rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-beta-control input,
@@ -293,7 +293,7 @@
   gap: clamp(0.3rem, 0.45cqw, 0.42rem);
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: clamp(0.4rem, 0.54cqw, 0.52rem);
+  font-size: var(--text-xs);
   text-align: center;
 }
 
@@ -315,7 +315,7 @@
   width: 100%;
   min-height: 0;
   height: 100%;
-  background: #fafbf8;
+  background: var(--surface-subtle);
 }
 
 .kdam-axis {
@@ -335,7 +335,7 @@
 .kdam-custom-label {
   fill: var(--muted);
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: var(--text-xs);
 }
 
 .kdam-boundary-text { fill: var(--accent); }
@@ -352,7 +352,7 @@
 .kdam-retention.definition { stroke: var(--blue); }
 .kdam-retention.semantic { stroke: var(--green); }
 .kdam-retention.punctuation { stroke: var(--accent); stroke-dasharray: 4 3; }
-.kdam-retention.custom { stroke: var(--muted); stroke-dasharray: 6 3; stroke-width: 3; }
+.kdam-retention.custom { stroke: var(--muted); stroke-dasharray: var(--dash-normal); stroke-width: 3; }
 
 .kdam-alpha-control {
   display: grid;
@@ -361,7 +361,7 @@
   align-items: center;
   color: var(--ink);
   font-family: var(--font-mono);
-  font-size: clamp(0.46rem, 0.62cqw, 0.58rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-channel-header {
@@ -374,13 +374,13 @@
 
 .kdam-channel-header > strong {
   font-family: var(--font-mono);
-  font-size: clamp(0.46rem, 0.62cqw, 0.58rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-token-switch button {
   height: clamp(1.25rem, 1.7cqw, 1.55rem);
   padding: 0 clamp(0.4rem, 0.6cqw, 0.55rem);
-  font-size: clamp(0.42rem, 0.56cqw, 0.53rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-channel-bars {
@@ -398,7 +398,7 @@
   gap: clamp(0.22rem, 0.35cqw, 0.32rem);
   align-items: center;
   font-family: var(--font-mono);
-  font-size: clamp(0.38rem, 0.5cqw, 0.48rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-channel-row > i {
@@ -414,14 +414,14 @@
   min-width: 0;
   min-height: 0;
   padding: clamp(0.45rem, 0.7cqw, 0.65rem);
-  background: #fafbf8;
+  background: var(--surface-subtle);
 }
 
 .kdam-pane-kicker,
 .kdam-side-kicker {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: clamp(0.46rem, 0.62cqw, 0.58rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-timeline {
@@ -435,7 +435,7 @@
 .kdam-lost-zone { fill: var(--accent-soft); fill-opacity: 0.58; }
 .kdam-history-token { fill: var(--muted); opacity: 0.45; }
 .kdam-history-token.active { fill: var(--green); opacity: 1; }
-.kdam-timeline-label { fill: var(--blue); font-family: var(--font-mono); font-size: 8px; }
+.kdam-timeline-label { fill: var(--blue); font-family: var(--font-mono); font-size: var(--text-xs); }
 .kdam-timeline-label.danger { fill: var(--accent); }
 
 .kdam-side-host {
@@ -473,7 +473,7 @@
 .kdam-conflict-text {
   fill: var(--ink);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: var(--text-xs);
 }
 
 .kdam-arch-node.active rect {
@@ -492,7 +492,7 @@
 .kdam-side-formula {
   padding: clamp(0.5rem, 0.8cqw, 0.72rem);
   border-top: clamp(0.08rem, 0.13cqw, 0.12rem) solid var(--ink);
-  background: #fafbf8;
+  background: var(--surface-subtle);
 }
 
 .kdam-side-formula p,
@@ -507,7 +507,7 @@
   display: block;
   margin-top: clamp(0.25rem, 0.4cqw, 0.36rem);
   color: var(--green);
-  font-size: clamp(0.56rem, 0.78cqw, 0.74rem);
+  font-size: var(--text-xs);
   line-height: 1.35;
 }
 
@@ -516,14 +516,14 @@
 .kdam-formula-note {
   padding-top: clamp(0.22rem, 0.34cqw, 0.3rem);
   color: var(--muted);
-  font-size: clamp(0.4rem, 0.52cqw, 0.5rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-full-formula {
   padding-top: clamp(0.4rem, 0.62cqw, 0.56rem);
   border-top: clamp(0.06rem, 0.1cqw, 0.1rem) solid var(--line);
   color: var(--muted);
-  font-size: clamp(0.4rem, 0.54cqw, 0.52rem);
+  font-size: var(--text-xs);
   line-height: 1.35;
 }
 
@@ -536,7 +536,7 @@
 .kdam-alpha-value {
   color: var(--accent);
   font-family: var(--font-mono);
-  font-size: clamp(1.7rem, 3.4cqw, 3.2rem);
+  font-size: var(--text-xl);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
@@ -545,7 +545,7 @@
   margin: 0;
   color: var(--green);
   font-family: var(--font-mono);
-  font-size: clamp(0.75rem, 1.15cqw, 1.05rem);
+  font-size: var(--text-sm);
   font-weight: 800;
 }
 
@@ -558,12 +558,12 @@
 
 .kdam-method-compare p {
   margin: 0 0 clamp(0.38rem, 0.58cqw, 0.52rem);
-  font-size: clamp(0.5rem, 0.68cqw, 0.64rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-method-compare small {
   color: var(--muted);
-  font-size: clamp(0.42rem, 0.54cqw, 0.52rem);
+  font-size: var(--text-xs);
 }
 
 /* Current two-pane KDA explainer */
@@ -585,8 +585,8 @@
 .kdam-data-flow {
   justify-content: space-between;
   padding: clamp(0.22rem, 0.34cqw, 0.31rem) clamp(0.3rem, 0.48cqw, 0.44rem);
-  background: #fafbf8;
-  font-size: clamp(0.4rem, 0.54cqw, 0.51rem);
+  background: var(--surface-subtle);
+  font-size: var(--text-xs);
 }
 
 .kdam-write-stage {
@@ -595,7 +595,7 @@
   min-height: 0;
   overflow: hidden;
   border-top: clamp(0.08rem, 0.12cqw, 0.11rem) solid var(--ink);
-  background: #fafbf8;
+  background: var(--surface-subtle);
 }
 
 .kdam-stage-header {
@@ -604,19 +604,19 @@
   gap: clamp(0.5rem, 0.8cqw, 0.72rem);
   align-items: baseline;
   padding: clamp(0.38rem, 0.58cqw, 0.52rem);
-  border-bottom: 1px solid var(--line);
+  border-bottom: var(--stroke-hairline) solid var(--line);
 }
 
 .kdam-step-badge {
   color: var(--accent);
   font-family: var(--font-mono);
-  font-size: clamp(0.5rem, 0.68cqw, 0.64rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-step-summary {
   margin: 0;
   color: var(--ink);
-  font-size: clamp(0.48rem, 0.64cqw, 0.61rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-stage-body {
@@ -633,24 +633,24 @@
   gap: clamp(0.28rem, 0.45cqw, 0.4rem);
   min-width: 0;
   padding: clamp(0.55rem, 0.85cqw, 0.78rem);
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border-right: var(--stroke-hairline) solid var(--line);
+  border-bottom: var(--stroke-hairline) solid var(--line);
 }
 
 .kdam-stage-card:nth-child(even) { border-right: 0; }
 .kdam-stage-card:nth-child(n+3) { border-bottom: 0; }
-.kdam-card-index { position: absolute; top: 0.35rem; left: 0.45rem; color: var(--muted); font-family: var(--font-mono); font-size: clamp(0.38rem, 0.5cqw, 0.47rem); }
-.kdam-stage-card strong { color: var(--blue); font-size: clamp(0.52rem, 0.72cqw, 0.68rem); line-height: 1.35; }
-.kdam-stage-card p { margin: 0; color: var(--muted); font-size: clamp(0.44rem, 0.58cqw, 0.55rem); line-height: 1.35; }
+.kdam-card-index { position: absolute; top: 0.35rem; left: 0.45rem; color: var(--muted); font-family: var(--font-mono); font-size: var(--text-xs); }
+.kdam-stage-card strong { color: var(--blue); font-size: var(--text-xs); line-height: 1.35; }
+.kdam-stage-card p { margin: 0; color: var(--muted); font-size: var(--text-xs); line-height: 1.35; }
 .kdam-live-formula { color: var(--ink) !important; font-family: var(--font-mono); overflow-wrap: anywhere; }
 .kdam-write-stage[data-step="2"] .kdam-operation-card,
 .kdam-write-stage[data-step="2"] .kdam-result-card { background: var(--accent-soft); }
 .kdam-write-stage[data-step="3"] .kdam-operation-card { background: var(--green-soft); }
 
 .kdam-matrix-flow { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: clamp(0.35rem, 0.55cqw, 0.5rem); align-items: center; }
-.kdam-matrix-snapshot { display: grid; justify-items: center; gap: 0.16rem; color: var(--muted); font-family: var(--font-mono); font-size: clamp(0.38rem, 0.5cqw, 0.47rem); }
+.kdam-matrix-snapshot { display: grid; justify-items: center; gap: 0.16rem; color: var(--muted); font-family: var(--font-mono); font-size: var(--text-xs); }
 .kdam-state-matrix.compact { width: min(100%, 5rem); padding: clamp(0.12rem, 0.18cqw, 0.17rem); gap: 1px; border-width: 1px; }
-.kdam-matrix-arrow { color: var(--accent); font-family: var(--font-mono); font-size: clamp(0.45rem, 0.62cqw, 0.58rem); font-weight: 800; writing-mode: horizontal-tb; }
+.kdam-matrix-arrow { color: var(--accent); font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; writing-mode: horizontal-tb; }
 .kdam-beta-control { position: static; width: 100%; }
 
 .kdam-decay-pane {
@@ -658,18 +658,18 @@
   gap: clamp(0.2rem, 0.32cqw, 0.29rem);
 }
 
-.kdam-window-threshold { stroke: var(--green); stroke-width: 1.3; stroke-dasharray: 6 3; }
-.kdam-threshold-text { fill: var(--green); font-family: var(--font-mono); font-size: 7px; font-weight: 800; }
+.kdam-window-threshold { stroke: var(--green); stroke-width: 1.3; stroke-dasharray: var(--dash-normal); }
+.kdam-threshold-text { fill: var(--green); font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; }
 .kdam-alpha-control { padding: 0 clamp(0.18rem, 0.28cqw, 0.25rem); }
 .kdam-decay-lower { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr); gap: clamp(0.45rem, 0.7cqw, 0.64rem); min-height: 0; }
 .kdam-channel-section { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
 .kdam-channel-header { padding-top: clamp(0.15rem, 0.24cqw, 0.22rem); }
 .kdam-channel-bars { gap: 1px clamp(0.38rem, 0.58cqw, 0.52rem); }
-.kdam-channel-row { font-size: clamp(0.34rem, 0.44cqw, 0.42rem); }
+.kdam-channel-row { font-size: var(--text-xs); }
 .kdam-channel-row > i { height: clamp(0.16rem, 0.23cqw, 0.21rem); }
-.kdam-timeline-wrap { display: grid; grid-template-rows: auto minmax(0, 1fr); padding: clamp(0.3rem, 0.45cqw, 0.42rem); border-top: 1px solid var(--ink); }
+.kdam-timeline-wrap { display: grid; grid-template-rows: auto minmax(0, 1fr); padding: clamp(0.3rem, 0.45cqw, 0.42rem); border-top: var(--stroke-hairline) solid var(--ink); }
 .kdam-timeline { height: 100%; }
-.kdam-timeline-note { fill: var(--muted); font-family: var(--font-mono); font-size: 8px; }
+.kdam-timeline-note { fill: var(--muted); font-family: var(--font-mono); font-size: var(--text-xs); }
 
 .kdam-side {
   padding-left: clamp(0.5rem, 0.75cqw, 0.68rem);
@@ -686,24 +686,24 @@
   justify-content: space-between;
   gap: 0.5rem;
   padding-bottom: clamp(0.22rem, 0.34cqw, 0.3rem);
-  border-bottom: 1px solid var(--ink);
+  border-bottom: var(--stroke-hairline) solid var(--ink);
   font-family: var(--font-mono);
 }
 
-.kdam-side-heading strong { color: var(--ink); font-size: clamp(0.54rem, 0.75cqw, 0.7rem); }
-.kdam-side-heading span { color: var(--accent); font-size: clamp(0.38rem, 0.5cqw, 0.48rem); }
+.kdam-side-heading strong { color: var(--ink); font-size: var(--text-xs); }
+.kdam-side-heading span { color: var(--accent); font-size: var(--text-xs); }
 .kdam-architecture { min-height: 11rem; }
-.kdam-arch-node rect { fill: #fafbf8; }
+.kdam-arch-node rect { fill: var(--surface-subtle); }
 .kdam-arch-node rect.update { fill: var(--blue-soft); }
 .kdam-arch-node rect.read { fill: var(--green-soft); }
 .kdam-arch-node.active rect { fill: var(--accent-soft); }
 .kdam-arch-node text,
 .kdam-core-title,
 .kdam-arch-input,
-.kdam-conflict-text { font-size: 11px; }
+.kdam-conflict-text { font-size: var(--text-xs); }
 .kdam-arch-input { text-anchor: middle; font-weight: 800; }
-.kdam-branch-label { fill: var(--muted); font-family: var(--font-mono); font-size: 10px; font-weight: 800; text-anchor: middle; }
-.kdam-gate-symbol { fill: var(--green); font-family: var(--font-mono); font-size: 20px; font-weight: 800; }
+.kdam-branch-label { fill: var(--muted); font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-anchor: middle; }
+.kdam-gate-symbol { fill: var(--green); font-family: var(--font-mono); font-size: var(--text-lg); font-weight: 800; }
 .kdam-arch-line { stroke-width: 1.4; }
 .kdam-arch-line.active { stroke-width: 3; }
 
@@ -720,16 +720,16 @@
   gap: 0.08rem 0.35rem;
   min-width: 0;
   padding: clamp(0.3rem, 0.46cqw, 0.42rem);
-  border: 1px solid var(--line);
-  background: #fafbf8;
+  border: var(--stroke-hairline) solid var(--line);
+  background: var(--surface-subtle);
 }
 
 .kdam-formula-row.active { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); background: var(--accent-soft); }
-.kdam-formula-number { grid-row: 1 / 4; display: grid; width: 1.15rem; height: 1.15rem; place-items: center; border-radius: 50%; background: var(--ink); color: white; font-family: var(--font-mono); font-size: 0.48rem; }
+.kdam-formula-number { grid-row: 1 / 4; display: grid; width: 1.15rem; height: 1.15rem; place-items: center; border-radius: 50%; background: var(--ink); color: white; font-family: var(--font-mono); font-size: var(--text-xs); }
 .kdam-formula-row.active .kdam-formula-number { background: var(--accent); }
-.kdam-formula-row strong { color: var(--ink); font-size: clamp(0.43rem, 0.56cqw, 0.53rem); }
-.kdam-formula-row p { margin: 0; color: var(--blue); font-family: var(--font-mono); font-size: clamp(0.37rem, 0.48cqw, 0.46rem); line-height: 1.28; overflow-wrap: anywhere; }
-.kdam-formula-row small { color: var(--muted); font-size: clamp(0.33rem, 0.43cqw, 0.41rem); line-height: 1.25; }
+.kdam-formula-row strong { color: var(--ink); font-size: var(--text-xs); }
+.kdam-formula-row p { margin: 0; color: var(--blue); font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.28; overflow-wrap: anywhere; }
+.kdam-formula-row small { color: var(--muted); font-size: var(--text-xs); line-height: 1.25; }
 
 @media (max-width: 900px) {
   .kdam-main { grid-template-columns: 1fr; overflow: auto; }
@@ -755,11 +755,11 @@
   width: 100%;
   min-width: 0;
   padding: clamp(0.42rem, 0.65cqw, 0.58rem);
-  border: 1px solid var(--ink);
-  border-radius: 4px;
+  border: var(--stroke-hairline) solid var(--ink);
+  border-radius: var(--radius-md);
   background: var(--surface);
   color: var(--ink);
-  font: 800 clamp(0.48rem, 0.66cqw, 0.62rem) var(--font-mono);
+  font: 800 var(--text-xs) var(--font-mono);
 }
 
 .kdam-evolution-current {
@@ -769,11 +769,11 @@
   min-width: 0;
   padding: clamp(0.35rem, 0.54cqw, 0.5rem);
   border-left: 3px solid var(--accent);
-  background: #fafbf8;
+  background: var(--surface-subtle);
 }
 
-.kdam-evolution-current strong { color: var(--blue); font: 800 clamp(0.48rem, 0.65cqw, 0.61rem) var(--font-mono); overflow-wrap: anywhere; }
-.kdam-evolution-current p { margin: 0; color: var(--muted); font-size: clamp(0.4rem, 0.54cqw, 0.51rem); }
+.kdam-evolution-current strong { color: var(--blue); font: 800 var(--text-xs) var(--font-mono); overflow-wrap: anywhere; }
+.kdam-evolution-current p { margin: 0; color: var(--muted); font-size: var(--text-xs); }
 
 .kdam-memory-viz {
   display: grid;
@@ -782,21 +782,21 @@
   gap: clamp(0.35rem, 0.55cqw, 0.5rem) clamp(0.6rem, 0.9cqw, 0.82rem);
   min-height: 0;
   padding: clamp(0.5rem, 0.75cqw, 0.68rem);
-  border-top: 2px solid var(--ink);
-  background: #fafbf8;
+  border-top: var(--stroke-strong) solid var(--ink);
+  background: var(--surface-subtle);
 }
 
 .kdam-viz-header { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
-.kdam-viz-header strong { color: var(--ink); font-size: clamp(0.52rem, 0.72cqw, 0.68rem); }
-.kdam-viz-header span { color: var(--accent); font: 800 clamp(0.4rem, 0.54cqw, 0.51rem) var(--font-mono); }
-.kdam-evolution-matrix { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; width: min(100%, 11rem); aspect-ratio: 1; place-self: center; padding: 0.28rem; border: 1px solid var(--ink); background: var(--surface); }
-.kdam-evolution-matrix i { transition: opacity 180ms ease, background 180ms ease; }
+.kdam-viz-header strong { color: var(--ink); font-size: var(--text-xs); }
+.kdam-viz-header span { color: var(--accent); font: 800 var(--text-xs) var(--font-mono); }
+.kdam-evolution-matrix { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; width: min(100%, 11rem); aspect-ratio: 1; place-self: center; padding: 0.28rem; border: var(--stroke-hairline) solid var(--ink); background: var(--surface); }
+.kdam-evolution-matrix i { transition: opacity var(--motion-fast) ease, background var(--motion-fast) ease; }
 .kdam-evolution-matrix i.erased { box-shadow: inset 0 0 0 1px rgb(255 255 255 / 65%); }
 .kdam-memory-legend { display: grid; align-content: center; gap: 0.38rem; }
-.kdam-memory-legend span { display: flex; gap: 0.3rem; align-items: center; color: var(--muted); font-size: clamp(0.36rem, 0.48cqw, 0.45rem); white-space: nowrap; }
+.kdam-memory-legend span { display: flex; gap: 0.3rem; align-items: center; color: var(--muted); font-size: var(--text-xs); white-space: nowrap; }
 .kdam-memory-legend span::before { width: 0.62rem; height: 0.62rem; background: var(--legend-color); content: ""; }
 .kdam-evolution-controls { display: grid; align-content: center; gap: clamp(0.38rem, 0.6cqw, 0.55rem); }
-.kdam-evolution-control { display: grid; gap: 0.18rem; color: var(--ink); font: 700 clamp(0.39rem, 0.52cqw, 0.49rem) var(--font-mono); }
+.kdam-evolution-control { display: grid; gap: 0.18rem; color: var(--ink); font: 700 var(--text-xs) var(--font-mono); }
 .kdam-evolution-control input { width: 100%; accent-color: var(--accent); }
 .kdam-evolution-control[hidden] { display: none; }
 
@@ -805,24 +805,24 @@
 .kdam-evolution-overview .kdam-evolution-table > * { display: grid; place-items: center; }
 
 .kdam-write-experience { grid-template-rows: minmax(0, 1fr) auto; }
-.kdam-kda-module { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; border-top: 2px solid var(--ink); background: #fafbf8; }
-.kdam-module-heading { display: flex; justify-content: space-between; gap: 0.7rem; align-items: baseline; padding: 0.32rem 0.48rem; border-bottom: 1px solid var(--line); }
-.kdam-module-heading strong { font-size: clamp(0.5rem, 0.69cqw, 0.65rem); }
-.kdam-module-heading span { color: var(--accent); font: 800 clamp(0.37rem, 0.49cqw, 0.46rem) var(--font-mono); white-space: nowrap; }
+.kdam-kda-module { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; border-top: var(--stroke-strong) solid var(--ink); background: var(--surface-subtle); }
+.kdam-module-heading { display: flex; justify-content: space-between; gap: 0.7rem; align-items: baseline; padding: 0.32rem 0.48rem; border-bottom: var(--stroke-hairline) solid var(--line); }
+.kdam-module-heading strong { font-size: var(--text-xs); }
+.kdam-module-heading span { color: var(--accent); font: 800 var(--text-xs) var(--font-mono); white-space: nowrap; }
 .kdam-module-body { display: grid; grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr); min-height: 0; }
-.kdam-architecture-host { min-width: 0; min-height: 0; padding-right: 0.35rem; border-right: 1px solid var(--line); }
+.kdam-architecture-host { min-width: 0; min-height: 0; padding-right: 0.35rem; border-right: var(--stroke-hairline) solid var(--line); }
 .kdam-architecture-host .kdam-architecture { width: 100%; height: 100%; min-height: 0; }
 .kdam-formula-stack-unified { grid-template-columns: 1fr; grid-template-rows: repeat(5, minmax(0, 1fr)) auto; gap: 2px; min-height: 0; padding-left: 0.4rem; }
 .kdam-formula-stack-unified .kdam-formula-row { grid-template-columns: auto minmax(0, 1fr); align-content: center; padding: 0.18rem 0.26rem; }
-.kdam-formula-stack-unified .kdam-formula-row p { font-size: clamp(0.31rem, 0.42cqw, 0.4rem); }
-.kdam-formula-stack-unified .kdam-formula-row small { display: block; font-size: clamp(0.29rem, 0.38cqw, 0.36rem); }
+.kdam-formula-stack-unified .kdam-formula-row p { font-size: var(--text-xs); }
+.kdam-formula-stack-unified .kdam-formula-row small { display: block; font-size: var(--text-xs); }
 
 /* Four-stage KDA learning path */
 .kdam-main { grid-template-columns: minmax(0, 62fr) minmax(0, 34fr); gap: 4%; }
 .kdam-tabs { width: 100%; }
 .kdam-tabs button { flex: 1; min-width: 0; padding-inline: clamp(0.24rem, 0.38cqw, 0.35rem); }
 .kdam-evolution-pane { display: grid; grid-template-rows: repeat(4, auto); align-content: start; gap: clamp(0.18rem, 0.28cqw, 0.26rem); height: 100%; overflow: auto; }
-.kdam-evolution-card { border: 1px solid var(--line); background: var(--surface); }
+.kdam-evolution-card { border: var(--stroke-hairline) solid var(--line); background: var(--surface); }
 .kdam-evolution-card:first-child { background: var(--paper); }
 .kdam-evolution-card.featured { border-color: var(--accent); background: var(--blue-soft); }
 .kdam-evolution-trigger {
@@ -838,34 +838,34 @@
   text-align: left;
   cursor: pointer;
 }
-.kdam-evolution-index { color: var(--accent); font-family: var(--font-mono); font-size: clamp(0.38rem, 0.5cqw, 0.47rem); }
-.kdam-evolution-trigger strong { font-size: clamp(0.48rem, 0.65cqw, 0.61rem); }
-.kdam-evolution-trigger code { color: var(--blue); font-family: var(--font-mono); font-size: clamp(0.39rem, 0.52cqw, 0.49rem); overflow-wrap: anywhere; }
-.kdam-evolution-trigger > span:nth-of-type(2) { color: var(--muted); font-size: clamp(0.39rem, 0.52cqw, 0.49rem); }
-.kdam-evolution-trigger b { color: var(--accent); font-size: 1rem; }
-.kdam-evolution-detail { padding: 0 clamp(0.55rem, 0.8cqw, 0.74rem) clamp(0.45rem, 0.68cqw, 0.62rem); border-top: 1px solid var(--line); }
+.kdam-evolution-index { color: var(--accent); font-family: var(--font-mono); font-size: var(--text-xs); }
+.kdam-evolution-trigger strong { font-size: var(--text-xs); }
+.kdam-evolution-trigger code { color: var(--blue); font-family: var(--font-mono); font-size: var(--text-xs); overflow-wrap: anywhere; }
+.kdam-evolution-trigger > span:nth-of-type(2) { color: var(--muted); font-size: var(--text-xs); }
+.kdam-evolution-trigger b { color: var(--accent); font-size: var(--text-md); }
+.kdam-evolution-detail { padding: 0 clamp(0.55rem, 0.8cqw, 0.74rem) clamp(0.45rem, 0.68cqw, 0.62rem); border-top: var(--stroke-hairline) solid var(--line); }
 .kdam-evolution-detail[hidden] { display: none; }
-.kdam-evolution-detail p { margin: 0.28rem 0 0; font-size: clamp(0.4rem, 0.54cqw, 0.51rem); }
+.kdam-evolution-detail p { margin: 0.28rem 0 0; font-size: var(--text-xs); }
 .kdam-evolution-detail p.danger { color: var(--accent); }
-.kdam-evolution-detail small { display: block; padding: 0.28rem 0; color: var(--muted); font-family: var(--font-mono); font-size: clamp(0.36rem, 0.48cqw, 0.45rem); }
+.kdam-evolution-detail small { display: block; padding: 0.28rem 0; color: var(--muted); font-family: var(--font-mono); font-size: var(--text-xs); }
 .kdam-interference { display: block; width: 100%; height: clamp(4.8rem, 7cqw, 6.5rem); }
 .kdam-mini-cell { fill: var(--paper); stroke: var(--line); }
 .kdam-mini-cell.blue { fill: var(--blue); opacity: 0.72; }
 .kdam-mini-cell.dirty { fill: #8c7168; opacity: 0.78; }
-.kdam-interference-title { fill: var(--ink); font-family: var(--font-mono); font-size: 10px; font-weight: 800; text-anchor: middle; }
-.kdam-interference-note { fill: var(--muted); font-family: var(--font-mono); font-size: 9px; text-anchor: middle; }
-.kdam-interference-danger { fill: var(--accent); font-family: var(--font-mono); font-size: 9px; text-anchor: middle; }
+.kdam-interference-title { fill: var(--ink); font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-anchor: middle; }
+.kdam-interference-note { fill: var(--muted); font-family: var(--font-mono); font-size: var(--text-xs); text-anchor: middle; }
+.kdam-interference-danger { fill: var(--accent); font-family: var(--font-mono); font-size: var(--text-xs); text-anchor: middle; }
 .kdam-interference-arrow { stroke: var(--muted); stroke-width: 1.2; }
-.kdam-query-arrow { fill: var(--green); font-family: var(--font-mono); font-size: 12px; font-weight: 800; }
-.kdam-fix-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.18rem 0.5rem; padding-top: 0.3rem; font-size: clamp(0.38rem, 0.5cqw, 0.47rem); }
+.kdam-query-arrow { fill: var(--green); font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 800; }
+.kdam-fix-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.18rem 0.5rem; padding-top: 0.3rem; font-size: var(--text-xs); }
 .kdam-fix-grid b { color: var(--green); }
 .kdam-evolution-side { grid-template-rows: auto auto minmax(0, 1fr); align-content: start; gap: 0.55rem; }
-.kdam-side-title { color: var(--ink); font-size: clamp(0.58rem, 0.8cqw, 0.75rem); }
-.kdam-evolution-table { display: grid; grid-template-columns: 1.1fr repeat(4, 1fr); border-top: 1px solid var(--ink); border-left: 1px solid var(--line); }
-.kdam-evolution-table > * { padding: clamp(0.42rem, 0.62cqw, 0.56rem) 0.2rem; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: clamp(0.56rem, 0.72cqw, 0.68rem); line-height: 1.25; text-align: center; }
+.kdam-side-title { color: var(--ink); font-size: var(--text-xs); }
+.kdam-evolution-table { display: grid; grid-template-columns: 1.1fr repeat(4, 1fr); border-top: var(--stroke-hairline) solid var(--ink); border-left: var(--stroke-hairline) solid var(--line); }
+.kdam-evolution-table > * { padding: clamp(0.42rem, 0.62cqw, 0.56rem) 0.2rem; border-right: var(--stroke-hairline) solid var(--line); border-bottom: var(--stroke-hairline) solid var(--line); font-size: var(--text-xs); line-height: 1.25; text-align: center; }
 .kdam-evolution-table strong { font-family: var(--font-mono); }
 .kdam-evolution-table .featured { background: var(--accent-soft); color: var(--accent); font-weight: 800; }
-.kdam-evolution-conclusion { align-self: end; margin: 0; padding-top: 0.5rem; border-top: 1px solid var(--ink); font-size: clamp(0.48rem, 0.65cqw, 0.61rem); line-height: 1.45; }
+.kdam-evolution-conclusion { align-self: end; margin: 0; padding-top: 0.5rem; border-top: var(--stroke-hairline) solid var(--ink); font-size: var(--text-xs); line-height: 1.45; }
 
 .kdam-write-pane { grid-template-rows: auto minmax(0, 1fr) auto; }
 .kdam-write-canvas {
@@ -874,8 +874,8 @@
   min-height: 0;
   place-items: center;
   overflow: hidden;
-  border-top: 1px solid var(--ink);
-  background: #fafbf8;
+  border-top: var(--stroke-hairline) solid var(--ink);
+  background: var(--surface-subtle);
 }
 .kdam-write-canvas .kdam-matrix-label { top: clamp(3rem, 4.5cqw, 4.1rem); }
 .kdam-write-canvas .kdam-token-row { top: clamp(0.55rem, 0.85cqw, 0.78rem); }
@@ -894,11 +894,11 @@
   gap: clamp(0.18rem, 0.28cqw, 0.25rem);
   align-items: center;
   padding: clamp(0.32rem, 0.48cqw, 0.44rem);
-  border: 1px solid var(--line);
+  border: var(--stroke-hairline) solid var(--line);
   background: var(--surface);
   color: var(--blue);
   font-family: var(--font-mono);
-  font-size: clamp(0.38rem, 0.5cqw, 0.47rem);
+  font-size: var(--text-xs);
 }
 .kdam-output-flow b { display: grid; width: 1.25rem; height: 1.25rem; place-items: center; border-radius: 50%; background: var(--accent); color: white; }
 .kdam-output-flow i { color: var(--muted); font-style: normal; }
@@ -912,75 +912,75 @@
 .kdam-formula-stack { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .kdam-formula-row { grid-template-columns: 1fr; align-content: start; gap: 0.1rem; padding: 0.28rem; }
 .kdam-formula-number { grid-row: auto; width: 1rem; height: 1rem; }
-.kdam-formula-row p { font-size: clamp(0.31rem, 0.4cqw, 0.38rem); }
+.kdam-formula-row p { font-size: var(--text-xs); }
 .kdam-formula-row small { display: none; }
-.kdam-full-equation { margin: 0; padding-top: 0.28rem; border-top: 1px solid var(--line); color: var(--muted); font-family: var(--font-mono); font-size: clamp(0.34rem, 0.44cqw, 0.42rem); }
+.kdam-full-equation { margin: 0; padding-top: 0.28rem; border-top: var(--stroke-hairline) solid var(--line); color: var(--muted); font-family: var(--font-mono); font-size: var(--text-xs); }
 
 .kdam-decay-pane { grid-template-rows: minmax(0, 1.05fr) auto auto auto minmax(0, 0.85fr); }
 .kdam-alpha-control { grid-template-columns: auto minmax(0, 1fr) auto; }
 .kdam-alpha-control input.danger { accent-color: var(--accent); }
-.kdam-alpha-warning { color: var(--accent); font-size: clamp(0.34rem, 0.45cqw, 0.42rem); }
+.kdam-alpha-warning { color: var(--accent); font-size: var(--text-xs); }
 .kdam-alpha-warning[hidden] { visibility: hidden; }
-.kdam-alpha-floor-line { stroke: #c7732f; stroke-width: 1.2; stroke-dasharray: 6 3; }
-.kdam-alpha-floor-text { fill: #c7732f; font-family: var(--font-mono); font-size: 7px; font-weight: 800; }
-.kdam-floor-note { margin: 0; color: var(--muted); font-size: clamp(0.34rem, 0.46cqw, 0.43rem); }
+.kdam-alpha-floor-line { stroke: var(--warning); stroke-width: 1.2; stroke-dasharray: var(--dash-normal); }
+.kdam-alpha-floor-text { fill: var(--warning); font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; }
+.kdam-floor-note { margin: 0; color: var(--muted); font-size: var(--text-xs); }
 .kdam-decay-side-v2 { grid-template-rows: auto auto auto minmax(0, 1fr); align-content: center; gap: clamp(0.6rem, 0.9cqw, 0.82rem); }
-.kdam-alpha-value-v2 { color: var(--accent); font-family: var(--font-mono); font-size: clamp(1.7rem, 3.2cqw, 3rem); line-height: 1; }
-.kdam-window-value-v2 { margin: 0; color: var(--green); font-family: var(--font-mono); font-size: clamp(0.7rem, 1.05cqw, 0.98rem); font-weight: 800; }
-.kdam-method-compare-v2 { align-self: end; padding-top: 0.55rem; border-top: 1px solid var(--ink); font-family: var(--font-mono); }
-.kdam-method-compare-v2 p { margin: 0 0 0.4rem; font-size: clamp(0.48rem, 0.64cqw, 0.6rem); }
-.kdam-method-compare-v2 small { color: var(--muted); font-size: clamp(0.38rem, 0.5cqw, 0.47rem); }
+.kdam-alpha-value-v2 { color: var(--accent); font-family: var(--font-mono); font-size: var(--text-xl); line-height: 1; }
+.kdam-window-value-v2 { margin: 0; color: var(--green); font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 800; }
+.kdam-method-compare-v2 { align-self: end; padding-top: 0.55rem; border-top: var(--stroke-hairline) solid var(--ink); font-family: var(--font-mono); }
+.kdam-method-compare-v2 p { margin: 0 0 0.4rem; font-size: var(--text-xs); }
+.kdam-method-compare-v2 small { color: var(--muted); font-size: var(--text-xs); }
 
 .kdam-hybrid-pane { display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; gap: clamp(0.2rem, 0.32cqw, 0.29rem); height: 100%; min-height: 0; }
-.kdam-hybrid-narrative { margin: 0; padding: 0.35rem 0.5rem; border-left: 3px solid var(--accent); background: #fafbf8; font-size: clamp(0.43rem, 0.57cqw, 0.54rem); line-height: 1.35; }
-.kdam-hybrid-svg { display: block; width: 100%; height: 100%; min-height: 8.5rem; background: #fafbf8; }
+.kdam-hybrid-narrative { margin: 0; padding: 0.35rem 0.5rem; border-left: 3px solid var(--accent); background: var(--surface-subtle); font-size: var(--text-xs); line-height: 1.35; }
+.kdam-hybrid-svg { display: block; width: 100%; height: 100%; min-height: 8.5rem; background: var(--surface-subtle); }
 .kdam-hybrid-divider { stroke: var(--line); stroke-width: 1.2; stroke-dasharray: 5 4; }
-.kdam-hybrid-title { font-family: var(--font-mono); font-size: 11px; font-weight: 800; text-anchor: middle; }
+.kdam-hybrid-title { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-anchor: middle; }
 .kdam-hybrid-title.kda { fill: var(--blue); }
 .kdam-hybrid-title.mla { fill: var(--green); }
-.kdam-hybrid-center { fill: var(--ink); font-family: var(--font-mono); font-size: 10px; font-weight: 800; text-anchor: middle; }
+.kdam-hybrid-center { fill: var(--ink); font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-anchor: middle; }
 .kdam-hybrid-token.kda { fill: var(--blue); }
 .kdam-hybrid-token.mla { fill: var(--green); }
 .kdam-state-box { fill: var(--blue-soft); stroke: var(--blue); }
 .kdam-latent-box { fill: var(--green-soft); stroke: var(--green); }
-.kdam-state-link { stroke: var(--blue); stroke-width: 1; stroke-dasharray: 3 2; }
+.kdam-state-link { stroke: var(--blue); stroke-width: 1; stroke-dasharray: var(--dash-fine); }
 .kdam-retrieval-arc { fill: none; stroke: var(--green); stroke-width: 1; }
 .kdam-retrieval-arc.weight-0 { opacity: 0.28; }
 .kdam-retrieval-arc.weight-1 { opacity: 0.58; }
 .kdam-retrieval-arc.weight-2 { opacity: 0.9; }
-.kdam-hybrid-caption { font-family: var(--font-mono); font-size: 9px; font-weight: 800; text-anchor: middle; }
+.kdam-hybrid-caption { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-anchor: middle; }
 .kdam-hybrid-caption.kda { fill: var(--blue); }
 .kdam-hybrid-caption.mla { fill: var(--green); }
-.kdam-hybrid-note { fill: var(--muted); font-family: var(--font-mono); font-size: 8px; text-anchor: middle; }
-.kdam-block-ratio { fill: var(--ink); font-family: var(--font-mono); font-size: 9px; font-weight: 800; text-anchor: middle; }
-.kdam-token-count-control { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.6rem; align-items: center; font-family: var(--font-mono); font-size: clamp(0.4rem, 0.54cqw, 0.51rem); }
+.kdam-hybrid-note { fill: var(--muted); font-family: var(--font-mono); font-size: var(--text-xs); text-anchor: middle; }
+.kdam-block-ratio { fill: var(--ink); font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-anchor: middle; }
+.kdam-token-count-control { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.6rem; align-items: center; font-family: var(--font-mono); font-size: var(--text-xs); }
 .kdam-token-count-control input { accent-color: var(--accent); }
 .kdam-hybrid-bottom { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.45rem; min-height: 0; }
 .kdam-scenario-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.3rem; }
-.kdam-scenario { padding: 0.34rem; border: 1px solid var(--line); background: var(--surface); }
-.kdam-scenario strong { font-size: clamp(0.4rem, 0.54cqw, 0.51rem); }
-.kdam-scenario p { margin: 0.2rem 0 0; font-size: clamp(0.34rem, 0.45cqw, 0.42rem); }
+.kdam-scenario { padding: 0.34rem; border: var(--stroke-hairline) solid var(--line); background: var(--surface); }
+.kdam-scenario strong { font-size: var(--text-xs); }
+.kdam-scenario p { margin: 0.2rem 0 0; font-size: var(--text-xs); }
 .kdam-scenario p.kda { color: var(--blue); }
 .kdam-scenario p.mla { color: var(--green); }
 .kdam-mini-block { display: grid; gap: 2px; width: clamp(6rem, 9cqw, 8rem); }
-.kdam-mini-block span { padding: 0.2rem 0.3rem; font-family: var(--font-mono); font-size: clamp(0.31rem, 0.4cqw, 0.38rem); }
+.kdam-mini-block span { padding: 0.2rem 0.3rem; font-family: var(--font-mono); font-size: var(--text-xs); }
 .kdam-mini-block span.kda { background: var(--blue-soft); color: var(--blue); }
 .kdam-mini-block span.mla { background: var(--green-soft); color: var(--green); font-weight: 800; }
-.kdam-mini-block small { color: var(--muted); font-size: clamp(0.3rem, 0.39cqw, 0.37rem); }
+.kdam-mini-block small { color: var(--muted); font-size: var(--text-xs); }
 
 .kdam-hybrid-side { grid-template-rows: auto auto auto minmax(0, 1fr); gap: 0.42rem; }
-.kdam-hybrid-table { display: grid; grid-template-columns: 0.8fr 1fr 1fr; border-top: 1px solid var(--ink); border-left: 1px solid var(--line); }
-.kdam-hybrid-table > * { padding: 0.25rem 0.16rem; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: clamp(0.31rem, 0.41cqw, 0.39rem); text-align: center; }
+.kdam-hybrid-table { display: grid; grid-template-columns: 0.8fr 1fr 1fr; border-top: var(--stroke-hairline) solid var(--ink); border-left: var(--stroke-hairline) solid var(--line); }
+.kdam-hybrid-table > * { padding: 0.25rem 0.16rem; border-right: var(--stroke-hairline) solid var(--line); border-bottom: var(--stroke-hairline) solid var(--line); font-size: var(--text-xs); text-align: center; }
 .kdam-hybrid-table strong { font-family: var(--font-mono); }
-.kdam-cache-readout { padding: 0.38rem; background: #fafbf8; font-family: var(--font-mono); }
-.kdam-cache-readout p { margin: 0.16rem 0; font-size: clamp(0.39rem, 0.52cqw, 0.49rem); font-weight: 800; }
+.kdam-cache-readout { padding: 0.38rem; background: var(--surface-subtle); font-family: var(--font-mono); }
+.kdam-cache-readout p { margin: 0.16rem 0; font-size: var(--text-xs); font-weight: 800; }
 .kdam-cache-readout p.kda { color: var(--blue); }
 .kdam-cache-readout p.mla { color: var(--green); }
-.kdam-ratio-reason { align-self: end; border-top: 1px solid var(--ink); }
-.kdam-ratio-reason > button { width: 100%; padding: 0.4rem 0; border: 0; background: transparent; color: var(--ink); font-size: clamp(0.4rem, 0.54cqw, 0.51rem); font-weight: 800; text-align: left; cursor: pointer; }
+.kdam-ratio-reason { align-self: end; border-top: var(--stroke-hairline) solid var(--ink); }
+.kdam-ratio-reason > button { width: 100%; padding: 0.4rem 0; border: 0; background: transparent; color: var(--ink); font-size: var(--text-xs); font-weight: 800; text-align: left; cursor: pointer; }
 .kdam-ratio-reason > div { padding: 0.38rem; background: var(--surface); }
-.kdam-ratio-reason p { margin: 0.2rem 0; font-size: clamp(0.36rem, 0.48cqw, 0.45rem); }
-.kdam-ratio-reason small { color: var(--muted); font-size: clamp(0.32rem, 0.42cqw, 0.4rem); }
+.kdam-ratio-reason p { margin: 0.2rem 0; font-size: var(--text-xs); }
+.kdam-ratio-reason small { color: var(--muted); font-size: var(--text-xs); }
 
 .kdam-derivation {
   display: grid;
@@ -991,23 +991,23 @@
   min-height: 0;
   padding: clamp(0.55rem, 0.85cqw, 0.78rem);
 }
-.kdam-back-button { grid-column: 1 / -1; justify-self: start; padding: 0; border: 0; background: transparent; color: var(--muted); font-family: var(--font-mono); font-size: clamp(0.44rem, 0.58cqw, 0.55rem); cursor: pointer; }
-.kdam-derivation-section { min-width: 0; padding: clamp(0.55rem, 0.85cqw, 0.78rem); border-top: 2px solid var(--ink); background: #fafbf8; }
-.kdam-derivation-section h2 { margin: 0 0 clamp(0.55rem, 0.85cqw, 0.78rem); font-size: clamp(0.68rem, 0.95cqw, 0.9rem); }
+.kdam-back-button { grid-column: 1 / -1; justify-self: start; padding: 0; border: 0; background: transparent; color: var(--muted); font-family: var(--font-mono); font-size: var(--text-xs); cursor: pointer; }
+.kdam-derivation-section { min-width: 0; padding: clamp(0.55rem, 0.85cqw, 0.78rem); border-top: var(--stroke-strong) solid var(--ink); background: var(--surface-subtle); }
+.kdam-derivation-section h2 { margin: 0 0 clamp(0.55rem, 0.85cqw, 0.78rem); font-size: var(--text-xs); }
 .kdam-update-derivation { display: grid; align-content: center; }
-.kdam-derivation-formula { color: var(--ink); font-family: var(--font-mono); font-size: clamp(0.72rem, 1.05cqw, 0.98rem); line-height: 1.6; }
+.kdam-derivation-formula { color: var(--ink); font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1.6; }
 .kdam-derivation-formula .erase,
 .kdam-formula-annotations .erase { color: var(--accent); }
 .kdam-derivation-formula .decay,
 .kdam-formula-annotations .decay { color: var(--muted); }
 .kdam-derivation-formula .write,
 .kdam-formula-annotations .write { color: var(--green); }
-.kdam-formula-annotations { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; margin-top: 0.5rem; font-family: var(--font-mono); font-size: clamp(0.42rem, 0.56cqw, 0.53rem); }
+.kdam-formula-annotations { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; margin-top: 0.5rem; font-family: var(--font-mono); font-size: var(--text-xs); }
 .kdam-query-formulas { grid-column: 1; }
-.kdam-query-formulas p { margin: 0.32rem 0; color: var(--blue); font-family: var(--font-mono); font-size: clamp(0.58rem, 0.82cqw, 0.77rem); }
+.kdam-query-formulas p { margin: 0.32rem 0; color: var(--blue); font-family: var(--font-mono); font-size: var(--text-xs); }
 .kdam-constraints { grid-column: 2; grid-row: 2 / 4; }
-.kdam-constraint-table { display: grid; grid-template-columns: 0.55fr 1.1fr 1.7fr; border-top: 1px solid var(--ink); border-left: 1px solid var(--line); }
-.kdam-constraint-table > * { padding: clamp(0.38rem, 0.58cqw, 0.52rem) 0.25rem; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: clamp(0.38rem, 0.5cqw, 0.47rem); line-height: 1.3; }
+.kdam-constraint-table { display: grid; grid-template-columns: 0.55fr 1.1fr 1.7fr; border-top: var(--stroke-hairline) solid var(--ink); border-left: var(--stroke-hairline) solid var(--line); }
+.kdam-constraint-table > * { padding: clamp(0.38rem, 0.58cqw, 0.52rem) 0.25rem; border-right: var(--stroke-hairline) solid var(--line); border-bottom: var(--stroke-hairline) solid var(--line); font-size: var(--text-xs); line-height: 1.3; }
 .kdam-constraint-table strong { background: var(--paper); font-family: var(--font-mono); }
 
 @media (max-width: 900px) {
@@ -1026,56 +1026,56 @@
 .kdam-formula-stack-unified .kdam-formula-row { grid-template-columns: auto minmax(0, 1fr); }
 .kdam-formula-stack-unified .kdam-formula-number { grid-row: 1 / 4; }
 .kdam-formula-stack-unified .kdam-formula-row small { display: block; }
-.kdam-master-equation { display: flex; flex-wrap: wrap; gap: 0.18rem; align-items: center; padding: 0.26rem 0.32rem; border-top: 1px solid var(--ink); color: var(--ink); font: 700 clamp(0.34rem, 0.46cqw, 0.43rem) var(--font-mono); }
+.kdam-master-equation { display: flex; flex-wrap: wrap; gap: 0.18rem; align-items: center; padding: 0.26rem 0.32rem; border-top: var(--stroke-hairline) solid var(--ink); color: var(--ink); font: 700 var(--text-xs) var(--font-mono); }
 .kdam-master-equation .erase { color: var(--accent); }
 .kdam-master-equation .decay { color: var(--muted); }
 .kdam-master-equation .write { color: var(--green); }
 .kdam-master-equation[data-step="3"] { background: var(--green-soft); }
 
 .kdam-write-explanation { grid-template-rows: auto auto auto minmax(0, 1fr); gap: clamp(0.35rem, 0.55cqw, 0.5rem); }
-.kdam-write-explanation h2 { margin: 0; font-size: clamp(0.72rem, 1.05cqw, 0.98rem); line-height: 1.2; }
-.kdam-step-explanation { margin: 0; padding-left: 0.55rem; border-left: 3px solid var(--accent); color: var(--muted); font-size: clamp(0.43rem, 0.58cqw, 0.55rem); line-height: 1.45; }
+.kdam-write-explanation h2 { margin: 0; font-size: var(--text-sm); line-height: 1.2; }
+.kdam-step-explanation { margin: 0; padding-left: 0.55rem; border-left: 3px solid var(--accent); color: var(--muted); font-size: var(--text-xs); line-height: 1.45; }
 .kdam-write-constraints { align-self: end; grid-template-columns: 0.6fr 1fr 1.55fr; }
-.kdam-write-constraints > * { padding: clamp(0.28rem, 0.42cqw, 0.39rem) 0.2rem; font-size: clamp(0.34rem, 0.45cqw, 0.42rem); }
+.kdam-write-constraints > * { padding: clamp(0.28rem, 0.42cqw, 0.39rem) 0.2rem; font-size: var(--text-xs); }
 
 .kdam-decay-pane { grid-template-rows: minmax(0, 1.05fr) auto auto auto auto minmax(0, 0.85fr); }
-.kdam-threshold-control { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.6rem; align-items: center; padding: 0 0.18rem; color: var(--green); font: 700 clamp(0.4rem, 0.53cqw, 0.5rem) var(--font-mono); }
+.kdam-threshold-control { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.6rem; align-items: center; padding: 0 0.18rem; color: var(--green); font: 700 var(--text-xs) var(--font-mono); }
 .kdam-threshold-control input { width: 100%; accent-color: var(--green); }
-.kdam-window-threshold { stroke: var(--green); stroke-width: 1.3; stroke-dasharray: 6 3; }
-.kdam-threshold-text { fill: var(--green); font: 800 7px var(--font-mono); }
+.kdam-window-threshold { stroke: var(--green); stroke-width: 1.3; stroke-dasharray: var(--dash-normal); }
+.kdam-threshold-text { fill: var(--green); font: 800 var(--text-xs) var(--font-mono); }
 
 .kdam-division-pane { grid-template-rows: auto minmax(0, 1fr) auto auto; gap: clamp(0.4rem, 0.65cqw, 0.58rem); }
-.kdam-division-intro { margin: 0; color: var(--ink); font-size: clamp(0.43rem, 0.58cqw, 0.55rem); line-height: 1.4; }
+.kdam-division-intro { margin: 0; color: var(--ink); font-size: var(--text-xs); line-height: 1.4; }
 .kdam-memory-lanes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(0.65rem, 1cqw, 0.9rem); min-height: 0; }
-.kdam-memory-lane { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto auto; gap: clamp(0.3rem, 0.48cqw, 0.44rem); min-height: 0; padding: clamp(0.48rem, 0.75cqw, 0.68rem); border-top: 3px solid var(--blue); background: #fafbf8; }
+.kdam-memory-lane { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto auto; gap: clamp(0.3rem, 0.48cqw, 0.44rem); min-height: 0; padding: clamp(0.48rem, 0.75cqw, 0.68rem); border-top: 3px solid var(--blue); background: var(--surface-subtle); }
 .kdam-memory-lane.mla { border-color: var(--green); }
-.kdam-memory-lane > span { color: var(--blue); font-size: clamp(0.48rem, 0.66cqw, 0.62rem); font-weight: 800; }
+.kdam-memory-lane > span { color: var(--blue); font-size: var(--text-xs); font-weight: 800; }
 .kdam-memory-lane.mla > span { color: var(--green); }
-.kdam-memory-lane > strong { font: 800 clamp(0.52rem, 0.72cqw, 0.68rem) var(--font-mono); }
-.kdam-memory-lane > small { color: var(--muted); font-size: clamp(0.36rem, 0.48cqw, 0.45rem); }
+.kdam-memory-lane > strong { font: 800 var(--text-xs) var(--font-mono); }
+.kdam-memory-lane > small { color: var(--muted); font-size: var(--text-xs); }
 .kdam-lane-tokens { display: flex; gap: 0.18rem; min-height: 0.5rem; }
 .kdam-lane-tokens i { width: clamp(0.34rem, 0.48cqw, 0.44rem); aspect-ratio: 1; border-radius: 50%; background: var(--muted); }
-.kdam-fixed-state { display: grid; width: clamp(3.6rem, 5.7cqw, 5.2rem); aspect-ratio: 1; place-self: center; place-items: center; border: 2px solid var(--blue); background: var(--blue-soft); color: var(--blue); font: 800 clamp(1rem, 1.6cqw, 1.45rem) var(--font-mono); }
+.kdam-fixed-state { display: grid; width: clamp(3.6rem, 5.7cqw, 5.2rem); aspect-ratio: 1; place-self: center; place-items: center; border: var(--stroke-strong) solid var(--blue); background: var(--blue-soft); color: var(--blue); font: 800 var(--text-md) var(--font-mono); }
 .kdam-latent-cache { display: flex; gap: clamp(0.1rem, 0.16cqw, 0.15rem); align-items: end; justify-content: center; min-height: 0; }
-.kdam-latent-cache i { width: clamp(0.26rem, 0.4cqw, 0.36rem); height: 76%; border: 1px solid var(--green); background: var(--green-soft); }
-.kdam-token-control { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.65rem; align-items: center; font: 700 clamp(0.4rem, 0.53cqw, 0.5rem) var(--font-mono); }
+.kdam-latent-cache i { width: clamp(0.26rem, 0.4cqw, 0.36rem); height: 76%; border: var(--stroke-hairline) solid var(--green); background: var(--green-soft); }
+.kdam-token-control { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.65rem; align-items: center; font: 700 var(--text-xs) var(--font-mono); }
 .kdam-token-control input { width: 100%; accent-color: var(--accent); }
 .kdam-division-block { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.28rem; }
-.kdam-division-block i { padding: 0.3rem; background: var(--blue-soft); color: var(--blue); font: 700 clamp(0.36rem, 0.48cqw, 0.45rem) var(--font-mono); font-style: normal; text-align: center; }
+.kdam-division-block i { padding: 0.3rem; background: var(--blue-soft); color: var(--blue); font: 700 var(--text-xs) var(--font-mono); font-style: normal; text-align: center; }
 .kdam-division-block i.mla { background: var(--green-soft); color: var(--green); font-weight: 800; }
 
 .kdam-division-side { grid-template-rows: auto auto minmax(0, 1fr) auto; gap: 0.45rem; }
-.kdam-division-count { color: var(--accent); font: 800 clamp(0.72rem, 1.1cqw, 1rem) var(--font-mono); }
-.kdam-division-table { display: grid; grid-template-columns: minmax(4.2rem, 0.55fr) minmax(0, 1.45fr); grid-template-rows: repeat(4, minmax(0, 1fr)); align-content: stretch; min-height: 0; border-top: 1px solid var(--ink); border-left: 1px solid var(--line); }
+.kdam-division-count { color: var(--accent); font: 800 var(--text-sm) var(--font-mono); }
+.kdam-division-table { display: grid; grid-template-columns: minmax(4.2rem, 0.55fr) minmax(0, 1.45fr); grid-template-rows: repeat(4, minmax(0, 1fr)); align-content: stretch; min-height: 0; border-top: var(--stroke-hairline) solid var(--ink); border-left: var(--stroke-hairline) solid var(--line); }
 .kdam-division-table > strong,
-.kdam-division-table > div { min-width: 0; padding: clamp(0.38rem, 0.56cqw, 0.51rem); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.kdam-division-table > strong { display: grid; place-items: center; font: 800 clamp(0.46rem, 0.61cqw, 0.58rem) var(--font-mono); }
+.kdam-division-table > div { min-width: 0; padding: clamp(0.38rem, 0.56cqw, 0.51rem); border-right: var(--stroke-hairline) solid var(--line); border-bottom: var(--stroke-hairline) solid var(--line); }
+.kdam-division-table > strong { display: grid; place-items: center; font: 800 var(--text-xs) var(--font-mono); }
 .kdam-division-values { display: grid; gap: 0.16rem; align-content: center; }
-.kdam-division-values span { display: grid; grid-template-columns: minmax(3.8rem, 0.62fr) minmax(0, 1.38fr); gap: 0.3rem; align-items: baseline; padding: 0.12rem 0.2rem; font-size: clamp(0.38rem, 0.5cqw, 0.47rem); line-height: 1.25; }
+.kdam-division-values span { display: grid; grid-template-columns: minmax(3.8rem, 0.62fr) minmax(0, 1.38fr); gap: 0.3rem; align-items: baseline; padding: 0.12rem 0.2rem; font-size: var(--text-xs); line-height: 1.25; }
 .kdam-division-values span.featured { background: var(--green-soft); color: var(--green); font-weight: 800; }
 .kdam-division-values b { font-family: var(--font-mono); }
 .kdam-division-values i { font-style: normal; }
-.kdam-side-note { margin: 0; color: var(--muted); font-size: clamp(0.38rem, 0.5cqw, 0.47rem); line-height: 1.4; }
+.kdam-side-note { margin: 0; color: var(--muted); font-size: var(--text-xs); line-height: 1.4; }
 .kdam-evolution-side.kdam-evolution-overview { grid-template-rows: auto minmax(0, 1fr) auto; align-content: stretch; }
 .kdam-evolution-side.kdam-evolution-overview .kdam-evolution-table { height: 100%; grid-template-rows: repeat(5, minmax(0, 1fr)); }
 
@@ -1121,12 +1121,16 @@
   gap: clamp(0.28rem, 0.42cqw, 0.38rem);
 }
 
+.kdam-write-pane.kdam-write-experience {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
 .kdam-write-step-list {
   display: grid;
   grid-template-rows: repeat(5, minmax(0, 1fr));
   height: 100%;
   min-height: 0;
-  border-top: 1px solid var(--ink);
+  border-top: var(--stroke-hairline) solid var(--ink);
 }
 
 .kdam-write-step-list button {
@@ -1136,7 +1140,7 @@
   align-content: center;
   min-height: 0;
   padding: clamp(0.26rem, 0.4cqw, 0.36rem);
-  border-bottom: 1px solid var(--line);
+  border-bottom: var(--stroke-hairline) solid var(--line);
   border-left: 3px solid transparent;
   border-top: 0;
   border-right: 0;
@@ -1148,7 +1152,7 @@
 }
 
 .kdam-write-step-list button:hover {
-  background: #fafbf8;
+  background: var(--surface-subtle);
 }
 
 .kdam-write-step-list button:focus-visible {
@@ -1164,11 +1168,11 @@
 .kdam-write-step-number {
   grid-row: 1 / 4;
   color: var(--muted);
-  font: 800 clamp(0.42rem, 0.55cqw, 0.52rem) var(--font-mono);
+  font: 800 var(--text-xs) var(--font-mono);
 }
 
 .kdam-write-step-list strong {
-  font-size: clamp(0.5rem, 0.65cqw, 0.61rem);
+  font-size: var(--text-xs);
 }
 
 .kdam-write-step-list p,
@@ -1179,17 +1183,265 @@
 
 .kdam-write-step-list p {
   color: var(--blue);
-  font: 700 clamp(0.4rem, 0.52cqw, 0.49rem) var(--font-mono);
+  font: 700 var(--text-xs) var(--font-mono);
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
 
 .kdam-write-step-list small {
   color: var(--muted);
-  font-size: clamp(0.36rem, 0.47cqw, 0.44rem);
+  font-size: var(--text-xs);
   line-height: 1.25;
 }
 
 .kdam-write-step-list button.active :is(.kdam-write-step-number, strong, p, small) {
   color: var(--accent);
+}
+
+/* KDA write flow: one state drives the diagram, formula card, and progress dots. */
+.kdam-write-pane.kdam-write-experience {
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: clamp(0.26rem, 0.4cqw, 0.36rem);
+}
+
+.kdam-write-experience .kdam-kda-module {
+  min-height: 0;
+  background: var(--paper);
+}
+
+.kdam-write-experience .kdam-module-body,
+.kdam-write-experience .kdam-architecture-host {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+}
+
+.kdam-write-flow {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  --active-flow: var(--accent);
+}
+
+.kdam-write-flow[data-step="3"] { --active-flow: #b53f31; }
+.kdam-write-flow[data-step="4"] { --active-flow: var(--green); }
+.kdam-write-flow[data-step="5"] { --active-flow: #6b4f7a; }
+.kdam-write-flow marker path { fill: var(--active-flow); }
+
+.kdam-flow-node,
+.kdam-flow-line,
+.kdam-update-line,
+.kdam-flow-product {
+  transition: opacity 300ms ease, stroke 300ms ease, fill 300ms ease;
+}
+
+.kdam-flow-node rect {
+  fill: var(--paper);
+  stroke: var(--line-strong);
+  stroke-width: 1.2;
+}
+
+.kdam-flow-node .title,
+.kdam-flow-node .subtitle {
+  fill: var(--ink);
+  font-family: var(--font-mono);
+}
+
+.kdam-flow-node .title { font-size: 14px; font-weight: 800; }
+.kdam-flow-node .subtitle { fill: var(--muted); font-size: 12px; }
+.kdam-flow-node.state-update rect { fill: var(--surface-subtle); }
+.kdam-flow-node.read rect { fill: var(--green-soft); }
+
+.kdam-flow-node.active rect {
+  stroke: var(--active-flow);
+  stroke-width: 2.4;
+}
+
+.kdam-flow-node.active .title { fill: var(--active-flow); }
+.kdam-flow-node.muted,
+.kdam-flow-line.muted,
+.kdam-update-line.muted,
+.kdam-flow-product.muted { opacity: 0.2; }
+
+.kdam-flow-line {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-linecap: square;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+
+.kdam-flow-line.active {
+  stroke: var(--active-flow);
+  stroke-width: 2.8;
+  stroke-dasharray: 9 6;
+  animation: kdam-flow-forward 900ms linear infinite;
+}
+
+.kdam-update-line {
+  fill: var(--ink);
+  font: 700 13px var(--font-mono);
+  text-anchor: middle;
+}
+
+.kdam-update-line.conflict { fill: var(--accent); }
+.kdam-update-line.strong { font-weight: 900; }
+.kdam-update-line.decay.active { fill: var(--blue); animation: kdam-write-sequence 1.2s ease infinite; }
+.kdam-update-line.erase.active { fill: var(--accent); animation: kdam-write-sequence 1.2s 400ms ease infinite; }
+.kdam-update-line.write.active { fill: var(--green); animation: kdam-write-sequence 1.2s 800ms ease infinite; }
+.kdam-flow-product { fill: var(--active-flow); font: 900 28px var(--font-mono); text-anchor: middle; }
+
+.kdam-write-progress {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  padding: 0.08rem clamp(1.8rem, 3cqw, 2.8rem);
+}
+
+.kdam-write-progress::before {
+  position: absolute;
+  right: clamp(2.5rem, 4.2cqw, 3.9rem);
+  left: clamp(2.5rem, 4.2cqw, 3.9rem);
+  border-top: var(--stroke-hairline) solid var(--line-strong);
+  content: "";
+}
+
+.kdam-write-progress button {
+  z-index: 1;
+  display: grid;
+  width: 1.55rem;
+  aspect-ratio: 1;
+  place-self: center;
+  place-items: center;
+  border: var(--stroke-hairline) solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--muted);
+  font: 800 var(--text-xs) var(--font-mono);
+  cursor: pointer;
+}
+
+.kdam-write-progress button.active { border-color: var(--accent); background: var(--accent); color: white; }
+.kdam-write-progress button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+@keyframes kdam-flow-forward { to { stroke-dashoffset: -30; } }
+@keyframes kdam-write-sequence { 0%, 25%, 100% { opacity: 0.45; } 10%, 18% { opacity: 1; } }
+
+.kdam-write-explanation {
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: clamp(0.26rem, 0.4cqw, 0.36rem);
+}
+
+.kdam-write-step-list {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border-top: var(--stroke-hairline) solid var(--ink);
+}
+
+.kdam-write-step-card {
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: hidden;
+  border-bottom: var(--stroke-hairline) solid var(--line);
+  background: var(--paper);
+  transition: flex-basis 200ms ease, background 200ms ease;
+}
+
+.kdam-write-step-card.active {
+  flex: 1 1 auto;
+  background: var(--surface-subtle);
+}
+
+.kdam-write-step-list .kdam-write-step-trigger {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: clamp(0.34rem, 0.5cqw, 0.46rem);
+  align-items: center;
+  width: 100%;
+  min-height: 2.45rem;
+  padding: clamp(0.34rem, 0.5cqw, 0.46rem);
+  border: 0;
+  border-left: 3px solid transparent;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.kdam-write-step-card.active .kdam-write-step-trigger { border-left-color: var(--accent); }
+.kdam-write-step-trigger:hover { background: var(--surface); }
+.kdam-write-step-trigger:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
+.kdam-write-step-trigger strong { font-size: var(--text-xs); line-height: 1.25; }
+.kdam-write-step-toggle { color: var(--muted); font: 800 var(--text-sm) var(--font-mono); }
+.kdam-write-step-card.active .kdam-write-step-number,
+.kdam-write-step-card.active .kdam-write-step-toggle { color: var(--accent); }
+.kdam-write-step-trigger .kdam-write-step-number { grid-row: auto; }
+
+.kdam-write-step-details {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 200ms ease, opacity 200ms ease;
+}
+
+.kdam-write-step-card.active .kdam-write-step-details {
+  max-height: 30rem;
+  overflow: auto;
+  opacity: 1;
+  padding: 0 clamp(0.48rem, 0.72cqw, 0.66rem) clamp(0.46rem, 0.7cqw, 0.64rem);
+}
+
+.kdam-write-formulas {
+  display: grid;
+  gap: clamp(0.16rem, 0.24cqw, 0.22rem);
+  padding: clamp(0.34rem, 0.5cqw, 0.46rem) 0;
+  border-top: var(--stroke-hairline) solid var(--line);
+}
+
+.kdam-write-formulas code {
+  display: block;
+  color: var(--ink);
+  font: 700 var(--text-xs) var(--font-mono);
+  line-height: 1.32;
+  overflow-wrap: anywhere;
+}
+
+.kdam-write-formulas code.blue { color: var(--blue); }
+.kdam-write-formulas code.accent { color: var(--accent); }
+.kdam-write-formulas code.green { color: var(--green); }
+.kdam-write-formulas code.purple { color: #6b4f7a; }
+.kdam-write-formulas code.master { padding-bottom: 0.22rem; border-bottom: var(--stroke-hairline) solid var(--line); color: var(--ink); }
+
+.kdam-write-intuition,
+.kdam-write-why {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(0.34rem, 0.5cqw, 0.46rem);
+  margin: 0;
+  padding-top: clamp(0.32rem, 0.48cqw, 0.44rem);
+  border-top: var(--stroke-hairline) solid var(--line);
+  font-size: var(--text-xs);
+  line-height: 1.38;
+}
+
+.kdam-write-intuition strong,
+.kdam-write-why strong { color: var(--muted); font-family: var(--font-mono); white-space: nowrap; }
+.kdam-write-intuition em { color: var(--ink); }
+.kdam-write-why span { color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .kdam-flow-line.active,
+  .kdam-update-line.active { animation: none; }
+  .kdam-flow-node,
+  .kdam-flow-line,
+  .kdam-update-line,
+  .kdam-write-step-card,
+  .kdam-write-step-details { transition: none; }
 }

@@ -1,3 +1,5 @@
+import { MOTION } from "../design/tokens.js";
+
 const element = (tag, className, text) => {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -196,7 +198,7 @@ const renderTrack = (block, context) => {
     viewport.className = "track-viewport";
     if (wasCompare) {
       viewport.replaceChildren(newPane);
-      newPane.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: "ease-out" });
+      newPane.animate([{ opacity: 0 }, { opacity: 1 }], { duration: MOTION.fast, easing: "ease-out" });
       root.focus({ preventScroll: true });
       return;
     }
@@ -216,11 +218,11 @@ const renderTrack = (block, context) => {
     viewport.style.height = `${Math.max(oldHeight, newPane.scrollHeight)}px`;
     const outgoing = oldPane.animate(
       [{ transform: "translateX(0)", opacity: 1 }, { transform: `translateX(${-direction * 100}%)`, opacity: 0.4 }],
-      { duration: 280, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+      { duration: MOTION.normal, easing: MOTION.easing },
     );
     const incoming = newPane.animate(
       [{ transform: `translateX(${direction * 100}%)`, opacity: 0.4 }, { transform: "translateX(0)", opacity: 1 }],
-      { duration: 280, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+      { duration: MOTION.normal, easing: MOTION.easing },
     );
     let completed = false;
     finishTransition = () => {

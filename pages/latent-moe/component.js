@@ -1,5 +1,6 @@
 import { element, svgElement } from "../../shared/dom/element.js";
-import { ARCH_PARAMS, QB_EXAMPLE, calcActivatedWeights, calcSituGlu, formatMillions } from "./logic.js";
+import { MOTION } from "../../shared/design/tokens.js";
+import { ARCH_PARAMS, QB_EXAMPLE, calcComparisonWeights, calcSituGlu, formatMillions, formatParameters } from "./logic.js";
 
 const TABS = [
   ["routing", "① 降维路由"],
@@ -66,11 +67,13 @@ const buildRoutingFlow = () => {
 };
 
 const buildWeightBars = () => {
-  const weights = calcActivatedWeights();
+  const { denseModel, fullWidthMoe, latentMoe } = calcComparisonWeights();
   const wrap = element("div", "lmoe-weight-bars");
+  wrap.append(element("p", "lmoe-weight-title", "完整模型 · 单 token 激活参数（线长同比例）"));
   const rows = [
-    ["ordinary", "普通全宽 MoE（Top-16）", "~1,189M", "100%"],
-    ["latent", "LatentMoE（Top-16）", `~${Math.round(weights.total / 1e6)}M · 节省 40%`, "60%"],
+    ["dense", "等容量 Dense（无 MoE）", `~${formatParameters(denseModel.total)}`, "100%"],
+    ["full", "全宽 MoE（Top-16）", `~${formatParameters(fullWidthMoe.modelTotal)}`, `${fullWidthMoe.modelTotal / denseModel.total * 100}%`],
+    ["latent", "K3 Stable LatentMoE", `${formatParameters(latentMoe.modelTotal)} · 官方`, `${latentMoe.modelTotal / denseModel.total * 100}%`],
   ];
   rows.forEach(([tone, label, value, width]) => {
     const row = element("div", `lmoe-weight-row ${tone}`);
@@ -84,7 +87,7 @@ const buildWeightBars = () => {
 
 const buildRoutingPane = () => {
   const pane = element("section", "lmoe-routing-pane");
-  pane.append(buildRoutingFlow(), buildWeightBars());
+  pane.append(buildRoutingFlow());
   return pane;
 };
 
@@ -270,25 +273,106 @@ const buildBalancePane = (state, persist, navigateToQb) => {
   return pane;
 };
 
-const buildRoutingSide = () => {
-  const side = element("aside", "lmoe-side");
-  side.append(element("p", "lmoe-side-kicker", "ARCHITECTURE READOUT"));
-  const params = element("div", "lmoe-param-grid");
-  [
-    ["总专家数 N", "896"], ["激活专家 K", "16"], ["稀疏比", "56:1"],
-    ["模型宽度 d", "7168"], ["路由宽度 ℓ", "3584 · d/2"], ["专家中间维 m", "3072"],
-    ["共享专家", "2 · 必激活"], ["总参数", "2.8T"], ["激活参数", "104B"],
-  ].forEach(([label, value]) => params.append(element("span", "", label), element("strong", "", value)));
-  const weights = calcActivatedWeights();
-  const summary = element("div", "lmoe-path-summary");
-  [
-    ["W↓ · 共享", formatMillions(weights.wDown)],
-    ["路由专家 ×16", formatMillions(weights.routedExperts)],
-    ["W↑ · 共享", formatMillions(weights.wUp)],
-    ["共享专家 ×2", formatMillions(weights.shared)],
-  ].forEach(([label, value]) => summary.append(element("span", "", label), element("b", "", value)));
-  summary.append(element("strong", "", "合计"), element("strong", "", `≈ ${formatMillions(weights.total)}`));
-  side.append(params, element("p", "lmoe-side-divider", "每 token 激活路径"), summary);
+const buildRoutingSide = (state, persist) => {
+  const { d, l, N, K, sharedExperts, layers } = ARCH_PARAMS;
+  const { denseModel, fullWidthMoe, latentMoe, fixedActivated } = calcComparisonWeights();
+  const pages = [
+    {
+      tabLabel: "01 Dense",
+      eyebrow: "01 · 等容量 Dense（反事实）",
+      title: "没有 MoE：每 token 支付全部 2.78T",
+      params: [["比较口径", "完整模型"], ["参数容量", formatParameters(denseModel.total)], ["条件路由", "无"]],
+      modelRows: [
+        ["保留同等模型能力容量", formatParameters(denseModel.total)],
+        ["本 token 跳过参数", "0"],
+        ["本 token 激活比例", "100%"],
+        ["激活参数量 / K3", `${(denseModel.total / latentMoe.modelTotal).toFixed(1)}×`],
+      ],
+      total: denseModel.total,
+      note: "假设移除条件计算但保留同等容量；26.7× 是参数量比，不是端到端速度比。",
+    },
+    {
+      tabLabel: "02 全宽 MoE",
+      eyebrow: "02 · 全宽 MoE（受控推导）",
+      title: "有 MoE：只激活 Top-16，但专家仍在 d 维",
+      params: [["MoE 层数", layers], ["激活专家 K", K], ["专家宽度", `d=${d}`], ["共享专家", `${sharedExperts} / 层`]],
+      layerRows: [
+        [`路由专家 K×3dm`, formatMillions(fullWidthMoe.routedExperts)],
+        [`共享专家 ${sharedExperts}×3dm`, formatMillions(fullWidthMoe.shared)],
+      ],
+      layerTotal: fullWidthMoe.total,
+      modelRows: [
+        [`${layers} 层 × ${formatMillions(fullWidthMoe.total)}`, formatParameters(fullWidthMoe.allLayers)],
+        ["其他固定激活参数", formatParameters(fixedActivated)],
+      ],
+      total: fullWidthMoe.modelTotal,
+      note: "仅把 routed path 从 ℓ 改回 d；attention、embedding 等固定部分保持 K3 不变。",
+    },
+    {
+      tabLabel: "03 LatentMoE",
+      eyebrow: "03 · K3 Stable LatentMoE（官方）",
+      title: "MoE + 降维：模型级激活降到 104.2B",
+      params: [["MoE 层数", layers], ["专家池 N / K", `${N} / ${K}`], ["模型宽度 d", d], ["路由宽度 ℓ", `${l} · d/2`]],
+      layerRows: [
+        ["W↓ d×ℓ", formatMillions(latentMoe.wDown)],
+        ["路由专家 K×3ℓm", formatMillions(latentMoe.routedExperts)],
+        ["W↑ ℓ×d", formatMillions(latentMoe.wUp)],
+        [`共享专家 ${sharedExperts}×3dm`, formatMillions(latentMoe.shared)],
+      ],
+      layerTotal: latentMoe.total,
+      modelRows: [
+        [`${layers} 层 × ${formatMillions(latentMoe.total)}`, formatParameters(latentMoe.allLayers)],
+        ["其他固定激活参数", formatParameters(fixedActivated)],
+      ],
+      total: latentMoe.modelTotal,
+      note: "104.2B 是 Table 1 的模型级 activated parameters；不是单层权重或 FLOPs。",
+    },
+  ];
+  const side = element("aside", "lmoe-side lmoe-routing-side");
+  const header = element("header", "lmoe-side-pager");
+  header.append(element("p", "lmoe-side-kicker", "ACTIVATED PARAMETER DERIVATION"));
+  const controls = element("div", "segment-control lmoe-calc-tabs");
+  const pageHost = element("div", "lmoe-calc-page-host");
+  const buttons = pages.map((page, index) => {
+    const button = element("button", "", page.tabLabel);
+    button.type = "button";
+    button.addEventListener("click", () => {
+      if (state.calcPage === index) return;
+      state.calcPage = index;
+      renderPage();
+    });
+    controls.append(button);
+    return button;
+  });
+  header.append(controls);
+  const renderPage = () => {
+    const page = pages[state.calcPage];
+    const body = element("section", "lmoe-calc-page");
+    body.append(element("p", "lmoe-calc-eyebrow", page.eyebrow), element("h3", "", page.title));
+    const params = element("div", "lmoe-param-grid");
+    page.params.forEach(([label, value]) => params.append(element("span", "", label), element("strong", "", String(value))));
+    body.append(params);
+    if (page.layerRows) {
+      const layerSummary = element("div", "lmoe-path-summary lmoe-layer-summary");
+      page.layerRows.forEach(([label, value]) => layerSummary.append(element("span", "", label), element("b", "", value)));
+      layerSummary.append(element("strong", "", "单层合计"), element("strong", "", `≈ ${formatMillions(page.layerTotal)}`));
+      body.append(element("p", "lmoe-side-divider", "单个 MoE 层"), layerSummary);
+    }
+    const modelSummary = element("div", "lmoe-path-summary lmoe-model-summary");
+    page.modelRows.forEach(([label, value]) => modelSummary.append(element("span", "", label), element("b", "", value)));
+    modelSummary.append(element("strong", "", "模型级合计"), element("strong", "", `≈ ${formatParameters(page.total)}`));
+    body.append(element("p", "lmoe-side-divider", "一个 token 跑完整模型"), modelSummary, element("p", "lmoe-calc-note", page.note));
+    pageHost.replaceChildren(body);
+    buttons.forEach((button, index) => {
+      const active = index === state.calcPage;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    persist();
+    animateIn(body);
+  };
+  side.append(header, pageHost, buildWeightBars());
+  renderPage();
   return side;
 };
 
@@ -349,7 +433,7 @@ const animateIn = (node) => {
   const start = performance.now();
   const tick = (now) => {
     if (!node.isConnected) return;
-    const progress = Math.min(1, (now - start) / 180);
+    const progress = Math.min(1, (now - start) / MOTION.fast);
     const eased = 1 - Math.pow(1 - progress, 3);
     node.style.opacity = String(eased);
     node.style.transform = `translateX(${(1 - eased) * 8}px)`;
@@ -364,6 +448,7 @@ export const renderLatentMoe = (block, context) => {
   const validTabs = new Set(TABS.map(([id]) => id));
   const state = {
     activeTab: validTabs.has(stored.activeTab) ? stored.activeTab : "routing",
+    calcPage: Math.min(2, Math.max(0, Number(stored.calcPage) || 0)),
     animStage: 0,
     animRun: 0,
     view: stored.view === "formula" ? "formula" : "main",
@@ -376,7 +461,7 @@ export const renderLatentMoe = (block, context) => {
   block.claims.forEach((claim) => claims.append(element("li", "", claim)));
   const viewport = element("div", "lmoe-viewport");
   const persist = () => {
-    context.setValue(block.id, { activeTab: state.activeTab, animStage: state.animStage, view: state.view });
+    context.setValue(block.id, { activeTab: state.activeTab, calcPage: state.calcPage, animStage: state.animStage, view: state.view });
     context.persist();
   };
   const navigateToQb = () => context.action({ action: "branch", target: "quantile-balancing" });
@@ -393,7 +478,7 @@ export const renderLatentMoe = (block, context) => {
       const pane = state.activeTab === "routing" ? buildRoutingPane()
         : state.activeTab === "stability" ? buildStabilityPane()
           : buildBalancePane(state, persist, navigateToQb);
-      const side = state.activeTab === "routing" ? buildRoutingSide()
+      const side = state.activeTab === "routing" ? buildRoutingSide(state, persist)
         : state.activeTab === "stability" ? buildStabilitySide() : buildBalanceSide();
       panelHost.replaceChildren(pane);
       sideHost.replaceChildren(side);

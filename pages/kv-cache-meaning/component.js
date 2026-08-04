@@ -1,4 +1,5 @@
 import { element, svgElement } from "../../shared/dom/element.js";
+import { MOTION } from "../../shared/design/tokens.js";
 import { cacheTotal, noCacheTotal, normalizedToken } from "./logic.js";
 
 const animateVector = (line, dot, from, to) => {
@@ -325,7 +326,7 @@ export const renderKvCacheDemo = (block, context) => {
           { transform: `translateX(${direction * 10}%)`, opacity: 0 },
           { transform: "translateX(0)", opacity: 1 },
         ],
-        { duration: 280, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+        { duration: MOTION.normal, easing: MOTION.easing },
       );
     }
   };
