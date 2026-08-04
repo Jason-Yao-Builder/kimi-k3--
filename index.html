@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f3f4ef" />
+    <link rel="icon" href="data:," />
+    <title>Kimi K3 · KV Cache</title>
+    <link rel="stylesheet" href="./app/styles.css" />
+  </head>
+  <body>
+    <div id="app" class="app-shell">
+      <aside class="sidebar" id="sidebar" aria-label="演示结构">
+        <div class="brand">
+          <span class="brand-mark">K3</span>
+          <div>
+            <strong>Kimi K3</strong>
+            <small>Architecture / 2</small>
+          </div>
+        </div>
+        <div class="sidebar-section">
+          <p class="section-label">播放路径</p>
+          <nav id="slide-nav"></nav>
+        </div>
+        <div class="sidebar-section filters">
+          <p class="section-label">路径过滤</p>
+          <div id="filter-list"></div>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="toolbar">
+          <button class="icon-button mobile-only" id="menu-button" aria-label="展开目录" title="展开目录">☰</button>
+          <div class="breadcrumb" id="breadcrumb"></div>
+          <div class="toolbar-actions">
+            <button class="text-button edit-mode-button" id="edit-mode-button" aria-pressed="false">编辑</button>
+            <button class="text-button" id="overview-button">总览</button>
+            <button class="icon-button" id="fullscreen-button" aria-label="全屏" title="全屏">⛶</button>
+          </div>
+        </header>
+
+        <section class="edit-toolbar" id="edit-toolbar" aria-label="编辑工具" hidden>
+          <div class="edit-tool-group">
+            <button class="icon-button" id="undo-button" aria-label="撤销" title="撤销">↶</button>
+            <button class="icon-button" id="redo-button" aria-label="重做" title="重做">↷</button>
+          </div>
+          <div class="edit-tool-group">
+            <button class="icon-button tool-glyph" id="add-text-button" aria-label="添加文本" title="添加文本">T+</button>
+            <button class="icon-button" id="duplicate-button" aria-label="复制元素" title="复制元素">⧉</button>
+            <button class="icon-button" id="reset-layout-button" aria-label="恢复自动布局" title="恢复自动布局">↺</button>
+          </div>
+          <div class="edit-tool-group">
+            <button class="icon-button" id="send-backward-button" aria-label="下移一层" title="下移一层">⇩</button>
+            <button class="icon-button" id="bring-forward-button" aria-label="上移一层" title="上移一层">⇧</button>
+            <button class="icon-button delete-tool" id="delete-button" aria-label="删除元素" title="删除元素">⌫</button>
+          </div>
+          <span class="editor-selection-label" id="editor-selection-label">未选择</span>
+          <span class="editor-save-state" id="editor-save-state" role="status">已保存</span>
+        </section>
+
+        <section class="stage-wrap" id="stage-wrap">
+          <div class="stage" id="stage" aria-live="polite"></div>
+          <div class="overview" id="overview" hidden></div>
+        </section>
+
+        <footer class="player-controls">
+          <button class="icon-button" id="prev-button" aria-label="上一页" title="上一页">↑</button>
+          <div class="progress-track"><span id="progress-bar"></span></div>
+          <span class="page-count" id="page-count"></span>
+          <button class="icon-button" id="next-button" aria-label="下一页" title="下一页">↓</button>
+        </footer>
+      </main>
+    </div>
+
+    <div class="zoom-backdrop" id="zoom-backdrop" hidden></div>
+    <script type="module" src="./app/main.js?build=20260731-2"></script>
+  </body>
+</html>

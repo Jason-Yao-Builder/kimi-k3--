@@ -1,0 +1,245 @@
+.slide-kv-cache-cost {
+  padding: clamp(1.25rem, 3.2cqw, 3rem);
+}
+
+.slide-kv-cache-cost .slide-header {
+  padding-bottom: clamp(0.6rem, 1.45cqw, 1.25rem);
+}
+
+.slide-kv-cache-cost .slide-header.hierarchy-header {
+  display: block;
+}
+
+.slide-kv-cache-cost .slide-header h1,
+.slide-kv-cache-cost .hierarchy-item strong {
+  font-size: clamp(1.3rem, 2.5cqw, 2.4rem);
+}
+
+.slide-kv-cache-cost .slide-body {
+  min-height: 0;
+  padding-top: clamp(0.6rem, 1.3cqw, 1.1rem);
+}
+
+.kv-cache-cost {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(0.45rem, 0.9cqw, 0.8rem);
+  height: 100%;
+  min-height: 0;
+}
+
+.kv-cache-cost[data-key-active="true"] .kvc-lab {
+  outline: clamp(0.06rem, 0.12cqw, 0.12rem) solid rgb(37 95 133 / 38%);
+  outline-offset: clamp(0.08rem, 0.15cqw, 0.2rem);
+}
+
+.kvc-claims {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.5rem, 1.25cqw, 1.1rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kvc-claims li {
+  position: relative;
+  min-width: 0;
+  padding-left: clamp(0.65rem, 0.95cqw, 0.9rem);
+  font-family: Georgia, "Times New Roman", var(--font-sans);
+  font-size: clamp(0.6rem, 0.93cqw, 0.85rem);
+  line-height: 1.4;
+}
+
+.kvc-claims li::before {
+  position: absolute;
+  top: 0.6em;
+  left: 0;
+  width: clamp(0.25rem, 0.35cqw, 0.35rem);
+  height: clamp(0.25rem, 0.35cqw, 0.35rem);
+  background: var(--accent);
+  content: "";
+}
+
+.kvc-lab {
+  display: grid;
+  grid-template-columns: minmax(0, 1.75fr) minmax(0, 0.85fr);
+  min-height: 0;
+  border-top: clamp(0.1rem, 0.16cqw, 0.15rem) solid var(--ink);
+  border-bottom: clamp(0.06rem, 0.1cqw, 0.1rem) solid var(--line);
+}
+
+.kvc-cache-panel,
+.kvc-decode-panel {
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(0.65rem, 1.1cqw, 1rem);
+}
+
+.kvc-cache-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  gap: clamp(0.4rem, 0.7cqw, 0.65rem);
+  border-right: clamp(0.06rem, 0.1cqw, 0.1rem) solid var(--line);
+}
+
+.kvc-panel-heading,
+.kvc-metric-label {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: clamp(0.55rem, 0.75cqw, 0.72rem);
+  font-weight: 800;
+}
+
+.kvc-cache-stage {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border-top: clamp(0.06rem, 0.1cqw, 0.1rem) solid var(--line);
+  border-bottom: clamp(0.06rem, 0.1cqw, 0.1rem) solid var(--line);
+  background: var(--surface);
+}
+
+.kvc-cache-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.kvc-key { fill: var(--blue); }
+.kvc-value { fill: var(--green); }
+.kvc-layer-line { stroke: var(--line); stroke-width: 0.13; }
+.kvc-overflow { fill: #d84f35; fill-opacity: 0.13; stroke: #d84f35; stroke-width: 0.22; }
+.kvc-capacity-line { display: none; stroke: var(--accent); stroke-dasharray: 1.4 0.85; stroke-width: 0.28; }
+
+.kvc-boundary-label {
+  position: absolute;
+  top: clamp(0.3rem, 0.55cqw, 0.5rem);
+  left: 72%;
+  display: none;
+  width: clamp(5.5rem, 10cqw, 9rem);
+  padding: clamp(0.18rem, 0.28cqw, 0.25rem);
+  background: var(--paper);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: clamp(0.45rem, 0.6cqw, 0.6rem);
+  line-height: 1.25;
+}
+
+.kvc-boundary-label[data-visible="true"] { display: block; }
+.kv-cache-cost[data-capacity-warning="true"] .kvc-capacity-line { display: block; }
+
+.kvc-legend {
+  color: var(--blue);
+  font-family: var(--font-mono);
+  font-size: clamp(0.5rem, 0.68cqw, 0.65rem);
+  font-weight: 800;
+}
+
+.kvc-legend::after {
+  margin-left: clamp(0.55rem, 0.8cqw, 0.75rem);
+  color: var(--green);
+  content: "V  Value";
+}
+
+.kvc-slider-label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: clamp(0.45rem, 0.7cqw, 0.65rem);
+  align-items: center;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: clamp(0.52rem, 0.72cqw, 0.68rem);
+}
+
+.kvc-slider {
+  min-width: 0;
+  accent-color: var(--accent);
+}
+
+.kvc-token-readout {
+  min-width: clamp(4.8rem, 6.6cqw, 6rem);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.kvc-slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: clamp(0.48rem, 0.64cqw, 0.6rem);
+}
+
+.kvc-decode-panel {
+  display: grid;
+  grid-template-rows: minmax(0, 0.92fr) minmax(0, 0.62fr) auto auto auto;
+  gap: clamp(0.65rem, 1cqw, 0.9rem);
+  background: var(--surface);
+}
+
+.kv-cache-cost[data-over-capacity="true"] .kvc-decode-panel {
+  background: rgb(216 79 53 / 8%);
+}
+
+.kvc-wait-metric,
+.kvc-total-metric {
+  display: grid;
+  align-content: center;
+  gap: clamp(0.35rem, 0.55cqw, 0.5rem);
+  min-width: 0;
+}
+
+.kvc-wait-metric {
+  border-bottom: clamp(0.06rem, 0.1cqw, 0.1rem) solid var(--line);
+}
+
+.kvc-metric-value {
+  min-width: clamp(8.5rem, 13cqw, 12rem);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: clamp(1.35rem, 3.1cqw, 2.95rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.kvc-wait-metric .kvc-metric-value { color: var(--green); }
+.kv-cache-cost[data-over-capacity="true"] .kvc-wait-metric .kvc-metric-value { color: var(--accent); }
+
+.kvc-total-metric .kvc-metric-value {
+  font-size: clamp(1rem, 1.95cqw, 1.85rem);
+}
+
+.kvc-metric-detail,
+.kvc-formula,
+.kvc-wait-formula,
+.kvc-equation,
+.kvc-source {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: clamp(0.5rem, 0.68cqw, 0.64rem);
+  line-height: 1.35;
+}
+
+.kvc-equation {
+  padding-top: clamp(0.55rem, 0.8cqw, 0.75rem);
+  border-top: clamp(0.1rem, 0.16cqw, 0.15rem) solid var(--ink);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.kvc-formula,
+.kvc-wait-formula {
+  padding-top: clamp(0.38rem, 0.56cqw, 0.5rem);
+  border-top: clamp(0.06rem, 0.1cqw, 0.1rem) solid var(--line);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.kvc-formula { color: var(--blue); }
+.kvc-wait-formula { color: var(--green); }
+
+.kvc-source { font-size: clamp(0.46rem, 0.6cqw, 0.58rem); }
