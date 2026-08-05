@@ -19,7 +19,7 @@ import {
   TABLE_ROWS,
   VERSIONS,
   getDetail,
-} from "./logic.js?build=20260805-data27";
+} from "./logic.js?build=20260805-data29";
 
 const fadeIn = (node) => {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -987,6 +987,52 @@ const buildDataTabs = (state, persist, rerender) => {
   return tablist;
 };
 
+const buildQualityScoreVisual = () => {
+  const svg = svgElement("svg", { class: "pte-quality-score-visual", viewBox: "0 0 720 148", role: "img", "aria-label": "四层质量信号组合为文档质量分，再决定采样权重" });
+  const text = (x, y, value, className = "", anchor = "middle") => svg.append(svgElement("text", { x, y, class: className, "text-anchor": anchor }, value));
+  const rect = (x, y, width, height, className = "") => svg.append(svgElement("rect", { x, y, width, height, rx: 4, class: className }));
+  const line = (x1, y1, x2, y2, className = "") => svg.append(svgElement("line", { x1, y1, x2, y2, class: className }));
+  [[24, "规则", "0.81"], [158, "FastText", "0.74"], [292, "嵌入", "0.88"], [426, "LLM", "0.92"]].forEach(([x, label, score]) => {
+    rect(x, 18, 112, 44, "signal");
+    text(x + 56, 38, label, "signal-label");
+    text(x + 56, 54, score, "signal-score");
+    line(x + 56, 64, 522, 88, "combine");
+  });
+  rect(536, 66, 160, 44, "combined");
+  text(616, 85, "组合质量分", "combined-label");
+  text(616, 102, "0.87", "combined-score");
+  line(616, 112, 616, 128, "down");
+  rect(424, 130, 164, 16, "downsample");
+  rect(646, 130, 64, 16, "upsample");
+  text(506, 142, "低质量 ↓ 下采样", "sampling-label");
+  text(678, 142, "高质量 ↑", "sampling-label");
+  return svg;
+};
+
+const buildQualityFilteringStory = (state, persist, rerender) => {
+  const side = element("aside", "pte-optimizer-detail dataTab pte-k15-custom pte-quality-story");
+  const scroll = element("div", "pte-optimizer-scroll");
+  scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+  const header = element("header", "pte-optimizer-heading");
+  header.append(element("span", "pte-optimizer-eyebrow", "数据谱系 · 质量清洗"), element("h2", "", "K1.5 四层质量筛选：四种信号汇成一个采样权重"), element("p", "", "没有单一过滤器能完整判断文档质量：前两层排除明显噪声，后两层控制近重复与细微质量。"));
+  const methods = element("section", "pte-quality-methods");
+  [
+    ["01", "Rule-based filtering", "规则过滤", "去除重复内容、机器翻译文本和低质量网页抓取；过滤特殊字符过多、格式异常、垃圾内容的文档。", "rule"],
+    ["02", "FastText-based classification", "FastText 分类器", "训练专门的 FastText 模型，基于语言特征和语义连贯性判断质量，识别自然语言流畅度和语法结构。", "fasttext"],
+    ["03", "Embedding-based similarity analysis", "嵌入相似度分析", "用文档嵌入计算文档级相似度，去除近重复文档，同时保留语义上有价值的变体，维持语料多样性。", "embedding"],
+    ["04", "LLM-based quality assessment", "LLM 质量评估", "用大模型对文档打分，评估连贯性、信息量和潜在教育价值，捕捉前三层会遗漏的细微质量信号。", "llm"],
+  ].forEach(([number, english, chinese, copy, tone]) => {
+    const card = element("article", `pte-quality-method ${tone}`);
+    card.append(element("span", "pte-quality-number", number), element("h3", "", english), element("strong", "", chinese), element("p", "", copy));
+    methods.append(card);
+  });
+  const result = element("section", "pte-quality-score-section");
+  result.append(element("h3", "", "四张卡片的评分，汇成文档质量分"), buildQualityScoreVisual(), element("p", "", "最终质量分数组合四个维度：高质量文档提高进入 batch 的概率，低质量文档降低采样频率。"));
+  scroll.append(header, methods, result, element("p", "pte-optimizer-source", "K1.5 Technical Report Appendix B（四层质量筛选与质量加权采样）"));
+  side.append(buildDataTabs(state, persist, rerender), scroll);
+  return side;
+};
+
 const buildSamplingChart = () => {
   const svg = svgElement("svg", { class: "pte-k15-sampling-chart", viewBox: "0 0 760 250", role: "img", "aria-label": "质量分连续映射为采样率" });
   const line = (x1, y1, x2, y2, cls = "") => svg.append(svgElement("line", { x1, y1, x2, y2, class: cls }));
@@ -1519,6 +1565,7 @@ const buildCooldownStory = (state, persist, rerender) => {
 };
 
 const buildDataDetail = (state, persist, rerender) => {
+  if (state.selectedLabel === "data-k15-filter") return buildQualityFilteringStory(state, persist, rerender);
   if (state.selectedLabel === "data-k15-sampling") return buildSamplingStory(state, persist, rerender);
   if (state.selectedLabel === "data-k25-unique") return buildUniqueTokensStory(state, persist, rerender);
   if (state.selectedLabel === "data-k2-math-rephrasing") return buildMathNotesStory(state, persist, rerender);
@@ -2525,7 +2572,7 @@ const buildViewSegments = (state, selectView) => {
 };
 
 const DATA_ENTRY_BY_OVERVIEW = {
-  "data-k15": "data-k15-sampling",
+  "data-k15": "data-k15-filter",
   "data-k2": "data-k2-math-rephrasing",
   "data-k25": "data-k25-vision-seven",
   "data-k3": "data-k3-programmatic",

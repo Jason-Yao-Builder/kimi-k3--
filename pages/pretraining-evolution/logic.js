@@ -470,7 +470,7 @@ export const CONTEXT_CHAPTERS = {
 };
 
 const dataRows = {
-  k15: [["sampling", "动态采样", "new"], ["vision-five", "五类视觉", "new"]],
+  k15: [["filter", "四层质量筛选", "inherit"], ["sampling", "动态采样", "new"], ["vision-five", "五类视觉", "new"]],
   k2: [["math-rephrasing", "数学学习笔记", "new"]],
   k25: [["unique", "unique tokens", "new"], ["vision-seven", "七类视觉", "improve"]],
   k3: [["long-doc", "长文档清洗", "improve"], ["cross-span", "长上下文训练", "new"], ["programmatic", "程序化多模态", "improve"]],
@@ -542,9 +542,9 @@ export const DATA_LINEAGES = [
     title: "先建立四层质量筛选，再把同一原则扩展到真实长文档与视频",
     lead: "K2 与 K2.5 沿用 K1.5 的质量底座；K3 面对超长内容，补上模糊去重、帧感知哈希与结构完整性检查。",
     cells: [
-      { version: "K1.5", text: "四层质量筛选", note: "质量底座保留在谱系中，不再展开独立详情。", toNext: "inherit" },
-      { version: "K2", text: "沿用质量筛选", note: "多数数据处理管线沿用 K1.5。", toNext: "inherit" },
-      { version: "K2.5", text: "沿用先前", note: "质量底座不变，新增预算放在视觉数据与融合方式。", toNext: "improve" },
+      { version: "K1.5", text: "四层质量筛选", labelId: "data-k15-filter", toNext: "inherit" },
+      { version: "K2", text: "沿用质量筛选", note: "多数数据处理管线沿用 K1.5。", toNext: "inherit", jumpTo: "data-k15-filter" },
+      { version: "K2.5", text: "沿用先前", note: "质量底座不变，新增预算放在视觉数据与融合方式。", toNext: "improve", jumpTo: "data-k15-filter" },
       { version: "K3", text: "长文档清洗", labelId: "data-k3-long-doc" },
     ],
   },

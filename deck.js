@@ -4,7 +4,7 @@ import { kvCacheSolutionsPage } from "./pages/kv-cache-solutions/page.js?build=2
 import { architectureEvolutionPage } from "./pages/architecture-evolution/page.js?build=20260803-architecture-cleanup";
 import { gatedMlaPage } from "./pages/gated-mla/page.js?build=20260804-nope-spacing-4";
 import { latentMoePage } from "./pages/latent-moe/page.js";
-import { pretrainingEvolutionPage } from "./pages/pretraining-evolution/page.js?build=20260805-data27";
+import { pretrainingEvolutionPage } from "./pages/pretraining-evolution/page.js?build=20260805-data29";
 import { posttrainingEvolutionPage } from "./pages/posttraining-evolution/page.js?build=20260805-post34";
 import { kdaMechanismPage } from "./pages/kda-mechanism/page.js?build=20260804-kda-query-arrow";
 import { residualConnectionsPage } from "./pages/residual-connections/page.js";
