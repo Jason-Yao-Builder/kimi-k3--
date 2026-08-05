@@ -232,7 +232,8 @@ export class PresentationEngine {
     }
     const body = create("div", "slide-body");
     slide.blocks.forEach((block) => body.append(this.renderBlock(block, this.componentContext())));
-    article.append(header, body);
+    const attribution = create("footer", "slide-attribution", "复星集团数智化与 AI 条线");
+    article.append(header, body, attribution);
     this.refs.stage.replaceChildren(article);
     this.renderSidebar();
     this.renderFilters();

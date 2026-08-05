@@ -28,9 +28,9 @@ const navigation = {
 
 export const deck = {
   meta: {
-    id: "kimi-k3-kv-cache-test",
-    title: "Kimi K3 · KV Cache",
-    subtitle: "模型架构 / KDA / KV Cache",
+    id: "kimi-k3-kv-cache-fosun",
+    title: "复星 Kimi K3 · 技术演示",
+    subtitle: "复星集团数智化与 AI 条线",
   },
   filters: [],
   slides: pages.map((page) => {

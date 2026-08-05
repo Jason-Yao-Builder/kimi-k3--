@@ -28,6 +28,11 @@ pageStyles.forEach((href) => {
   document.head.append(link);
 });
 
+const fosunTheme = document.createElement("link");
+fosunTheme.rel = "stylesheet";
+fosunTheme.href = new URL("../themes/fosun/theme.css", import.meta.url).href;
+document.head.append(fosunTheme);
+
 const blockRegistry = createBlockRegistry(pageRenderers);
 const errors = validateDeck(deck, blockRegistry.componentTypes);
 if (errors.length) {

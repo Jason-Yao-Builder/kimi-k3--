@@ -1,4 +1,4 @@
-const STORAGE_KEY = "kimi-k3:appearance:v1";
+const STORAGE_KEY = "kimi-k3-fosun:appearance:v1";
 const VALID_THEMES = new Set(["system", "light", "dark"]);
 const VALID_FONT_SIZES = new Set(["small", "medium", "large"]);
 
@@ -15,8 +15,8 @@ const FONT_SIZE_LABELS = {
 };
 
 const THEME_COLORS = {
-  light: "#f3f4ef",
-  dark: "#0f1211",
+  light: "#eeeae4",
+  dark: "#181716",
 };
 
 const readPreference = () => {

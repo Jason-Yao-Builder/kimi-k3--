@@ -1,0 +1,149 @@
+body {
+  background: var(--paper);
+}
+
+.sidebar {
+  background: var(--surface-raised);
+}
+
+.brand {
+  align-items: center;
+}
+
+.brand-mark {
+  width: 78px;
+  height: 28px;
+  background: transparent;
+}
+
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.brand small,
+.section-label,
+.breadcrumb,
+.page-count {
+  color: var(--muted);
+}
+
+.nav-section,
+.slide-header h1,
+.hierarchy-item strong,
+.hierarchy-item h1 {
+  color: var(--accent);
+  font-family: var(--font-serif);
+  font-weight: var(--weight-regular);
+}
+
+.nav-item[data-active="true"] {
+  background: var(--surface-sunken);
+}
+
+.toolbar,
+.player-controls {
+  background: var(--surface-subtle);
+}
+
+.progress-track span {
+  background: var(--accent);
+}
+
+.stage {
+  background: var(--surface);
+}
+
+.slide {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface) url("./assets/content_background.png") center / 100% 100% no-repeat;
+}
+
+.slide::before {
+  position: absolute;
+  z-index: 4;
+  top: clamp(20px, 2.5cqw, 38px);
+  right: clamp(24px, 3.2cqw, 48px);
+  width: clamp(132px, 14cqw, 180px);
+  aspect-ratio: 207 / 28;
+  background: url("./assets/fosun_logo_brown.png") center / contain no-repeat;
+  content: "";
+  pointer-events: none;
+}
+
+.slide-header {
+  padding-right: clamp(150px, 16cqw, 205px);
+  border-bottom-color: var(--line);
+}
+
+.slide-body {
+  padding-bottom: clamp(18px, 2cqw, 29px);
+}
+
+.slide-attribution {
+  position: absolute;
+  z-index: 5;
+  right: clamp(24px, 3.2cqw, 48px);
+  bottom: clamp(8px, 1.05cqw, 16px);
+  padding-left: var(--space-3);
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-normal);
+  pointer-events: none;
+}
+
+.role-label {
+  background: var(--accent);
+}
+
+.segment-control {
+  border-color: var(--line);
+  background: var(--surface-sunken);
+}
+
+.segment-control button.active,
+.appearance-segments button[aria-pressed="true"] {
+  color: var(--accent);
+}
+
+.mode-button,
+.action-button {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mode-button:hover,
+.action-button:hover {
+  background: var(--accent);
+  color: var(--ink-inverse);
+}
+
+:root[data-theme="dark"] .slide {
+  background-image: none;
+}
+
+:root[data-theme="dark"] .slide::before {
+  opacity: 0.9;
+}
+
+@container (max-width: 520px) {
+  .slide-header {
+    padding-right: 128px;
+  }
+
+  .slide::before {
+    top: 17px;
+    right: 18px;
+    width: 112px;
+  }
+
+  .slide-attribution {
+    right: 18px;
+    bottom: 6px;
+  }
+}
