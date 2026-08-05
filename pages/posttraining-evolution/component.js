@@ -1,7 +1,7 @@
 import { element, svgElement } from "../../shared/dom/element.js";
 import { MOTION } from "../../shared/design/tokens.js";
-import "./cards.js?build=20260804-post26";
-import { PIPELINES, PIPELINE_CARD_IDS, TABLE_ROWS, getCard, getPipelineGroup } from "./logic.js?build=20260804-post26";
+import "./cards.js?build=20260805-post33";
+import { PIPELINES, PIPELINE_CARD_IDS, TABLE_ROWS, getCard, getPipelineGroup } from "./logic.js?build=20260805-post33";
 
 const addText = (svg, x, y, text, className = "ptoe-svg-label", anchor = "middle") => {
   const node = svgElement("text", { x, y, class: className, "text-anchor": anchor }, text);
@@ -323,24 +323,54 @@ const buildVerifierVisual = () => {
   return svg;
 };
 
-const buildCapabilityVisual = () => {
-  const svg = svgElement("svg", { class: "ptoe-detail-visual", viewBox: "0 0 420 150", role: "img", "aria-label": "从按模态分管道改为按能力混合文本与视觉" });
-  addText(svg, 86, 20, "按模态分", "ptoe-svg-node");
-  svg.append(svgElement("rect", { x: 18, y: 34, width: 136, height: 34 }));
-  svg.append(svgElement("rect", { x: 18, y: 80, width: 136, height: 34 }));
-  addText(svg, 86, 56, "文本 RL", "ptoe-svg-caption");
-  addText(svg, 86, 102, "视觉 RL", "ptoe-svg-caption");
-  addText(svg, 183, 78, "×　→　✓", "ptoe-svg-push");
-  addText(svg, 306, 20, "按能力分", "ptoe-svg-node");
-  ["知识", "推理", "代码", "智能体"].forEach((label, index) => {
-    const x = 228 + (index % 2) * 92;
-    const y = 34 + Math.floor(index / 2) * 52;
-    svg.append(svgElement("rect", { x, y, width: 82, height: 42, class: "active" }));
-    addText(svg, x + 41, y + 18, label, "ptoe-svg-node");
-    addText(svg, x + 41, y + 34, "文 ●  视 ●", "ptoe-svg-value");
+const buildK25RewardDesign = () => {
+  const rewards = element("section", "ptoe-k25-mm-rewards");
+  rewards.append(element("h3", "", "六类视觉任务的奖励设计"));
+  [["◆ 目标定位", "IoU-F1 + 高斯软匹配"], ["◇ 轮廓分割", "光栅化后像素级 IoU"], ["★ OCR", "1 − editdist / max(|ŷ|, |y|)"], ["■ 计数", "max(0, 1 − |预测−真值| / 真值)"], ["▸ 视觉谜题", "K2 模型作为 LLM Judge"]].forEach(([name, method]) => {
+    const row = element("div", "ptoe-k25-mm-reward-row");
+    row.append(element("strong", "", name), element("span", "", method));
+    rewards.append(row);
   });
-  addText(svg, 306, 142, "视觉 RL → 文本推理也增益", "ptoe-svg-pull");
-  return svg;
+  rewards.append(element("p", "ptoe-k25-mm-deadzone", "⚠ IoU 死区：两框不相交时 IoU 恒为 0。高斯软匹配 score = exp(−d² / 2σ²)，中心距越近分越高；d≈600px 时 score≈0.05，仍保留方向信号。"));
+  return rewards;
+};
+
+const buildCapabilityVisual = () => {
+  const figure = element("figure", "ptoe-k25-mm-visual");
+  figure.setAttribute("aria-label", "Kimi K2.5 四能力域与联合视觉强化学习");
+
+  const problem = element("section", "ptoe-k25-mm-problem");
+  problem.append(element("h3", "", "❶ 按模态分管道会发生什么"));
+  [
+    "▸ 纯文字 → 文本 RL；含图 → 视觉 RL。两条管道梯度隔离。",
+    "▸ 任务：看折线图，解释 Q2 利润下滑，并给出数学推导。",
+    "▸ 图在视觉管道，推理链在文本管道；路由到哪边都不完整。",
+  ].forEach((text) => problem.append(element("p", "", text)));
+  problem.append(element("strong", "", "解法：按“需要什么能力”分域，让两种模态共享同一套参数更新。"));
+
+  const structure = element("section", "ptoe-k25-mm-structure");
+  const modality = element("div", "ptoe-k25-mm-modality");
+  modality.append(element("h3", "", "× 按模态分（未采用）"));
+  modality.append(element("div", "ptoe-k25-mm-pipe", "文本 RL 管道 · 数学 / 知识 / 代码"), element("b", "", "✗ 推理梯度不共享"), element("div", "ptoe-k25-mm-pipe", "视觉 RL 管道 · 定位 / OCR / 谜题"));
+  const capability = element("div", "ptoe-k25-mm-capability");
+  capability.append(element("h3", "", "✓ 按能力分（K2.5）"));
+  const domains = element("div", "ptoe-k25-mm-domains");
+  ["知识域", "推理域", "代码域", "智能体域"].forEach((name) => {
+    const card = element("div", "");
+    card.append(element("strong", "", name), element("span", "", "文 ●　视 ●"));
+    domains.append(card);
+  });
+  capability.append(domains, element("small", "", "GRM 统一评分两种模态"));
+  structure.append(modality, capability);
+
+  const transfer = element("section", "ptoe-k25-mm-transfer");
+  transfer.append(element("h3", "", "◆ 视觉 RL 意外提升纯文本 benchmark"));
+  const metrics = element("div", "ptoe-k25-mm-metrics");
+  ["MMLU-Pro +1.7", "GPQA-Diamond +2.1", "LongBench v2 +2.2"].forEach((text) => metrics.append(element("span", "", text)));
+  transfer.append(metrics, element("p", "", "视觉与文本推理共享“从复杂输入提取关键信息 → 多步推理”这条核心路径。"), element("small", "", "🔴 +1–2 分属数据多样性泛化，非视觉能力直接帮助文本。"));
+
+  figure.append(problem, structure, transfer);
+  return figure;
 };
 
 const buildZeroVisionVisual = () => {
@@ -475,6 +505,51 @@ const buildExpertGridVisual = () => {
   conflictGrid.append(mixed, split);
   conflict.append(conflictGrid);
 
+  const transition = element("section", "ptoe-k3-expert-transition");
+  transition.append(element("h3", "", "为什么不直接混训学生，而是先训专家再蒸馏？"));
+  const transitionBody = element("div", "ptoe-k3-expert-transition-body");
+  const density = element("div", "ptoe-k3-expert-density");
+  density.append(element("strong", "ptoe-k3-expert-density-title", "信号密度对比"));
+  const tokenLabels = ["t₁", "t₂", "t₃", "t₄", "t₅", "t₆", "t₇", "t₈"];
+  const makeSignalRow = (mode) => {
+    const row = element("div", `ptoe-k3-signal-row ${mode.toLowerCase()}`);
+    row.append(element("strong", "ptoe-k3-signal-label", mode));
+    const content = element("div", "ptoe-k3-signal-content");
+    const track = element("div", "ptoe-k3-signal-track");
+    tokenLabels.forEach((label, index) => {
+      const unit = element("div", "ptoe-k3-signal-unit");
+      unit.append(element("span", "ptoe-k3-signal-token", label));
+      if (mode === "MOPD") unit.append(element("span", "ptoe-k3-signal-loss", "loss"));
+      track.append(unit);
+      if (index < tokenLabels.length - 1) track.append(element("span", "ptoe-k3-signal-arrow", "→"));
+    });
+    track.append(element("span", "ptoe-k3-signal-arrow", "→"), element("span", "ptoe-k3-signal-reward", "rew\nard"));
+    content.append(
+      track,
+      element("small", "ptoe-k3-signal-caption", mode === "RL" ? "整条链结束才有 1 个信号" : "每个 token 都有信号，密度提升数量级"),
+    );
+    row.append(content);
+    return row;
+  };
+  density.append(makeSignalRow("RL"), makeSignalRow("MOPD"));
+
+  const reasons = element("div", "ptoe-k3-expert-transition-reasons");
+  [
+    ["① 信号密度", "RL：整条轨迹结束才有 1 个 reward", "MOPD：每个 token 都有 loss", "→ 信号密度提升数量级"],
+    ["② 行为已编码", "九个专家把九种行为规律编码进各自的概率分布", "学生直接对齐分布，不必从稀疏 reward 中重新归纳"],
+    ["③ 分布可控", "九个教师独立采样", "可精确调节每种 (domain, effort) 的训练比重"],
+  ].forEach(([title, ...lines]) => {
+    const reason = element("div", "ptoe-k3-expert-transition-reason");
+    reason.append(element("strong", "", title));
+    lines.forEach((line) => reason.append(element("p", "", line)));
+    reasons.append(reason);
+  });
+  transitionBody.append(density, reasons);
+  transition.append(
+    transitionBody,
+    element("p", "ptoe-k3-expert-transition-note", "梯度冲突在学生阶段仍然存在，但从“从稀疏 reward 归纳行为”变成了“在 token 级别对齐已知分布”，冲突的影响被大幅压缩。"),
+  );
+
   const matrix = element("section", "ptoe-k3-expert-matrix-section");
   matrix.append(element("h3", "", "九个专家 = 三域 × 三强度"));
   const matrixGrid = element("div", "ptoe-k3-expert-matrix");
@@ -533,7 +608,7 @@ const buildExpertGridVisual = () => {
   [["sg", "教师概率固定，不参与反向传播"], ["clip", "限制极端 token 信号"], ["正 / 负", "教师更偏好该 token / 学生概率已更高"]].forEach(([term, meaning]) => legend.append(element("p", "", `${term}：${meaning}`)));
   mopd.append(flow, mopdCore, mopdFormula, legend);
 
-  figure.append(conflict, mopd, matrix, lower, element("p", "ptoe-k3-expert-next", "九个专家要训出真正差异，前提是任务环境本身有不同的反馈结构。若仍是短问答，只会得到九个相似 checkpoint。→ 下一页：白盒 RL 环境与五类 Agentic 任务"));
+  figure.append(conflict, mopd, matrix, lower, transition, element("p", "ptoe-k3-expert-next", "九个专家要训出真正差异，前提是任务环境本身有不同的反馈结构。若仍是短问答，只会得到九个相似 checkpoint。→ 下一页：白盒 RL 环境与五类 Agentic 任务"));
   return figure;
 };
 
@@ -762,27 +837,89 @@ const buildGrmVisual = () => {
   });
   signalPanel.append(signalSvg, element("p", "ptoe-grm-takeaway", "接近目标的答案得到部分信用 → 梯度推动模型朝正确方向继续移动"));
   split.append(inputPanel, signalPanel);
-  figure.append(problem, split, element("p", "ptoe-grm-source", "来源：Kimi K2.5 Technical Report §3（joint multimodal RL 与 visual reward design）"));
+  figure.append(problem, split, buildK25RewardDesign(), element("p", "ptoe-grm-source", "来源：Kimi K2.5 Technical Report §3（joint multimodal RL 与 visual reward design）"));
   return figure;
 };
 
 const buildAgenticGrmVisual = () => {
-  const svg = svgElement("svg", { class: "ptoe-detail-visual", viewBox: "0 0 420 150", role: "img", "aria-label": "Agentic GRM 的 Read Rubric Score Scorepad 四步协议" });
-  [
-    ["① Read", "完整读完"], ["② Rubric", "动态立尺"], ["③ Score", "逐项判定"], ["④ Scorepad", "结构汇总"],
-  ].forEach(([title, note], index) => {
-    const x = 10 + index * 103;
-    svg.append(svgElement("rect", { x, y: 28, width: 88, height: 62, class: index === 3 ? "active" : "" }));
-    addText(svg, x + 44, 54, title, "ptoe-svg-node");
-    addText(svg, x + 44, 75, note, "ptoe-svg-caption");
-    if (index < 3) addText(svg, x + 96, 63, "→", "ptoe-svg-arrow");
+  const figure = element("figure", "ptoe-k3-grm-visual");
+  figure.setAttribute("aria-label", "Agentic GRM 强制裁判按 Read Rubric Score Scorepad 四步完成评价");
+
+  const why = element("section", "ptoe-k3-grm-why");
+  why.append(element("h3", "", "K2 的 Rubric 还不够：两个遗留问题"));
+  const whyGrid = element("div", "ptoe-k3-grm-why-grid");
+  const k2 = element("div", "ptoe-k3-grm-why-card legacy");
+  k2.append(
+    element("strong", "", "K2 Self-Critique 的局限"),
+    element("p", "", "裁判可能没读完长轨迹，就凭局部印象给结论。"),
+    element("p", "", "固定 Rubric 无法覆盖本次工具任务的特有完成条件。"),
+    element("p", "", "内容质量与回答长度容易混在同一个分数里。"),
+  );
+  const k3 = element("div", "ptoe-k3-grm-why-card protocol");
+  k3.append(
+    element("strong", "", "K3 四步协议的修复"),
+    element("p", "", "Read 强制完整阅读；Rubric 按当前实例动态生成。"),
+    element("p", "", "Score 逐项留证；Scorepad 完成后才允许汇总。"),
+    element("p", "", "长度惩罚成为独立规则，不污染内容质量分。"),
+  );
+  whyGrid.append(k2, k3);
+  why.append(whyGrid);
+
+  const protocol = element("section", "ptoe-k3-grm-protocol");
+  protocol.append(element("h3", "", "四步必须按顺序走，每一步都有输入与输出"));
+  const flow = element("div", "ptoe-k3-grm-flow");
+  const steps = [
+    ["01", "Read", "完整 agent 轨迹", "完整读取并摘要，不能跳步", "轨迹内容的完整理解", "防止凭印象直接给结论"],
+    ["02", "Rubric", "任务描述 + Read 摘要", "动态生成本任务检查项", "N 条实例级检查项", "覆盖正确工具序列等动态条件"],
+    ["03", "Score", "检查项 + agent 轨迹", "逐项判 pass / fail，并写理由", "N 条可复查判断记录", "训练管道可定位具体失分点"],
+    ["04", "Scorepad", "全部 Score 记录", "所有判断完成后再汇总", "最终内容质量分", "未完成 Score 时禁止提前汇总"],
+  ];
+  steps.forEach(([number, title, input, action, output, note], index) => {
+    const card = element("div", `ptoe-k3-grm-step${index === 3 ? " final" : ""}`);
+    card.append(
+      element("b", "", number),
+      element("strong", "", title),
+      element("p", "", `输入｜${input}`),
+      element("p", "", `动作｜${action}`),
+      element("p", "", `输出｜${output}`),
+      element("small", "", note),
+    );
+    flow.append(card);
+    if (index < steps.length - 1) flow.append(element("span", "ptoe-k3-grm-arrow", "→"));
   });
-  svg.append(svgElement("line", { x1: 20, y1: 116, x2: 285, y2: 116, class: "divider" }));
-  svg.append(svgElement("line", { x1: 300, y1: 101, x2: 300, y2: 134, class: "push" }));
-  addText(svg, 204, 108, "参考长度 σ·ℓ₀", "ptoe-svg-caption");
-  addText(svg, 350, 121, "超长 → penalty", "ptoe-svg-push");
-  addText(svg, 210, 146, "先审质量，再独立审成本", "ptoe-svg-pull");
-  return svg;
+  protocol.append(flow, element("div", "ptoe-k3-grm-length", "长度惩罚独立于四步内容评价：　r = r_quality − λ · 1[len(ŷ) > σ · ℓ₀]　｜　只在回答超过参考长度 σ 倍时扣分"));
+
+  const lower = element("div", "ptoe-k3-grm-lower");
+  const example = element("section", "ptoe-k3-grm-example");
+  example.append(element("h3", "", "案例：查官方文档后给迁移步骤"), element("p", "ptoe-k3-grm-task", "任务：用户要求调用搜索工具，查官方文档后给出可靠的迁移步骤。"));
+  const exampleSteps = [
+    ["Read", "完整读完轨迹：调用搜索工具 → 找到文档 → 提取版本说明 → 给出三步迁移方案。"],
+    ["Rubric", "动态生成三项：① 找到官方文档；② 版本信息正确；③ 来源、版本、步骤与回滚说明齐全。"],
+    ["Score", "① pass：文档已找到　② pass：版本正确　③ fail：缺少回滚说明。"],
+    ["Scorepad", "r_quality = 2 / 3 = 0.67；失分定位在“步骤完整性”。"],
+    ["长度检查", "本例 len(ŷ)=1.7ℓ₀，σ=1.5，独立触发惩罚 → 最终 reward = 0.67 − λ。"],
+  ];
+  exampleSteps.forEach(([title, text], index) => {
+    const row = element("div", `ptoe-k3-grm-example-step${index === 4 ? " length" : ""}`);
+    row.append(element("strong", "", title), element("p", "", text));
+    example.append(row);
+  });
+
+  const insights = element("section", "ptoe-k3-grm-insights");
+  insights.append(element("h3", "", "四步各自堵住一条捷径"));
+  [
+    ["Scorepad 的价值", "不只是最终数字，而是完整中间记录；训练管道能定位模型在哪类检查项上系统性失败。", "scorepad"],
+    ["动态 Rubric", "固定模板只看通用标准；动态生成会根据 Read 摘要推断本任务特有的工具与完成条件。", "rubric"],
+    ["长度惩罚解耦", "长内容不会自动降分；只有超过参考长度 σ 倍才触发负向信号。", "length"],
+  ].forEach(([title, text, className]) => {
+    const card = element("div", `ptoe-k3-grm-insight ${className}`);
+    card.append(element("strong", "", title), element("p", "", text));
+    insights.append(card);
+  });
+  lower.append(example, insights);
+
+  figure.append(why, protocol, lower, element("p", "ptoe-k3-grm-close", "评价顺序：先完整理解 → 为当前任务立尺 → 逐项留证 → 最后汇总；长度成本在内容质量之外单独结算。"));
+  return figure;
 };
 
 const buildLengthPenaltyVisual = () => {
@@ -816,34 +953,181 @@ const buildBudgetVisual = () => {
 };
 
 const buildToggleVisual = () => {
-  const svg = svgElement("svg", { class: "ptoe-detail-visual", viewBox: "0 0 420 150", role: "img", "aria-label": "Budget-Limited 与 Standard Scaling 的条件切换" });
-  svg.append(svgElement("line", { x1: 44, y1: 16, x2: 44, y2: 126, class: "divider" }));
-  svg.append(svgElement("line", { x1: 44, y1: 126, x2: 396, y2: 126, class: "divider" }));
-  svg.append(svgElement("path", { d: "M50 108 L50 42 L135 42 L135 108 L220 108 L220 42 L300 42 L300 108 L390 108", fill: "none", stroke: "var(--accent)", "stroke-width": 3 }));
-  svg.append(svgElement("path", { d: "M50 94 C105 76 145 62 195 70 C248 78 300 58 390 68", fill: "none", stroke: "var(--blue)", "stroke-width": 2 }));
-  svg.append(svgElement("line", { x1: 44, y1: 74, x2: 396, y2: 74, stroke: "var(--green)", "stroke-dasharray": "5 5" }));
-  addText(svg, 14, 46, "ON", "ptoe-svg-push");
-  addText(svg, 14, 112, "OFF", "ptoe-svg-value");
-  addText(svg, 382, 70, "λ", "ptoe-svg-pull");
-  addText(svg, 92, 34, "压缩", "ptoe-svg-push");
-  addText(svg, 177, 119, "放开", "ptoe-svg-value");
-  addText(svg, 260, 34, "再压缩", "ptoe-svg-push");
-  addText(svg, 220, 146, "准确率跌破 λ → 预算立即关闭", "ptoe-svg-caption");
-  return svg;
+  const figure = element("figure", "ptoe-k25-toggle-visual");
+  figure.setAttribute("aria-label", "K2.5 Toggle 让正确性与长度压缩串行优化");
+
+  const why = element("section", "ptoe-k25-toggle-why");
+  why.append(element("h3", "", "先做对，再做短：两个目标不能同时竞争"));
+  const whyGrid = element("div", "ptoe-k25-toggle-why-grid");
+  const k2 = element("div", "ptoe-k25-toggle-why-card k2");
+  k2.append(
+    element("strong", "", "K2｜长度惩罚全程开启"),
+    element("p", "", "正确性与压缩从第一步同时竞争；难题仍需探索，长度梯度却持续施压。"),
+    element("p", "", "结果：模型可能牺牲推理能力换取短输出，接近硬边界就提前收尾。"),
+  );
+  const toggle = element("div", "ptoe-k25-toggle-why-card toggle");
+  toggle.append(
+    element("strong", "", "K2.5｜Toggle 串行接管"),
+    element("p", "", "Standard Scaling：先关闭长度约束，让正确性收敛。"),
+    element("p", "", "acc ≥ λ 才开启压缩；跌破 λ 立即关闭，恢复后再重开。"),
+  );
+  whyGrid.append(k2, toggle);
+  why.append(whyGrid);
+
+  const chart = element("section", "ptoe-k25-toggle-chart");
+  chart.append(element("h3", "", "准确率跌破 λ，预算立即关闭"));
+  const svg = svgElement("svg", { class: "ptoe-k25-toggle-svg", viewBox: "0 0 760 230", role: "img", "aria-label": "准确率曲线跌破阈值时关闭长度预算，恢复后再次开启" });
+  svg.append(
+    svgElement("rect", { x: 210, y: 28, width: 140, height: 168, class: "budget-mask" }),
+    svgElement("rect", { x: 515, y: 28, width: 135, height: 168, class: "budget-mask" }),
+    svgElement("line", { x1: 56, y1: 28, x2: 56, y2: 196, class: "axis" }),
+    svgElement("line", { x1: 56, y1: 196, x2: 730, y2: 196, class: "axis" }),
+    svgElement("line", { x1: 56, y1: 105, x2: 730, y2: 105, class: "threshold" }),
+    svgElement("path", { d: "M64 170 C120 150 175 118 210 105 C260 68 315 80 350 105 C390 148 465 125 515 105 C560 68 620 82 650 105 C680 135 705 112 720 96", class: "accuracy" }),
+  );
+  [[210, "acc(t) ≥ λ", "开启压缩"], [350, "acc(t) < λ", "受损，关闭"], [515, "恢复 ≥ λ", "再次压缩"]].forEach(([x, label, action], index) => {
+    svg.append(svgElement("line", { x1: x, y1: 28, x2: x, y2: 196, class: `event event-${index}` }));
+    addText(svg, x, 16, label, index === 1 ? "ptoe-svg-push" : "ptoe-svg-pull");
+    addText(svg, x, index === 1 ? 218 : 34, action, index === 1 ? "ptoe-svg-push" : "ptoe-svg-pull");
+  });
+  addText(svg, 12, 38, "准确率 ↑", "ptoe-svg-value", "start");
+  addText(svg, 724, 100, "阈值 λ", "ptoe-svg-pull", "end");
+  addText(svg, 132, 188, "充分推理", "ptoe-svg-caption");
+  addText(svg, 280, 188, "压缩", "ptoe-svg-push");
+  addText(svg, 432, 188, "充分推理", "ptoe-svg-caption");
+  addText(svg, 582, 188, "压缩", "ptoe-svg-push");
+  addText(svg, 686, 188, "充分推理", "ptoe-svg-caption");
+  addText(svg, 58, 216, "训练轮次 →", "ptoe-svg-caption", "start");
+  chart.append(svg);
+  const phases = element("div", "ptoe-k25-toggle-phases");
+  phases.append(
+    element("p", "off", "Standard Scaling｜Toggle OFF：自由探索，准确率优先"),
+    element("p", "on", "Budget-Limited｜Toggle ON：开启压缩，准确率受 λ 保护"),
+  );
+  chart.append(phases);
+
+  const lower = element("div", "ptoe-k25-toggle-lower");
+  const walkthrough = element("section", "ptoe-k25-toggle-walkthrough");
+  walkthrough.append(element("h3", "", "六轮训练的 Toggle 状态变化"));
+  const table = element("div", "ptoe-k25-toggle-table");
+  ["轮次", "Toggle 状态", "准确率", "发生了什么"].forEach((text) => table.append(element("strong", "header", text)));
+  [
+    ["1–3", "OFF｜Standard", "72% → 84%", "自由探索，准确率上升"],
+    ["4", "ON｜84% ≥ 80%", "84% → 82%", "过线后开启压缩"],
+    ["5", "OFF｜78% < 80%", "78% → 83%", "跌破阈值，关闭并恢复"],
+    ["6", "ON｜83% ≥ 80%", "83% → …", "恢复过线，再次压缩"],
+  ].forEach((row) => row.forEach((text, index) => table.append(element(index === 0 ? "strong" : "span", "", text))));
+  walkthrough.append(
+    table,
+    element("code", "ptoe-k25-toggle-formula", "budget_on(t) = 1[phase=limited ∧ acc(t) ≥ λ]\nacc(t) < λ → budget_on(t) = 0\ncorrectness → compression → recheck"),
+    element("p", "ptoe-k25-toggle-result", "每次压缩都在正确性安全线以上进行，模型逐步找到更短但仍能完成任务的轨迹。"),
+  );
+
+  const insights = element("section", "ptoe-k25-toggle-insights");
+  insights.append(element("h3", "", "为什么必须反复切换"));
+  [
+    ["为什么不能只开一次", "压缩有代价；跌破 λ 表示推理能力已受损。必须先恢复，再继续压缩。", "primary"],
+    ["与 K2 硬上限的区别", "K2 接近 token 上限就收尾；Toggle 在能力不足时主动放开，不做硬截断。", "contrast"],
+    ["如何衔接 K3", "Toggle 仍是全局开关。K3 用 b₀(x) 按题估长，再用 τ 按域与 effort 收紧。", "next"],
+  ].forEach(([title, text, className]) => {
+    const card = element("div", `ptoe-k25-toggle-insight ${className}`);
+    card.append(element("strong", "", title), element("p", "", text));
+    insights.append(card);
+  });
+  lower.append(walkthrough, insights);
+
+  figure.append(why, chart, lower);
+  return figure;
 };
 
 const buildTauVisual = () => {
-  const svg = svgElement("svg", { class: "ptoe-detail-visual", viewBox: "0 0 420 150", role: "img", "aria-label": "按题基准长度乘以不同推理强度 tau 并逐阶段退火" });
-  [["max", 350, "宽松"], ["high", 276, "平衡"], ["low", 198, "严格"]].forEach(([label, end, note], index) => {
-    const y = 30 + index * 36;
-    addText(svg, 18, y + 5, label, "ptoe-svg-node", "start");
-    svg.append(svgElement("line", { x1: 82, y1: y, x2: end, y2: y, stroke: index === 0 ? "var(--blue)" : "var(--accent)", "stroke-width": 5 }));
-    [0.35, 0.58, 0.82].forEach((ratio) => svg.append(svgElement("circle", { cx: 82 + (Number(end) - 82) * ratio, cy: y, r: 4, class: "student" })));
-    addText(svg, Number(end) + 14, y + 5, note, "ptoe-svg-caption", "start");
+  const figure = element("figure", "ptoe-k3-tau-visual");
+  figure.setAttribute("aria-label", "先用基准长度按题估算，再用 tau 按任务域和推理强度缩放预算");
+
+  const why = element("section", "ptoe-k3-tau-why");
+  why.append(element("h3", "", "同一个上限管不了简单题和难题"));
+  const whyGrid = element("div", "ptoe-k3-tau-why-grid");
+  const fixed = element("div", "ptoe-k3-tau-why-card fixed");
+  fixed.append(
+    element("strong", "", "固定上限的问题"),
+    element("p", "", "所有题共享同一个 token 上限。"),
+    element("p", "", "简单题：上限过宽，允许无意义展开。"),
+    element("p", "", "难题：上限过紧，完整推理链被截断。"),
+  );
+  const adaptive = element("div", "ptoe-k3-tau-why-card adaptive");
+  adaptive.append(
+    element("strong", "", "K3 的两步估算"),
+    element("p", "", "① b₀(x)：先估这道题本身需要多长。"),
+    element("p", "", "② τ：再按 domain 与 effort 缩放基准。"),
+    element("code", "", "B(x, effort) = τ_effort · b₀(x)"),
+  );
+  whyGrid.append(fixed, adaptive);
+  why.append(whyGrid, element("p", "ptoe-k3-tau-bridge", "先问“这道题本身需要多少”，再决定当前 effort 允许它放大几倍。"));
+
+  const middle = element("div", "ptoe-k3-tau-middle");
+  const mechanism = element("section", "ptoe-k3-tau-mechanism");
+  mechanism.append(element("h3", "", "b₀(x) 按题估算，τ 从宽到紧退火"));
+  const baseline = element("div", "ptoe-k3-tau-baseline");
+  baseline.append(
+    element("strong", "", "Step 1｜每道题独立估算 b₀(x)"),
+    element("p", "", "冷启动模型估计“这道题本身需要多长”；基准只随题目变化，不随 effort 变化。"),
+  );
+  const baselineCases = element("div", "ptoe-k3-tau-baseline-cases");
+  [["简单问答", "b₀(x) ≈ 200 token"], ["代码修复", "b₀(x) ≈ 4000 token"]].forEach(([title, value]) => {
+    const item = element("div", "");
+    item.append(element("strong", "", title), element("code", "", value));
+    baselineCases.append(item);
   });
-  svg.append(svgElement("path", { d: "M74 132 L190 132 L190 124 L284 124 L284 116 L374 116", fill: "none", stroke: "var(--green)", "stroke-width": 3 }));
-  addText(svg, 210, 148, "课程：max → high → low　Coding τ > General τ", "ptoe-svg-pull");
-  return svg;
+  baseline.append(baselineCases);
+  mechanism.append(baseline, element("strong", "ptoe-k3-tau-scale-title", "Step 2｜τ 按 effort 缩放，课程从宽到紧"));
+  const ladder = element("div", "ptoe-k3-tau-ladder");
+  [
+    ["max", "B = τ_max · b₀(x)", "宽松预算，先学会充分解题"],
+    ["high", "B = τ_high · b₀(x)", "退火到平衡预算"],
+    ["low", "B = τ_low · b₀(x)", "严格预算，保留关键行为"],
+  ].forEach(([effort, formula, note], index) => {
+    const row = element("div", `ptoe-k3-tau-rung ${effort}`);
+    row.append(element("b", "", effort), element("code", "", formula), element("span", "", note));
+    ladder.append(row);
+    if (index < 2) ladder.append(element("div", "ptoe-k3-tau-down", index === 0 ? "↓ 充分学会后，再压缩" : "↓ 继续退火"));
+  });
+  mechanism.append(ladder, element("p", "ptoe-k3-tau-domain", "τ 还可按任务域配置：Coding Agents 的交互循环通常比 General Tasks 获得更宽预算。"));
+
+  const numbers = element("section", "ptoe-k3-tau-numbers");
+  numbers.append(element("h3", "", "同一道题，不同 effort；同一 effort，不同题目"));
+  const teaching = element("p", "ptoe-k3-tau-teaching", "教学倍数：τ_low=1.0，τ_high=1.5，τ_max=2.0（仅用于代入演示）");
+  numbers.append(teaching);
+  [
+    ["题目 A｜简单问答", "b₀(x)=200", ["low　 1.0×200 = 200", "high　1.5×200 = 300", "max　 2.0×200 = 400"]],
+    ["题目 B｜代码修复", "b₀(x)=4000", ["low　 1.0×4000 = 4000", "high　1.5×4000 = 6000", "max　 2.0×4000 = 8000"]],
+  ].forEach(([title, base, rows]) => {
+    const card = element("div", "ptoe-k3-tau-number-card");
+    card.append(element("strong", "", title), element("code", "", base));
+    rows.forEach((row) => card.append(element("span", "", row)));
+    numbers.append(card);
+  });
+  numbers.append(
+    element("p", "ptoe-k3-tau-observation", "同为 high effort：题目 A 上限 300，题目 B 上限 6000。预算保留了题目难度差异。"),
+    element("code", "ptoe-k3-tau-penalty", "len(ŷ) > B(x, ·)　→　r = r_quality − λ · 1[len(ŷ) > B(x, ·)]"),
+  );
+  middle.append(mechanism, numbers);
+
+  const evolution = element("section", "ptoe-k3-tau-evolution");
+  evolution.append(element("h3", "", "长度控制从统一尺度演进到按题预算"));
+  const evolutionGrid = element("div", "ptoe-k3-tau-evolution-grid");
+  [
+    ["K1.5｜相对软惩罚", "同题内比较长短；不区分题目难度。", "legacy"],
+    ["K2.5｜Toggle", "控制何时启用长度约束；预算仍是全局阶段规则。", "toggle"],
+    ["K3｜τ 退火", "b₀(x) 按题估基准，τ 按域与 effort 缩放；max → high → low。", "current"],
+  ].forEach(([title, text, className]) => {
+    const card = element("div", `ptoe-k3-tau-evolution-card ${className}`);
+    card.append(element("strong", "", title), element("p", "", text));
+    evolutionGrid.append(card);
+  });
+  evolution.append(evolutionGrid);
+
+  figure.append(why, middle, evolution, element("p", "ptoe-k3-tau-close", "课程原则：先用 max 预算学会充分解决，再退火到 high、low，在更少 token 内保留关键行为。τ 的具体数值未作为统一配置披露。"));
+  return figure;
 };
 
 const buildValueFreeVisual = () => {
@@ -1078,7 +1362,7 @@ const buildDetail = (id, state, persist, rerender, selectCard) => {
   const card = getCard(id);
   if (!card) return buildEmptyDetail(id);
   const group = getPipelineGroup(id);
-  const singleView = ["reward-k25", "rl-k25", "sft-k25", "sft-k3", "rl-k3", "domain-k3", "env-k3", "rl-k3-eagle"].includes(id);
+  const singleView = ["reward-k25", "rl-k25", "sft-k25", "domain-k25", "length-k25", "sft-k3", "rl-k3", "reward-k3", "domain-k3", "env-k3", "length-k3", "rl-k3-eagle"].includes(id);
   const detailTab = singleView ? "mechanism" : state.detailTab;
   const side = element("aside", `ptoe-detail${singleView ? " ptoe-detail-single" : ""}`);
   const top = element("section", "ptoe-detail-top");

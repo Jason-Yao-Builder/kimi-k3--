@@ -19,7 +19,7 @@ import {
   TABLE_ROWS,
   VERSIONS,
   getDetail,
-} from "./logic.js?build=20260804-data1";
+} from "./logic.js?build=20260805-data14";
 
 const fadeIn = (node) => {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -916,7 +916,7 @@ const buildSequenceDetail = ({ chapters, stateKey, labelByTab, scrollToSelected 
 
   const header = element("header", "pte-optimizer-heading");
   header.append(element("span", "pte-optimizer-eyebrow", chapter.eyebrow), element("h2", "", chapter.title), element("p", "", chapter.lead), arc);
-  scroll.append(header);
+  if (!chapter.hideHeader) scroll.append(header);
   chapter.sections.forEach((section, index) => {
     if (section.layout) {
       scroll.append(buildMuonSpecialSection(section, index, section.labelId === state.selectedLabel));
@@ -937,13 +937,24 @@ const buildSequenceDetail = ({ chapters, stateKey, labelByTab, scrollToSelected 
       section.formula.forEach((formula) => formulas.append(element("p", "", formula)));
       explainer.append(formulas);
     }
-    item.append(explainer);
+    if (explainer.childElementCount) item.append(explainer);
     if (section.points?.length) {
       const points = element("ul", "pte-sequence-points");
       section.points.forEach((point) => points.append(element("li", "", point)));
       item.append(points);
     }
     if (section.source) item.append(element("p", "pte-section-source", section.source));
+    if (section.jumpTo && stateKey === "dataTab") {
+      const jump = element("button", "pte-sequence-jump", "查看知识 rephrasing →");
+      jump.type = "button";
+      jump.addEventListener("click", () => {
+        state.selectedLabel = section.jumpTo;
+        state.dataTab = DATA_TAB_BY_LABEL[section.jumpTo];
+        persist();
+        rerender();
+      });
+      item.append(jump);
+    }
     scroll.append(item);
   });
   scroll.append(element("p", "pte-optimizer-source", chapter.source));
@@ -1004,7 +1015,7 @@ const buildSamplingStory = (state, persist, rerender) => {
   const scroll = element("div", "pte-optimizer-scroll");
   scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
   const header = element("header", "pte-optimizer-heading");
-  header.append(element("span", "pte-optimizer-eyebrow", "数据谱系 · 采样预算"), element("h2", "", "K1.5 上下采样：质量分连续映射为采样概率"), element("p", "", "不做硬切割，让高价值数据高频出现，让低质量数据低频但不消失。"));
+  header.append(element("span", "pte-optimizer-eyebrow", "数据谱系 · 采样方式"), element("h2", "", "K1.5 上下采样：质量分连续映射为采样概率"), element("p", "", "不做硬切割，让高价值数据高频出现，让低质量数据低频但不消失。"));
   const why = element("section", "pte-k15-sampling-why");
   why.append(element("h3", "", "不是“保留 or 丢弃”，是“高频 or 低频”"));
   const compare = element("div", "pte-k15-sampling-compare");
@@ -1012,7 +1023,7 @@ const buildSamplingStory = (state, persist, rerender) => {
   hard.append(element("h4", "", "硬切割的问题"), element("p", "", "设定阈值，低于阈值直接丢弃"), element("p", "", "稀有语种、稀有领域文档被误杀"), element("p", "", "覆盖度下降"));
   const soft = element("article", "soft");
   soft.append(element("h4", "", "连续映射的做法"), element("p", "", "质量分 → 采样概率（连续函数）"), element("p", "", "高质量：概率 > 1，同一文档多次抽到"), element("p", "", "低质量：概率 < 1，低频但不清零"), element("p", "", "低质量数据仍保留覆盖度"));
-  compare.append(hard, element("strong", "bridge", "质量分是连续值，采样率也是连续值"), soft);
+  compare.append(hard, soft);
   why.append(compare);
   const plot = element("figure", "pte-k15-sampling-plot");
   plot.append(element("h3", "", "连续映射：采样率随质量分平滑变化"), buildSamplingChart());
@@ -1037,6 +1048,400 @@ const buildSamplingStory = (state, persist, rerender) => {
   notes.append(benefit, meaning);
   lower.append(code, notes);
   scroll.append(header, why, plot, lower, element("p", "pte-optimizer-source", "🟢 K1.5 Technical Report；BigCode 数据方法"));
+  side.append(buildDataTabs(state, persist, rerender), scroll);
+  return side;
+};
+
+const buildUniqueTokensStory = (state, persist, rerender) => {
+  const side = element("aside", "pte-optimizer-detail dataTab pte-k15-custom pte-unique-custom");
+  const scroll = element("div", "pte-optimizer-scroll");
+  scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+  const header = element("header", "pte-optimizer-heading");
+  header.append(element("span", "pte-optimizer-eyebrow", "数据谱系 · 采样方式"), element("h2", "", "K2.5 采样预算：unique tokens"), element("p", "", "用去重信息量控制每个 source 的采样上限，让训练量与有效信息量成比例。"));
+
+  const problem = element("section", "pte-unique-problem");
+  problem.append(element("h3", "", "代码库 10T，专业文档 50B——按体量采样会发生什么？"));
+  const problemGrid = element("div", "pte-unique-problem-grid");
+  const volume = element("article", "pte-unique-volume");
+  volume.append(element("div", "source-block large", "代码库\n10T token"), element("div", "source-block small", "专业文档\n50B token"));
+  const repeats = element("article", "pte-unique-repeats");
+  repeats.append(element("h4", "", "按原始体量采样"), element("p", "", "代码库：被看 ≈ 1 遍"), element("p", "danger", "专业文档：被看 ≈ 200 遍"));
+  problemGrid.append(volume, repeats);
+  problem.append(problemGrid, element("p", "pte-unique-warning", "看第 200 遍相同文档 ≠ 学到 200 倍新知识。重复内容提供的是重复梯度，不是新信息。"));
+
+  const middle = element("section", "pte-unique-middle");
+  const mechanism = element("article", "pte-unique-mechanism");
+  mechanism.append(element("h3", "", "用去重信息量设置采样上限"));
+  [
+    ["Step 1", "统计 unique tokens", "对每个 source 去重后统计 token 总量：代码库约 8T，专业文档约 45B。"],
+    ["Step 2", "设定采样上限", "上限 = epoch × source_size；每个 source 独立累计已采样 token。"],
+    ["Step 3", "达到上限即停止", "该 source 已充分覆盖，再采只会制造重复梯度；同时提高相关代码内容的配方权重。"],
+  ].forEach(([label, title, copy]) => {
+    const step = element("div", "pte-unique-step");
+    step.append(element("span", "step-label", label), element("h4", "", title), element("p", "", copy));
+    mechanism.append(step);
+  });
+  const examples = element("div", "pte-unique-examples");
+  examples.append(element("p", "", "专业文档 50B unique tokens → 最多采 1–2 遍，不无限循环"), element("p", "", "代码库 8T unique tokens → 上限相应更高，按信息量分配"));
+  mechanism.append(examples);
+
+  const division = element("article", "pte-unique-division");
+  division.append(element("h3", "", "两个机制解决两个维度的重复"));
+  [
+    ["rephrasing", "同一文档，内容不变，表面形式改变。", "解决：同一文档重复出现", "blue"],
+    ["unique tokens", "跨 source 控制采样量，小 source 不无限循环。", "解决：同一数据源重复", "green"],
+    ["叠加效果", "形式多样性 ↑；来源重复 ↓。", "既扩展表达，又阻止来源循环", "neutral"],
+  ].forEach(([title, copy, result, tone]) => {
+    const card = element("div", `pte-unique-card ${tone}`);
+    card.append(element("h4", "", title), element("p", "", copy), element("strong", "", result));
+    division.append(card);
+  });
+  middle.append(mechanism, division);
+
+  const summary = element("section", "pte-unique-summary");
+  summary.append(element("strong", "", "每个 source 的训练量和它包含的去重信息量成比例。"), element("p", "", "信息密度高的小 source 得到保护，不被稀释；体量大的 source 按真实信息量，而非原始体量，分配训练步。"));
+
+  const dilution = element("section", "pte-data-story-section");
+  dilution.append(element("h3", "", "大量视觉 token 进来后，代码在 batch 里的占比自然下降"));
+  const batches = element("div", "pte-batch-compare");
+  [["K2 · 纯文本 batch", [["code", "代码 30%", 30], ["text", "文字 / 数学 / 其他 70%", 70]]], ["K2.5 · 联合预训练 batch", [["vision", "视觉 35%", 35], ["code", "代码 20%", 20], ["text", "其他 45%", 45]]]].forEach(([title, segments]) => {
+    const card = element("article", "pte-batch-card");
+    card.append(element("h4", "", title));
+    const bar = element("div", "pte-batch-bar");
+    segments.forEach(([tone, label, width]) => {
+      const segment = element("span", tone, label);
+      segment.style.width = `${width}%`;
+      bar.append(segment);
+    });
+    card.append(bar);
+    batches.append(card);
+  });
+  dilution.append(batches, element("p", "pte-data-warning", "视觉 token 体量增大 → 代码相对占比下降 → 代码逻辑信号变弱。代码比例下降不是代码数据变少，而是训练分母变大，因此需要 unique tokens + rephrasing 扩展有效权重：前者控制来源预算，后者增加同一知识的表达覆盖。"));
+  scroll.append(header, problem, middle, summary, dilution, element("p", "pte-optimizer-source", "🟢 K2.5 Technical Report；🔴 计数实现细节与示例数字、batch 占比为工程推断"));
+  side.append(buildDataTabs(state, persist, rerender), scroll);
+  return side;
+};
+
+const buildMathNotesStory = (state, persist, rerender) => {
+  const side = element("aside", "pte-optimizer-detail dataTab pte-k15-custom pte-data-story");
+  const scroll = element("div", "pte-optimizer-scroll");
+  scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+  const header = element("header", "pte-optimizer-heading");
+  header.append(element("span", "pte-optimizer-eyebrow", "数据谱系 · 领域专项"), element("h2", "", "K2 数学学习笔记：把压缩推导展开成可追溯过程"), element("p", "", "数学原文常省略条件、中间步骤与直觉；learning-note style 把这些隐含结构重新写出来。"));
+
+  const top = element("section", "pte-data-story-section");
+  top.append(element("h3", "", "数学原文跳步骤——模型学到的是结论，不是推导路径"));
+  const contrast = element("div", "pte-data-contrast math");
+  const original = element("article", "muted");
+  original.append(element("h4", "", "原始数学文本"), element("blockquote", "", "“由 Cauchy-Schwarz 不等式得 ‖Ax‖ ≤ ‖A‖·‖x‖”"));
+  ["× 为什么可以使用 Cauchy-Schwarz？条件是什么？", "× ‖A‖ 是算子范数还是 Frobenius 范数？", "× 这一步的直觉是什么？"].forEach((text) => original.append(element("p", "danger", text)));
+  original.append(element("strong", "", "模型见过结论，却未必能在新问题中重建推导。"));
+  const notes = element("article", "blue");
+  notes.append(element("h4", "", "学习笔记风格展开"), element("blockquote", "", "“我们想上界 ‖Ax‖。先确认 ‖A‖ 取诱导算子范数，再把 Ax 的每个分量写成行向量与 x 的内积；对每个内积使用 Cauchy-Schwarz，最后合并各分量……”"));
+  ["✓ 每步包含条件检查", "✓ 直觉说明显式写出", "✓ 推导路径可以追溯"].forEach((text) => notes.append(element("p", "success", text)));
+  contrast.append(original, notes);
+  top.append(contrast);
+
+  const middle = element("section", "pte-data-story-middle");
+  const flow = element("article", "pte-data-flow");
+  flow.append(element("h3", "", "按 SwallowMath 方法改写为 learning-note style"));
+  [
+    ["Step 1", "识别隐含跳步", "定位省略的条件检查、中间变量与直觉说明。"],
+    ["Step 2", "展开并验证", "补齐学生推导时会写下的过程；保留原结论，并验证改写与原文等价。"],
+    ["Step 3", "扩展来源", "把其他语言的高质量数学材料翻译成英文，增加来源与表达多样性。"],
+  ].forEach(([label, title, copy]) => {
+    const step = element("div", "pte-data-flow-step");
+    step.append(element("span", "", label), element("h4", "", title), element("p", "", copy));
+    flow.append(step);
+  });
+  flow.append(element("p", "pte-data-range", "使用范围：K2 只在知识域和数学域使用 rephrasing；每个语料库最多改写两次。"));
+  const cards = element("article", "pte-data-card-stack");
+  cards.append(element("h3", "", "为什么不是普通改写"));
+  [
+    ["数学比普通文本更敏感", "普通文本换表达通常不伤核心信息；数学推导少一个步骤，整条逻辑就可能断掉。", "blue"],
+    ["学习笔记 vs 教材原文", "教材面向已知读者而大量省略；学习笔记面向正在学习的人，让模型学习展开推导而非只记结论。", "neutral"],
+    ["与 unique tokens 的分工", "rephrasing 增加推导表达多样性；unique tokens 控制 source 上限，避免小源无限循环。", "green"],
+  ].forEach(([title, copy, tone]) => {
+    const card = element("div", `pte-data-card ${tone}`);
+    card.append(element("h4", "", title), element("p", "", copy));
+    cards.append(card);
+  });
+  middle.append(flow, cards);
+  scroll.append(header, top, middle, element("p", "pte-optimizer-source", "🟢 K2 Technical Report §2.2（SwallowMath、learning-note style rephrasing）"));
+  side.append(buildDataTabs(state, persist, rerender), scroll);
+  return side;
+};
+
+const buildVisionSevenStory = (state, persist, rerender) => {
+  const side = element("aside", "pte-optimizer-detail dataTab pte-k15-custom pte-data-story pte-vision-seven");
+  const scroll = element("div", "pte-optimizer-scroll");
+  scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+  const header = element("header", "pte-optimizer-heading");
+  header.append(element("span", "pte-optimizer-eyebrow", "数据谱系 · 视觉语料"), element("h2", "", "K2.5 七类视觉：从看懂内容到定位、时序与操作"), element("p", "", "K1.5 的基础视觉任务主要回答“图中有什么”；K2.5 用感知、视频、智能体数据补齐三个盲区。"));
+
+  const blind = element("section", "pte-data-story-section");
+  blind.append(element("h3", "", "五类视觉能回答“是什么”，但不能回答“在哪里、怎么变、怎么操作”"));
+  const blindGrid = element("div", "pte-blind-grid");
+  [["盲区 1 · 像素级定位", "能识别“图中有一只猫”，却不能给出边界框、点级引用或轮廓 mask。"], ["盲区 2 · 时序理解", "能理解单张图片，却没有帧间关系与长视频时序推理。"], ["盲区 3 · GUI 操作", "能描述界面截图，却不能定位控件并生成点击、输入、滚动轨迹。"]].forEach(([title, copy]) => {
+    const card = element("article", "pte-blind-card");
+    card.append(element("span", "", "×"), element("h4", "", title), element("p", "", copy));
+    blindGrid.append(card);
+  });
+  blind.append(blindGrid);
+
+  const additions = element("section", "pte-data-story-section");
+  additions.append(element("h3", "", "三类新数据，各填一个盲区"));
+  const additionGrid = element("div", "pte-addition-grid");
+  [
+    ["感知数据", "像素级定位", "边界框、点级引用、轮廓分割 mask", "从“图中有猫”到“猫在 [120,80,340,260]”"],
+    ["视频数据", "时序理解", "视频帧序列、帧间关系、长视频片段", "从单帧理解到多帧时序推理"],
+    ["智能体数据", "GUI 操作", "桌面、移动端、Web 操作轨迹", "从看懂界面到生成点击、输入、滚动、拖拽步骤"],
+  ].forEach(([title, ability, data, effect]) => {
+    const card = element("article", "pte-addition-card");
+    card.append(element("h4", "", title), element("strong", "", `填补：${ability}`), element("p", "", `数据：${data}`), element("p", "effect", `效果：${effect}`));
+    additionGrid.append(card);
+  });
+  additions.append(additionGrid);
+
+  const lower = element("section", "pte-vision-seven-lower");
+  const overview = element("article", "pte-vision-table-wrap");
+  overview.append(element("h3", "", "七类视觉数据的完整能力覆盖"));
+  const table = element("div", "pte-vision-seven-table");
+  [["Caption / 图文交织", "图文对应、顺序理解、互相指代"], ["OCR", "表格、手写、图中文字识别"], ["知识 / 通用 QA", "结构化知识提取、视觉问答"], ["感知（新增）", "像素定位、点级引用、轮廓分割"], ["视频（新增）", "帧间时序、长视频理解"], ["智能体（新增）", "GUI 操作轨迹、跨平台操作"]].forEach(([kind, ability]) => {
+    table.append(element("strong", "", kind), element("span", "", ability));
+  });
+  overview.append(table, element("p", "pte-data-range", "能力从“图中有什么”扩展到“物体在哪里、时间如何变化、界面怎样操作”。"));
+  const cards = element("article", "pte-data-card-stack");
+  cards.append(element("h3", "", "实现层面的三项补充"));
+  [["MoonViT-3D 统一图像与视频", "原生分辨率 patch packing；图像视为单帧视频，多帧按时序拼接，避免维护两套系统。", "blue"], ["感知标注从粗到细", "边界框定位区域，点级引用指定元素，轮廓 mask 提供像素级边界。", "neutral"], ["智能体覆盖三端", "桌面侧重窗口与菜单，移动端侧重触控与手势，Web 侧重 DOM 与动态内容。", "green"]].forEach(([title, copy, tone]) => {
+    const card = element("div", `pte-data-card ${tone}`);
+    card.append(element("h4", "", title), element("p", "", copy));
+    cards.append(card);
+  });
+  lower.append(overview, cards);
+  scroll.append(header, blind, additions, lower, element("p", "pte-optimizer-source", "🟢 K2.5 Technical Report §4.2–§4.3（七类视觉数据、感知 / 视频 / 智能体新增）"));
+  side.append(buildDataTabs(state, persist, rerender), scroll);
+  return side;
+};
+
+const buildPerceptualHashVisual = () => {
+  const svg = svgElement("svg", { class: "pte-longdoc-hash-visual", viewBox: "0 0 420 88", role: "img", "aria-label": "DCT pHash 指纹与汉明距离对比" });
+  const rows = [
+    ["帧 A（原始）", [1, 0, 1, 1, 0, 1, 0, 1], ""],
+    ["帧 A′（重编码）", [1, 0, 1, 1, 0, 1, 0, 1], "d = 0  判重 ✓", "match"],
+    ["帧 B（不同）", [0, 1, 0, 0, 1, 0, 1, 0], "d = 31  不同 ×", "different"],
+  ];
+  rows.forEach(([label, bits, result, tone], rowIndex) => {
+    const y = 8 + rowIndex * 26;
+    svg.append(svgElement("text", { x: 4, y: y + 11, class: "row-label" }, label));
+    bits.forEach((bit, bitIndex) => {
+      const x = 100 + bitIndex * 16;
+      const changed = rowIndex === 2 && bit !== rows[0][1][bitIndex];
+      svg.append(svgElement("rect", { x, y, width: 13, height: 15, rx: 1, class: `bit ${bit ? "on" : "off"} ${changed ? "changed" : ""}` }));
+      svg.append(svgElement("text", { x: x + 6.5, y: y + 11, class: `bit-label ${bit || changed ? "on" : "off"}`, "text-anchor": "middle" }, String(bit)));
+    });
+    svg.append(svgElement("text", { x: 232, y: y + 11, class: "ellipsis" }, "…"));
+    if (result) svg.append(svgElement("text", { x: 252, y: y + 11, class: `result ${tone}` }, result));
+  });
+  return svg;
+};
+
+const buildHashMethodCard = (number, title, goal, steps, fit, tone) => {
+  const card = element("article", `pte-hash-method ${tone}`);
+  const heading = element("header", "");
+  heading.append(element("span", "", number), element("h3", "", title));
+  card.append(heading, element("p", "goal", `设计目标：${goal}`));
+  const process = element("ol", "");
+  steps.forEach((step) => process.append(element("li", "", step)));
+  card.append(process, element("p", "fit", `适合检测：${fit}`));
+  return card;
+};
+
+const buildLongDocStory = (state, persist, rerender) => {
+  const side = element("aside", "pte-optimizer-detail dataTab pte-k15-custom pte-hash-page");
+  const scroll = element("div", "pte-optimizer-scroll");
+  scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+  const header = element("header", "pte-optimizer-heading");
+  header.append(element("span", "pte-optimizer-eyebrow", "K3 · 长文档训练 · 数据去重"), element("h2", "", "为什么三种 hash，不是一种？"), element("p", "", "K3 长上下文训练同时包含文本和视频：文本的“相同”藏在字符里，视频的“相同”藏在像素里。"));
+
+  const methods = element("section", "pte-hash-section");
+  methods.append(element("h3", "", "三种 hash，各自解决一种“相同”"));
+  const methodList = element("div", "pte-hash-method-list");
+  methodList.append(
+    buildHashMethodCard("01", "精确 hash（SHA-256）", "雪崩效应，输入改变一个字节，输出面目全非。", ["读取文件全部字节 → SHA-256 → 256 位摘要。", "摘要相同，才判定为同一文件。"], "完全相同的副本。", "exact"),
+    buildHashMethodCard("02", "MinHash", "估计集合的 Jaccard 相似度，容忍少量字符改动。", ["文档切成字符 n-gram，形成集合。", "用 k 个随机哈希函数，各自保留集合中的最小值。", "拼成长度 k 的签名向量。", "相同位置值相等的比例 ≈ Jaccard；超过阈值即判为近重复。"], "改了少量文字的近重复文本。", "minhash"),
+    buildHashMethodCard("03", "DCT 帧感知哈希（pHash）", "与精确 hash 相反，输入小幅变化，输出也只小幅变化。", ["取一帧 → 缩放 8×8 → 转灰度。", "对矩阵做 DCT，取左上角低频系数，保留整体明暗布局。", "系数与均值比较：大于均值记 1，否则记 0，得到 64 位指纹。", "两帧汉明距离 d ≤ 阈值，即判为同一内容。"], "重编码后画面相同的视频帧。", "phash"),
+  );
+  methods.append(methodList, element("p", "pte-hash-emphasis", "精确 hash 和 MinHash 比的是存储形式，DCT pHash 比的是语义结构。"));
+
+  const routes = element("section", "pte-hash-section");
+  routes.append(element("h3", "", "同一个问题：“这段内容，数据集里出现过吗？”"));
+  const routeGrid = element("div", "pte-hash-routes");
+  const textRoute = element("article", "text-route");
+  textRoute.append(element("h4", "", "路径 A · 文本"), element("p", "", "论文被转载 50 次，文件字节完全相同。"), element("strong", "success", "→ 精确 hash 摘要相同，命中 ✓"), element("p", "", "摘要改了三个字后重新上传。"), element("strong", "danger", "→ 精确 hash 面目全非，漏过 ×"), element("strong", "success", "→ MinHash 发现 n-gram 大部分重叠，命中 ✓"), element("small", "", "文本用精确 hash + MinHash 两层覆盖。"));
+  const videoRoute = element("article", "video-route");
+  videoRoute.append(element("h4", "", "路径 B · 视频"), element("p", "", "H.264 视频经 ffmpeg 转为 H.265，画面一帧没变。"), element("strong", "danger", "→ 精确 hash：字节流全变，误判为新文件 ×"), element("strong", "danger", "→ MinHash：字节 n-gram 几乎无交集，同样漏过 ×"), element("strong", "success", "→ DCT pHash：低频指纹近似，d = 0，判重 ✓"), element("small", "", "重编码改变每一个字节，却没有改变任何一个像素的含义。"));
+  routeGrid.append(textRoute, videoRoute);
+  routes.append(routeGrid);
+
+  const comparison = element("section", "pte-hash-section");
+  comparison.append(element("h3", "", "三种 hash 的核心对比"));
+  const table = element("div", "pte-hash-table");
+  [["", "SHA-256", "MinHash", "DCT pHash"], ["设计目标", "严格判同", "估计集合相似", "保留感知相似"], ["输入微变", "面目全非", "平滑变化", "几乎不变"], ["本质", "加密摘要", "集合相似度估计器", "感知特征指纹"], ["视频重编码", "×", "×", "✓"]].flat().forEach((value, index) => table.append(element(index < 4 || index % 4 === 0 ? "strong" : "span", index === 19 ? "success" : "", value)));
+  comparison.append(table);
+
+  const phash = element("section", "pte-hash-section pte-phash-section");
+  phash.append(element("h3", "", "DCT pHash：先消除干扰，再比较指纹"));
+  const pipeline = element("div", "pte-phash-flow");
+  [["原始帧", "读取画面"], ["缩放 8×8", "抹掉高频细节"], ["灰度", "移除颜色差异"], ["DCT 低频", "保留整体布局"], ["均值比较", "转为相对明暗"], ["64 位指纹", "稳定内容签名"]].forEach(([title, copy], index, steps) => {
+    const step = element("div", "pte-phash-step");
+    step.append(element("strong", "", title), element("small", "", copy));
+    pipeline.append(step);
+    if (index < steps.length - 1) pipeline.append(element("span", "", "→"));
+  });
+  phash.append(pipeline, buildPerceptualHashVisual(), element("p", "pte-hash-emphasis", "重编码改变了每一个字节，但没有改变任何一个像素的含义。"));
+
+  scroll.append(header, methods, routes, comparison, phash, element("p", "pte-optimizer-source", "🟢 K3 Technical Report §3.1–§3.3；🔴 算法机械过程与示例为工程解释"));
+  side.append(buildDataTabs(state, persist, rerender), scroll);
+  return side;
+};
+
+const buildCrossSpanStory = (state, persist, rerender) => {
+  const side = element("aside", "pte-optimizer-detail dataTab pte-k15-custom pte-data-story");
+  const scroll = element("div", "pte-optimizer-scroll");
+  scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+  const header = element("header", "pte-optimizer-heading");
+  header.append(element("span", "pte-optimizer-eyebrow", "数据谱系 · 领域专项"), element("h2", "", "K3 跨段合成：让远处证据无法被忽略"), element("p", "", "长上下文的关键不是长度本身，而是让答案必须依赖分散在远处的多处证据。"));
+
+  const top = element("section", "pte-data-story-section");
+  top.append(element("h3", "", "证据太近，模型就会学会只看最后几段"));
+  const contrast = element("div", "pte-data-contrast");
+  const shortcut = element("article", "muted");
+  shortcut.append(element("h4", "", "普通长文档训练"), element("p", "", "机械拼成 1M 上下文，只增加长度。"), element("p", "", "答案证据集中在来源段落附近，模型只看最近内容也能答对。"), element("strong", "danger", "后果：忽略前 99% 仍不增加 loss，长上下文训练失败。"));
+  const forced = element("article", "blue");
+  forced.append(element("h4", "", "跨段合成的强制约束"), element("p", "", "第 1 / 80 / 300 / 900 段各放一处必要证据。"), element("p", "", "任何一处缺失，答案都不成立。"), element("strong", "success", "捷径失效：必须真正跨段读取并整合。"));
+  contrast.append(shortcut, forced);
+  top.append(contrast);
+
+  const middle = element("section", "pte-data-story-middle");
+  const flow = element("article", "pte-data-flow");
+  flow.append(element("h3", "", "把证据随机散布到不可忽略的位置"));
+  [["Step 1", "选择 N 篇文档", "从不同来源选取文本、图表、代码输出等材料。"], ["Step 2", "提取相互依赖的事实", "每篇提取 1–2 个关键事实，任一缺失都无法完成判断。"], ["Step 3", "设计组合问题", "答案必须同时依赖 N 处证据，而不是复述其中一段。"], ["Step 4", "随机散布证据", "不把证据集中在末尾；距离越远，局部阅读捷径越难奏效。"]].forEach(([label, title, copy]) => {
+    const step = element("div", "pte-data-flow-step");
+    step.append(element("span", "", label), element("h4", "", title), element("p", "", copy));
+    flow.append(step);
+  });
+  const example = element("div", "pte-data-code");
+  example.append(element("strong", "", "问题：这个角色在第三幕的行为符合他在第一幕的性格吗？"), element("p", "", "第 1 段：人物身份与性格"), element("p", "", "第 80 段：时间线与背景事件"), element("p", "", "第 300 段：外部条件变化"), element("p", "", "第 900 段：第三幕具体行为"), element("span", "", "缺任何一处 → 无法作出有依据的判断"));
+  flow.append(example);
+  const cards = element("article", "pte-data-card-stack");
+  cards.append(element("h3", "", "训练信号如何升级"));
+  [["与 NIAH 的区别", "NIAH 是单针检索，测“能不能找到”；跨段合成是多针 + 组合推理，测“能不能整合”。", "blue"], ["多模态跨段", "证据可以同时来自人物文本、时间线图表和系统代码输出；单一模态不足以作答。", "neutral"], ["配方必须动态更新", "简单任务饱和后，需要更远距离、更多跨段的任务；采样率应由小模型消融动态决定。", "green"]].forEach(([title, copy, tone]) => {
+    const card = element("div", `pte-data-card ${tone}`);
+    card.append(element("h4", "", title), element("p", "", copy));
+    cards.append(card);
+  });
+  middle.append(flow, cards);
+  const standard = element("section", "pte-data-standard");
+  standard.append(element("strong", "", "核心验收标准：漏掉任一远处关键段落，答案就会错。"), element("p", "", "只有这样，忽略远处证据才会直接增加 loss，迫使模型放弃局部阅读捷径。"));
+  scroll.append(header, top, middle, standard, element("p", "pte-optimizer-source", "🟢 K3 Technical Report §3.4（跨段合成任务）；🔴 合成流程为工程推断"));
+  side.append(buildDataTabs(state, persist, rerender), scroll);
+  return side;
+};
+
+const buildNativeVisionCurves = () => {
+  const svg = svgElement("svg", { class: "pte-native-curves", viewBox: "0 0 520 150", role: "img", "aria-label": "SigLIP 初始化与随机初始化的梯度稳定性示意" });
+  svg.append(svgElement("line", { x1: 54, y1: 124, x2: 500, y2: 124, class: "axis" }), svgElement("line", { x1: 54, y1: 20, x2: 54, y2: 124, class: "axis" }));
+  svg.append(svgElement("path", { d: "M54 108 C92 100 112 94 142 88 L157 38 L170 90 C205 82 225 78 250 72 L268 28 L282 76 C322 68 342 64 370 60 L386 34 L399 62 C440 56 470 52 500 49", class: "spiky" }));
+  svg.append(svgElement("path", { d: "M54 116 C120 108 170 98 226 88 S338 69 500 48", class: "smooth" }));
+  svg.append(svgElement("text", { x: 496, y: 35, class: "spiky-label", "text-anchor": "end" }, "SigLIP 初始化：频繁 spike"), svgElement("text", { x: 496, y: 74, class: "smooth-label", "text-anchor": "end" }, "随机初始化：梯度平稳"), svgElement("text", { x: 278, y: 145, class: "axis-label", "text-anchor": "middle" }, "训练 step"));
+  return svg;
+};
+
+const buildNativeVisionStory = (state, persist, rerender) => {
+  const side = element("aside", "pte-optimizer-detail dataTab pte-k15-custom pte-data-story");
+  const scroll = element("div", "pte-optimizer-scroll");
+  scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+  const header = element("header", "pte-optimizer-heading");
+  header.append(element("span", "pte-optimizer-eyebrow", "数据谱系 · 视觉语料"), element("h2", "", "K3 视觉从头 NTP：从第一步统一目标"), element("p", "", "MoonViT-V2 从随机参数与语言主干联合训练，只接受 NTP 监督，不经历覆盖旧视觉目标的过渡期。"));
+
+  const top = element("section", "pte-data-story-section");
+  top.append(element("h3", "", "对比学习的表示和 NTP 需要的表示不是同一件事"));
+  const contrast = element("div", "pte-data-contrast native");
+  const siglip = element("article", "muted");
+  siglip.append(element("h4", "", "SigLIP 初始化"), element("p", "", "旧目标：判断整张图与一段文本是否匹配。"), element("p", "", "学到的是整图级相似度，容易忽略局部 patch 与 token 的细粒度对应。"), element("p", "danger", "切到 NTP 后梯度方向改变，编码器必须“忘掉”旧表示，过渡期频繁 spike。"));
+  const random = element("article", "blue");
+  random.append(element("h4", "", "随机初始化"), element("p", "", "从第一步起只有 NTP：根据视觉信息预测下一个语言 token。"), element("p", "", "视觉表示从零开始为局部 token 对齐服务，没有旧目标需要覆盖。"), element("p", "success", "梯度方向从一开始一致，训练曲线更平稳。"));
+  contrast.append(siglip, random);
+  top.append(contrast, element("p", "pte-data-warning", "SigLIP 初始化版本频繁 spike；从头训练版本的视觉编码器梯度范数全程更平稳。"));
+
+  const middle = element("section", "pte-data-story-middle");
+  const design = element("article", "pte-native-design");
+  design.append(element("h3", "", "MoonViT-V2：共享参数、压缩 token、只收 NTP 梯度"));
+  [["图像与视频共享参数", "图像视为长度为 1 的视频；视频多帧按时序拼接，由同一编码器处理。"], ["2×2 pixel shuffle", "每 2×2 patch 合并为 1 个 token，视觉 token 数降为 1/4，为语言推理保留上下文空间。"], ["训练监督", "不使用对比学习目标；视觉编码器的梯度完全来自语言主干的 next-token prediction 误差。"]].forEach(([title, copy]) => {
+    const item = element("div", "pte-native-item");
+    item.append(element("h4", "", title), element("p", "", copy));
+    design.append(item);
+  });
+  design.append(buildNativeVisionCurves());
+  const cards = element("article", "pte-data-card-stack");
+  cards.append(element("h3", "", "为什么这个取舍成立"));
+  [["全局目标 ≠ 局部目标", "对比学习优化整图—文本相似度；NTP 需要局部视觉 patch 对齐下一个 token，优化粒度不同。", "blue"], ["压缩视觉 token", "原始分辨率产生大量视觉 token；2×2 合并后数量 ÷4，把有限上下文窗口留给语言推理。", "neutral"], ["代价与收益", "代价是随机参数需要更多训练步、无法借用 SigLIP 视觉知识；收益是目标统一、训练稳定、无需忘掉旧目标。", "green"]].forEach(([title, copy, tone]) => {
+    const card = element("div", `pte-data-card ${tone}`);
+    card.append(element("h4", "", title), element("p", "", copy));
+    cards.append(card);
+  });
+  middle.append(design, cards);
+  const summary = element("section", "pte-data-summary");
+  summary.append(element("strong", "", "预训练视觉编码器不一定是更好的起点，也可能是一套需要被覆盖的旧目标。"), element("p", "", "从随机参数开始，视觉编码器和语言主干从第一步就为同一个 NTP 目标服务。"));
+  scroll.append(header, top, middle, summary, element("p", "pte-optimizer-source", "🟢 K3 Technical Report §3.3、Figure 6（MoonViT-V2、随机初始化 vs SigLIP、pixel shuffle）"));
+  side.append(buildDataTabs(state, persist, rerender), scroll);
+  return side;
+};
+
+const buildProgrammaticStory = (state, persist, rerender) => {
+  const side = element("aside", "pte-optimizer-detail dataTab pte-k15-custom pte-data-story pte-programmatic");
+  const scroll = element("div", "pte-optimizer-scroll");
+  scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+  const header = element("header", "pte-optimizer-heading");
+  header.append(element("span", "pte-optimizer-eyebrow", "数据谱系 · 合成扩增"), element("h2", "", "K3 程序化多模态：代码与渲染结果天然配对"), element("p", "", "代码直接决定视觉结果，因此同一批数据可以训练代码→画面与画面→代码两个方向。"));
+
+  const top = element("section", "pte-data-story-section");
+  top.append(element("h3", "", "Caption 描述内容，程序化数据描述因果"));
+  const triad = element("div", "pte-programmatic-triad");
+  const caption = element("article", "muted");
+  caption.append(element("h4", "", "Caption / OCR 的能力边界"), element("p", "", "能回答：“图中有一个居中的红色圆形”。"), element("p", "danger", "不能回答：哪行代码生成它？改成蓝色要改什么？这段 CSS 会渲染成什么？"), element("strong", "", "本质：描述已有内容，不理解生成机制。"));
+  const causal = element("article", "blue");
+  causal.append(element("h4", "", "程序化数据的因果结构"), element("pre", "pte-program-code", '<circle cx="50" cy="50" r="40" fill="red"/>'), element("span", "pte-causal-arrow", "↓ 渲染"), element("strong", "", "[ 红色圆形渲染图 ]"), element("p", "success", "代码完全决定结果；代码执行就是精确标注。"));
+  const ability = element("article", "green");
+  ability.append(element("h4", "", "由此带来的能力"), element("p", "", "Code review：看代码预判视觉结果，无需运行。"), element("p", "", "界面生成：给截图反推代码结构。"), element("p", "", "调试：由 bug 截图定位问题代码行。"));
+  triad.append(caption, causal, ability);
+  top.append(triad);
+
+  const middle = element("section", "pte-data-story-middle");
+  const directions = element("article", "pte-data-flow");
+  directions.append(element("h3", "", "同一批数据，训练两个方向的映射"));
+  [["方向 1 · 代码 → 画面", "输入：display:flex; justify-content:center", "输出：按钮水平居中截图", "训练信号：预测视觉结果与真实渲染是否一致", "应用：Code review 无需运行程序，直接预判布局"], ["方向 2 · 画面 → 代码", "输入：[截图：水平居中的按钮]", "输出：display:flex; justify-content:center", "训练信号：预测代码与真实代码是否等价", "应用：给界面截图生成对应代码结构"]].forEach(([title, input, output, signal, usage]) => {
+    const direction = element("div", "pte-direction-card");
+    direction.append(element("h4", "", title), element("p", "", input), element("span", "pte-causal-arrow", "→"), element("p", "", output), element("small", "", signal), element("strong", "", usage));
+    directions.append(direction);
+  });
+  const coordinate = element("div", "pte-coordinate-note");
+  coordinate.append(element("h4", "", "坐标归一化：跨分辨率通用"), element("p", "", "绝对坐标（200,160,600,400）只在 800×600 下有效。"), element("p", "", "将每个坐标除以对应维度：归一化为（0.2, 0.2, 0.6, 0.5），换分辨率仍表达同一布局。"));
+  directions.append(coordinate);
+  const coverage = element("article", "pte-data-card-stack");
+  coverage.append(element("h3", "", "六类程序化数据：从 UI 到 3D"));
+  [["◆", "3D 资产", "空间几何，三维坐标"], ["◇", "HTML + CSS", "网页布局，DOM 结构"], ["★", "游戏场景", "实体位置，物理规则"], ["▣", "CAD 图纸", "工程图与精确尺寸"], ["↗", "代码执行输出", "程序运行结果截图"]].forEach(([icon, name, copy]) => {
+    const row = element("div", "pte-programmatic-row");
+    row.append(element("span", "", icon), element("strong", "", name), element("p", "", copy));
+    coverage.append(row);
+  });
+  const grounding = element("div", "pte-data-card green");
+  grounding.append(element("h4", "", "Grounding 能力的升级"), element("p", "", "K2.5 Grounding：标出图里有什么物体（识别）。"), element("p", "", "K3 程序化多模态：解释哪段代码如何创造物体（因果）。"), element("strong", "", "从“识别存在”升级到“理解生成机制”。"));
+  coverage.append(grounding);
+  middle.append(directions, coverage);
+
+  scroll.append(header, top, middle, element("p", "pte-optimizer-source", "🟢 K3 Technical Report §3.1（程序化多模态、双向映射、坐标归一化）"));
   side.append(buildDataTabs(state, persist, rerender), scroll);
   return side;
 };
@@ -1087,16 +1492,30 @@ const buildCooldownStory = (state, persist, rerender) => {
 
 const buildDataDetail = (state, persist, rerender) => {
   if (state.selectedLabel === "data-k15-sampling") return buildSamplingStory(state, persist, rerender);
+  if (state.selectedLabel === "data-k25-unique") return buildUniqueTokensStory(state, persist, rerender);
+  if (state.selectedLabel === "data-k2-math-rephrasing") return buildMathNotesStory(state, persist, rerender);
+  if (state.selectedLabel === "data-k25-vision-seven") return buildVisionSevenStory(state, persist, rerender);
+  if (state.selectedLabel === "data-k3-long-doc") return buildLongDocStory(state, persist, rerender);
+  if (state.selectedLabel === "data-k3-cross-span") return buildCrossSpanStory(state, persist, rerender);
+  if (state.selectedLabel === "data-k3-native-vision") return buildNativeVisionStory(state, persist, rerender);
+  if (state.selectedLabel === "data-k3-programmatic") return buildProgrammaticStory(state, persist, rerender);
   if (state.selectedLabel === "data-k15-vision-five") return buildVisionFiveStory(state, persist, rerender);
   if (state.selectedLabel === "data-k15-cooldown-synth") return buildCooldownStory(state, persist, rerender);
-  const chapters = Object.fromEntries(DATA_LINEAGES.map((lineage) => [lineage.id, {
+  const chapters = Object.fromEntries(DATA_LINEAGES.map((lineage) => {
+    const cells = lineage.id === "quality"
+      ? lineage.cells.filter((cell) => cell.labelId)
+      : lineage.id === "augmentation" && state.selectedLabel === "data-k2-rephrasing"
+        ? lineage.cells.filter((cell) => ["data-k2-rephrasing", "data-k25-code-visual"].includes(cell.labelId))
+        : lineage.cells;
+    return [lineage.id, {
     tab: lineage.tab,
     eyebrow: `数据谱系 · ${lineage.tab}`,
     title: lineage.title,
     lead: lineage.lead,
-    stages: lineage.cells.map((cell) => cell.text),
+    hideHeader: lineage.id === "augmentation" && state.selectedLabel === "data-k2-rephrasing",
+    stages: cells.map((cell) => cell.text),
     highlightStages: false,
-    sections: lineage.cells.map((cell) => {
+    sections: cells.map((cell) => {
       if (!cell.labelId) return {
         title: `${cell.version} · ${cell.text}`,
         copy: `🟢 ${cell.note}`,
@@ -1116,10 +1535,12 @@ const buildDataDetail = (state, persist, rerender) => {
         visual: detail.visual,
         points: [...detail.how, ...detail.evidence],
         source: detail.source,
+        jumpTo: detail.jumpTo,
       };
     }),
     source: "每个节点的事实与边界沿用对应技术报告标注；占位节点只表达继承或中断。",
-  }]));
+  }];
+  }));
   return buildSequenceDetail({ chapters, stateKey: "dataTab", labelByTab: DATA_LABEL_BY_TAB, scrollToSelected: true }, state, persist, rerender);
 };
 
@@ -1400,6 +1821,13 @@ const buildDataView = (state, select, selectTab, returnToOverview) => {
         node.setAttribute("aria-pressed", String(state.selectedLabel === cell.labelId));
         node.addEventListener("click", () => select(cell.labelId));
         slot.append(node);
+      } else if (cell.jumpTo) {
+        const placeholder = element("button", "pte-lineage-node placeholder jumpable", cell.text);
+        placeholder.type = "button";
+        placeholder.dataset.jumpTo = cell.jumpTo;
+        placeholder.title = cell.note || "";
+        placeholder.addEventListener("click", () => select(cell.jumpTo));
+        slot.append(placeholder);
       } else {
         const placeholder = element("span", `pte-lineage-node placeholder ${cell.toNext === "break" ? "break" : ""}`, cell.text);
         placeholder.title = cell.note || "";

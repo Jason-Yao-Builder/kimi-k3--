@@ -1,4 +1,4 @@
-import { registerCards } from "./logic.js?build=20260804-post26";
+import { registerCards } from "./logic.js?build=20260805-post33";
 
 registerCards({
   "sft-k15": {
@@ -291,7 +291,7 @@ registerCards({
   "domain-k25": {
     version: "K2.5",
     title: "四能力域 + 联合视觉 RL",
-    oneliner: "按能力组织数据，而不是按模态拆管道；每个能力域同时混入文本与视觉任务。",
+    oneliner: "把组织轴从“输入形式”换成“模型要完成什么能力”。",
     problem: [
       "文本 RL 与视觉 RL 分开训练时，两条管道对“好推理”的定义和数据节奏彼此隔离。",
       "真实任务往往跨模态：读图表后写分析、看界面后调用工具，不能先假设问题只属于文字或图像。",
@@ -473,7 +473,7 @@ registerCards({
   "reward-k3": {
     version: "K3",
     title: "Agentic GRM 四步",
-    oneliner: "强制裁判先读、再立标准、逐项打分、最后汇总，堵住直接凭感觉给结论的捷径。",
+    oneliner: "先完整读轨迹，再动态生成本任务的检查项；逐项留证后才汇总，长度成本单独结算。",
     problem: [
       "K2 的 Self-Critique 有 Rubric，但流程仍较自由；模型可能跳过完整阅读，直接输出偏好结论。",
       "Agent 轨迹包含工具调用、观察与修正，最终答案看似正确也可能掩盖中途伪造或漏执行。",
@@ -593,7 +593,7 @@ registerCards({
   "length-k3": {
     version: "K3",
     title: "τ 退火",
-    oneliner: "先估计每道题自身需要多长，再用 τ 从 max 到 low 逐阶段收紧，而不是所有题共享一把尺。",
+    oneliner: "先用 b₀(x) 估计每道题自身需要多长，再用 τ 按任务域与 effort 缩放预算。",
     problem: [
       "Toggle 解决了何时压缩，却仍以训练阶段为全局开关；同一阶段内，简单题与难题受到相似约束。",
       "General Tasks 一次输出即可，Coding Agents 需要编译—报错—修复循环，天然 token 需求不同。",

@@ -471,9 +471,9 @@ export const CONTEXT_CHAPTERS = {
 
 const dataRows = {
   k15: [["filter", "四层质量筛选", "inherit"], ["sampling", "动态采样", "new"], ["vision-five", "五类视觉", "new"], ["cooldown-synth", "Cooldown 合成 QA", "new"]],
-  k2: [["filter-inherit", "沿用质量筛选", "inherit"], ["rephrasing", "知识 rephrasing", "new"], ["math-rephrasing", "数学学习笔记", "new"]],
-  k25: [["unique", "unique tokens", "new"], ["code-weight", "代码权重上调", "improve"], ["vision-seven", "七类视觉", "improve"], ["code-visual", "代码—视觉配对", "new"]],
-  k3: [["long-doc", "长文档清洗", "improve"], ["cross-span", "跨段合成任务", "new"], ["native-vision", "视觉从头 NTP", "new"], ["programmatic", "程序化多模态", "improve"]],
+  k2: [["rephrasing", "知识 rephrasing", "new"], ["math-rephrasing", "数学学习笔记", "new"]],
+  k25: [["unique", "unique tokens", "new"], ["vision-seven", "七类视觉", "improve"], ["code-visual", "代码—视觉配对", "new"]],
+  k3: [["long-doc", "长文档清洗", "improve"], ["cross-span", "长上下文训练", "new"], ["native-vision", "视觉从头 NTP", "new"], ["programmatic", "程序化多模态", "improve"]],
 };
 
 export const DATA_LABELS = VERSIONS.flatMap((version) => dataRows[version.id].map(([suffix, text, lineType]) => ({
@@ -543,21 +543,21 @@ export const DATA_LINEAGES = [
     lead: "K2 与 K2.5 沿用 K1.5 的质量底座；K3 面对超长内容，补上模糊去重、帧感知哈希与结构完整性检查。",
     cells: [
       { version: "K1.5", text: "四层质量筛选", labelId: "data-k15-filter", toNext: "inherit" },
-      { version: "K2", text: "沿用质量筛选", labelId: "data-k2-filter-inherit", note: "多数数据处理管线沿用 K1.5。", toNext: "inherit" },
-      { version: "K2.5", text: "继续沿用", note: "质量底座不变，新增预算放在视觉数据与融合方式。", toNext: "improve" },
+      { version: "K2", text: "沿用质量筛选", note: "多数数据处理管线沿用 K1.5。", toNext: "inherit", jumpTo: "data-k15-filter" },
+      { version: "K2.5", text: "沿用先前", note: "质量底座不变，新增预算放在视觉数据与融合方式。", toNext: "improve", jumpTo: "data-k15-filter" },
       { version: "K3", text: "长文档清洗", labelId: "data-k3-long-doc" },
     ],
   },
   {
     id: "sampling",
-    tab: "采样预算",
+    tab: "采样方式",
     title: "从文档质量权重，演化为数据源上限与稀缺长数据预算",
     lead: "原始互联网频率不等于训练价值：高质量文档提高抽样概率，小数据源设置最大 epoch，稀缺长数据则在严格清洗后上采样。",
     cells: [
       { version: "K1.5", text: "动态采样", labelId: "data-k15-sampling", toNext: "inherit" },
-      { version: "K2", text: "沿用域采样", note: "多数数据处理管线沿用 K1.5，创新集中于 rephrasing。", toNext: "improve" },
+      { version: "K2", text: "沿用先前", note: "多数数据处理管线沿用 K1.5，创新集中于 rephrasing。", toNext: "improve", jumpTo: "data-k15-sampling" },
       { version: "K2.5", text: "unique tokens", labelId: "data-k25-unique", toNext: "improve" },
-      { version: "K3", text: "长数据上采样", note: "长文档和长视频严格清洗后提高进入 batch 的概率。" },
+      { version: "K3", text: "沿用先前", note: "长文档和长视频严格清洗后提高进入 batch 的概率。", jumpTo: "data-k25-unique" },
     ],
   },
   {
@@ -566,10 +566,10 @@ export const DATA_LINEAGES = [
     title: "每代都为最容易被通用管线误伤或忽略的能力建立专项数据",
     lead: "K1.5 建立专项数据；K2 把数学材料改成学习笔记；K2.5 上调代码权重；K3 合成必须跨段取证的任务。",
     cells: [
-      { version: "K1.5", text: "专项数据", note: "K1.5 将专项数据并入多维质量评分与采样策略。", toNext: "inherit" },
+      { version: "K1.5", text: "未明显披露", note: "报告未明显披露独立的领域专项改动。", toNext: "inherit" },
       { version: "K2", text: "数学学习笔记", labelId: "data-k2-math-rephrasing", toNext: "improve" },
-      { version: "K2.5", text: "代码权重上调", labelId: "data-k25-code-weight", toNext: "improve" },
-      { version: "K3", text: "跨段合成", labelId: "data-k3-cross-span" },
+      { version: "K2.5", text: "代码权重上调", jumpTo: "data-k25-unique", toNext: "improve" },
+      { version: "K3", text: "长上下文训练", labelId: "data-k3-cross-span" },
     ],
   },
   {
@@ -579,7 +579,7 @@ export const DATA_LINEAGES = [
     lead: "K2 是纯文本中断点；K2.5 扩为七类视觉数据；K3 不再依赖 SigLIP 表示，让视觉编码器从随机参数开始接受 NTP。",
     cells: [
       { version: "K1.5", text: "五类视觉", labelId: "data-k15-vision-five", toNext: "break" },
-      { version: "K2", text: "纯文本暂停", note: "K2 不训练视觉，但语言主干随后由 K2.5 加载。", toNext: "redesign" },
+      { version: "K2", text: "沿用先前", note: "K2 不训练视觉，但语言主干随后由 K2.5 加载。", toNext: "redesign", jumpTo: "data-k15-vision-five" },
       { version: "K2.5", text: "七类视觉", labelId: "data-k25-vision-seven", toNext: "redesign" },
       { version: "K3", text: "视觉从头 NTP", labelId: "data-k3-native-vision" },
     ],
@@ -632,18 +632,17 @@ export const DETAILS = {
   "data-k15-sampling": detail("上下采样", "K1.5", "质量分不做硬切割，而是转成每篇文档被抽中的概率。", ["高分文档重复抽取，低分文档随机跳过", "60 篇×2 + 40 篇×0.5 = 140 次抽样", "高质量样本贡献占比由 60% 提升到 86%"], ["软删除保留小语种与垂直领域覆盖度。", "采样率 0.3 可理解为长期梯度权重约为原始的 0.3×。"], "sampling"),
   "data-k15-vision-five": detail("五类视觉", "K1.5", "用五种任务覆盖识别、图文对应、读字、知识提取和视觉问答。", ["caption / 图文交织 / OCR", "知识型图表 / 通用 QA", "图文交织额外按渲染位置重排"], ["合成数据仅在 cooldown 使用。", "视觉仍在语言主干训练完成后追加。"], "vision"),
   "data-k15-cooldown-synth": detail("Cooldown 合成 QA", "K1.5", "在低学习率阶段加入验证后的数学、知识与代码 QA，集中巩固能力。", ["专有 LM 生成 QA 对", "拒绝采样过滤低质量生成", "全面验证后才进入 cooldown"], ["合成数据不进入主预训练"], "steps"),
-  "data-k2-filter-inherit": detail("沿用质量评分", "K2", "K2 沿用 K1.5 的数据处理管线，把新增实验集中在 rephrasing。", ["继续使用多维质量信号筛选文本", "不重复设计已经验证的数据底座", "以相同底座比较重复训练与多版本改写"], ["数据处理方法沿用 K1.5；K2 的新增数据策略是知识与数学 rephrasing。"], "inherit"),
   "data-k2-rephrasing": detail("rephrasing", "K2", "同一知识改写 10 个表面版本各看 1 次，胜过同一原文重复 10 次。", ["问答、因果、对比、推导等多风格提示", "长文档分块自回归改写再拼接", "语义忠实度验证过滤失真版本"], ["SimpleQA：原文×10ep 23.76；10版×1ep 28.94。", "关键不是制造更多字，而是迫使模型提取跨表达不变的事实结构。"], "rephrase"),
-  "data-k2-math-rephrasing": detail("数学学习笔记", "K2", "把高质量数学文档改写为学习笔记，并翻译其他语言材料扩充英文数学数据。", ["遵循 SwallowMath 风格", "保持推导结构与结论", "仅用于数学域"], ["推广到其他域仍有幻觉与毒性风险"], "steps"),
-  "data-k25-code-weight": detail("代码权重上调", "K2.5", "在联合预训练配方中增加代码相关内容权重，并用 source epoch 上限防止过拟合。", ["提高代码相关采样概率", "配合 unique token 预算", "延续已有去重与语言识别"], ["调权发生在 K2.5 联合预训练配方"], "sampling"),
-  "data-k25-vision-seven": detail("七类视觉", "K2.5", "在 Caption、交织、OCR、知识基础上加入感知、视频与智能体数据。", ["感知：框、点级引用与轮廓分割", "视频：长视频与人工轨迹", "智能体：桌面、移动端与 Web GUI"], ["七类覆盖识别、定位、时序与操作"], "vision"),
-  "data-k25-unique": detail("unique tokens", "K2.5", "按每个数据源去重后的 token 总量设置最大 epoch，阻止小源被重复几十遍。", ["大源和小源不再共享同一 epoch 数", "source budget 到上限后停止采样", "与 rephrasing 解决的是两类不同重复"], ["rephrasing 管文档表面形式；unique tokens 管数据源整体预算。"], "budget"),
+  "data-k2-math-rephrasing": detail("数学学习笔记", "K2", "把压缩推导展开成包含条件检查、隐含步骤与直觉说明的可追溯学习过程。", ["识别原文中的隐含跳步", "按 SwallowMath learning-note style 展开", "翻译其他语言材料并验证忠实度"], ["仅在知识与数学域使用；每个语料库最多改写两次。"], "steps"),
+  "data-k25-code-weight": detail("代码权重上调", "K2.5", "视觉 token 扩大训练分母后，代码需要上调配方权重，并用 unique tokens 上限防止小源过拟合。", ["提高代码 source 的采样概率", "为每个 source 设置 unique tokens 上限", "恢复能力密度并阻止无限循环"], ["权重与上限缺一不可。"], "sampling"),
+  "data-k25-vision-seven": detail("七类视觉", "K2.5", "新增感知、视频与智能体数据，把视觉能力扩展到精确定位、时序理解与 GUI 操作。", ["感知：框、点级引用与轮廓分割", "视频：帧间关系与长视频理解", "智能体：桌面、移动端与 Web 操作轨迹"], ["从看懂内容扩展到定位、理解变化与执行操作。"], "vision"),
+  "data-k25-unique": detail("采样预算：unique tokens", "K2.5", "用每个 source 的去重信息量设置采样上限，让实际训练量与有效信息量成比例。", ["统计每个 source 的 unique tokens", "用 epoch × source_size 设置采样上限", "达到上限后停止采样该 source"], ["rephrasing 管表面形式；unique tokens 管来源预算。"], "budget"),
   "data-k25-vit-ce": detail("ViT 去对比损失", "K2.5", "只保留 caption cross-entropy，让每个输出 token 都能追责视觉细节丢失。", ["移除 CLIP 风格整图—整句对比", "用 NTP 目标直接训练视觉编码", "更契合表格单元格、OCR 与局部结构"], ["Lcaption = −∑ log P(tₖ | t₍<k₎, I)", "🔴 可能牺牲零样本检索，但 K2.5 的目标是生成而非检索。"], "loss"),
   "data-k25-code-visual": detail("代码—视觉配对", "K2.5", "把 HTML、React、SVG 等代码与渲染截图配对，连接结构与布局结果。", ["代码 → 页面截图", "截图 → 布局结构", "为后续程序化多模态奠基"], ["K3 将其扩展到 3D、游戏与 CAD"], "code-visual"),
-  "data-k3-native-vision": detail("视觉从头 NTP", "K3", "MoonViT-V2 从随机参数开始，与语言主干共同接受 NTP 监督。", ["不使用 SigLIP 初始化", "不使用对比损失", "梯度范数全程更平稳"], ["27 层、约 0.4B 参数、2×2 pixel shuffle"], "native"),
-  "data-k3-programmatic": detail("程序化多模态", "K3", "把代码与渲染结果配成天然精确的数据，学习“代码结构 ↔ 视觉后果”。", ["SVG / 3D / HTML+CSS / 游戏 / CAD", "支持看图反推布局，也支持看代码预判结果", "绝对坐标与归一化坐标双格式"], ["例：display:flex + justify-content:center ↔ 按钮水平居中。", "区别于 Grounding：它不只标出物体，而是解释物体如何被创造。"], "code-visual"),
+  "data-k3-native-vision": detail("视觉从头 NTP", "K3", "MoonViT-V2 从随机参数开始，只接受 NTP 监督，避免覆盖 SigLIP 对比学习表示时产生的目标冲突。", ["从第一步统一视觉与语言目标", "图像和视频共享参数", "2×2 pixel shuffle 将视觉 token 压缩为 1/4"], ["随机初始化需要更多训练步，但梯度范数更平稳。"], "native"),
+  "data-k3-programmatic": detail("程序化多模态", "K3", "代码直接决定渲染结果，形成无需人工标注的因果配对，并训练代码与视觉结果的双向映射。", ["Caption 描述内容；程序化数据解释结构与因果", "代码 → 画面、画面 → 代码双向训练", "绝对坐标归一化后跨分辨率通用"], ["从 Grounding 的“识别存在”升级到“理解生成机制”。"], "code-visual"),
   "data-k3-long-doc": detail("长文档上采样", "K3", "真实长依赖天然稀缺，先严格清洗，再提高其进入训练 batch 的概率。", ["精确 / 模糊去重与视频感知哈希", "启发式、分类器与结构完整性过滤", "学术全文、法律文书、技术手册上采样"], ["上采样会放大残余噪声，因此清洗质量比倍率更重要。"], "funnel"),
-  "data-k3-cross-span": detail("跨段合成任务", "K3", "把答案所需证据分散到 1M 上下文多个位置，逼迫模型真正跨段读取。", ["第1段身份 + 第300段例外 + 第900段问题", "从单针检索升级为多针组合推理", "证据可跨文本、图表与代码输出"], ["合格标准不是文件够长，而是忽略远处证据会让 loss 变差。"], "spans"),
+  "data-k3-cross-span": detail("跨段合成任务", "K3", "把答案所需证据随机散布到长上下文远处，让漏读任何一段都会答错。", ["从多篇文档提取相互依赖的事实", "设计必须组合全部事实的问题", "证据跨文本、图表与代码输出分散放置"], ["从 NIAH 单针检索升级为多针组合推理。"], "spans"),
 };
 
 const story = (why, how, evidence, deepDive, source) => ({ why, how, evidence, deepDive, source });
@@ -1023,9 +1022,7 @@ Object.assign(DETAILS["data-k15-filter"], story(
     "采样率通过下游任务实证选择阈值组合，寻找质量与覆盖度的帕累托最优点。",
     "示例判断：Cosine>0.95 但表达有信息增量时，论文与科普改写都可保留；仅调换段落顺序的副本删除一个。",
   ],
-  [
-    "规则 / FastText / 嵌入 / LLM → 连续质量分",
-  ],
+  [],
   "🟢 K1.5 Technical Report Appendix B.1；🔴 Cosine 阈值为机制示例",
 ));
 
@@ -1124,24 +1121,6 @@ Object.assign(DETAILS["data-k2-math-rephrasing"], story(
     "数学原文 → 学习笔记式重写 → 忠实度验证",
   ],
   "🟢 K2 Technical Report §2.2",
-));
-
-Object.assign(DETAILS["data-k2-filter-inherit"], story(
-  [
-    "K1.5 已建立规则、FastText、嵌入与 LLM 组合评分，K2 不需要重新发明同一套入口。",
-    "保持数据底座一致，才能把 SimpleQA 的变化主要归因于 rephrasing，而不是清洗策略同时变化。",
-  ],
-  [
-    "继续沿用 K1.5 的主要数据处理方法。",
-    "把 K2 的新增数据实验集中在知识与数学 rephrasing。",
-  ],
-  [
-    "K2 报告明确说明多数数据处理管线沿用 K1.5。",
-  ],
-  [
-    "K1.5 多维质量评分 → K2 沿用底座 → 单独检验 rephrasing",
-  ],
-  "🟢 K2 Technical Report §2.2『Pre-training Data Overall』",
 ));
 
 Object.assign(DETAILS["data-k25-code-weight"], story(

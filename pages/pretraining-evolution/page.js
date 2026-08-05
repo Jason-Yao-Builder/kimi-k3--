@@ -1,7 +1,7 @@
-import { renderPretrainingEvolution } from "./component.js?build=20260804-data1";
+import { renderPretrainingEvolution } from "./component.js?build=20260805-data14";
 
 export const pretrainingEvolutionPage = {
-  style: new URL("./styles.css?build=20260804-data1", import.meta.url).href,
+  style: new URL("./styles.css?build=20260805-data14", import.meta.url).href,
   renderers: { "pretraining-evolution": renderPretrainingEvolution },
   slide: {
     id: "pretraining-evolution",

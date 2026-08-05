@@ -1,7 +1,7 @@
-import { renderPosttrainingEvolution } from "./component.js?build=20260804-post26";
+import { renderPosttrainingEvolution } from "./component.js?build=20260805-post34";
 
 export const posttrainingEvolutionPage = {
-  style: new URL("./styles.css?build=20260804-post26", import.meta.url).href,
+  style: new URL("./styles.css?build=20260805-post33", import.meta.url).href,
   renderers: { "posttraining-evolution": renderPosttrainingEvolution },
   slide: {
     id: "posttraining-evolution",
