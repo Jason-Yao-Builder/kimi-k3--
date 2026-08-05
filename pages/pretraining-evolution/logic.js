@@ -78,7 +78,7 @@ export const OPTIMIZER_CHAPTERS = {
       },
       {
         title: "Adam：方向之外，还要估计尺度",
-        copy: "🟢 Adam 原论文：Momentum 只累积“往哪走”，Adam 还用梯度平方的历史均值估计每个参数平时的尺度。大梯度方向自动缩小步长，小梯度方向保留推进速度。",
+        copy: "Adam 原论文：Momentum 只累积“往哪走”，Adam 还用梯度平方的历史均值估计每个参数平时的尺度。大梯度方向自动缩小步长，小梯度方向保留推进速度。",
         formula: ["Momentum：uₜ=0.9uₜ₋₁+gₜ，Δθ=−0.01uₜ", "Adam：Δθ=−η·m̂ₜ/(√v̂ₜ+ε)", "g₁=100g₂ ⇒ m̂₁/√v̂₁≈m̂₂/√v̂₂"],
         example: {
           title: "三步数值对照",
@@ -91,12 +91,12 @@ export const OPTIMIZER_CHAPTERS = {
           ],
           note: "Momentum 两个方向始终相差 100×；Adam 用 √v̂ 抵消尺度差，让相对同样显著的梯度获得近似同样的步长。",
         },
-        source: "🟢 Kingma & Ba, Adam: A Method for Stochastic Optimization, arXiv:1412.6980。",
+        source: "Kingma & Ba, Adam: A Method for Stochastic Optimization, arXiv:1412.6980。",
         visual: "adam",
       },
       {
         title: "下一步问题：正则化不该被自适应步长扭曲",
-        copy: "🟢 AdamW 原论文：Adam+L2 的权重衰减没有少一项，而是藏在 m̂⁽ᴸ²⁾ 中；λθ 同时参与 m 和 v，使衰减强度依赖任务梯度尺度。AdamW 让 m、v 只统计任务梯度，再直接衰减参数。",
+        copy: "AdamW 原论文：Adam+L2 的权重衰减没有少一项，而是藏在 m̂⁽ᴸ²⁾ 中；λθ 同时参与 m 和 v，使衰减强度依赖任务梯度尺度。AdamW 让 m、v 只统计任务梯度，再直接衰减参数。",
         formulaComparison: {
           setup: "精确同号首步：m₀=v₀=0，θ=1，λ=0.1；比较 gₐ=10 与 gᵦ=0.1",
           columns: [
@@ -125,7 +125,7 @@ export const OPTIMIZER_CHAPTERS = {
             },
           ],
         },
-        source: "🟢 Loshchilov & Hutter, Decoupled Weight Decay Regularization, arXiv:1711.05101。",
+        source: "Loshchilov & Hutter, Decoupled Weight Decay Regularization, arXiv:1711.05101。",
       },
     ],
     source: "🟡 Momentum、Adam 与 AdamW 的标准定义；此 Tab 只建立后续演进所需前置概念。",
@@ -224,12 +224,12 @@ export const OPTIMIZER_CHAPTERS = {
       {
         number: "07",
         title: "K2.5 为什么选择继承",
-        copy: "🟢 K2.5 Technical Report 与 K3 回顾：K2.5 的创新集中在融合时机、视觉编码器和 DEP。主干架构规模相当，MuonClip 已经验证 15.5T token 稳定性，因此优化器、WSD 与 weight decay 沿用 K2。冻结语言配方也让视觉消融更容易归因。",
+        copy: "K2.5 Technical Report 与 K3 回顾：K2.5 的创新集中在融合时机、视觉编码器和 DEP。主干架构规模相当，MuonClip 已经验证 15.5T token 稳定性，因此优化器、WSD 与 weight decay 沿用 K2。冻结语言配方也让视觉消融更容易归因。",
         formula: ["K2：Muon + QK-Clip + WSD", "K2.5：语言底座不变 → 只检验视觉侧变量"],
         visual: "inherit",
       },
     ],
-    source: "🟢 K2 Technical Report §2.1、Figure 2、Algorithm 1；Moonlight；K2.5 Technical Report；K3 回顾性描述。",
+    source: "K2 Technical Report §2.1、Figure 2、Algorithm 1；Moonlight；K2.5 Technical Report；K3 回顾性描述。",
   },
   "per-head": {
     tab: "Per-Head",
@@ -321,13 +321,13 @@ export const MULTIMODAL_CHAPTERS = {
     lead: "K1.5 先训练纯语言模型，再让视觉塔适配已经固化的语言空间。这是当时稳妥且便宜的路径，也直接暴露了下一代必须解决的问题。",
     stages: ["纯语言模型", "冻结 LLM", "训练 ViT+P", "解冻联合", "视觉 30%"],
     sections: [
-      { title: "两阶段接入：先对齐，再联合", copy: "🟢 K1.5 Technical Report：第一阶段冻结 LLM，只训练视觉塔与 projector，把图像特征映射到语言嵌入；第二阶段解冻联合训练，视觉 token 占比逐步提高到 30%。", formula: ["Stage 1：θLLM 固定，更新 θViT, θP", "Stage 2：联合更新；视觉:文本≈3:7"], visual: "append-pipeline" },
+      { title: "两阶段接入：先对齐，再联合", copy: "K1.5 Technical Report：第一阶段冻结 LLM，只训练视觉塔与 projector，把图像特征映射到语言嵌入；第二阶段解冻联合训练，视觉 token 占比逐步提高到 30%。", formula: ["Stage 1：θLLM 固定，更新 θViT, θP", "Stage 2：联合更新；视觉:文本≈3:7"], visual: "append-pipeline" },
       { title: "为什么当时愿意冻结", copy: "🟡 2023–2024 年工程主流（LLaVA、InternVL 等类似路线）：冻结能保护已经获得的语言能力，并显著降低计算量，因为主要训练 ViT 与 projector。", formula: ["收益：语言退化风险低 + 训练成本低", "代价：跨模态表示不能从头共塑"], visual: "freeze-benefit" },
       { title: "真正的限制：视觉只能“翻译”成已有概念", copy: "🔴 演进分析：语言表示空间先固化后，视觉编码器只能迎合已有语言锚点。若纯视觉概念在语言空间中没有对应位置，投影层很难凭空创造新表示。", formula: ["视觉概念 → projector → 既有语言锚点", "无锚点概念 → 表达上限受限"], visual: "anchor" },
-      { title: "数据也被限制在后期", copy: "🟢 K1.5：合成视觉数据只在 cooldown 使用，不进入主预训练。这样可控制合成分布偏差，但视觉信号无法长期参与语言底座形成。", formula: ["主预训练：真实数据为主", "cooldown：低 LR、小预算引入合成视觉"], visual: "cooldown" },
+      { title: "数据也被限制在后期", copy: "K1.5：合成视觉数据只在 cooldown 使用，不进入主预训练。这样可控制合成分布偏差，但视觉信号无法长期参与语言底座形成。", formula: ["主预训练：真实数据为主", "cooldown：低 LR、小预算引入合成视觉"], visual: "cooldown" },
       { title: "它自然提出下一问", copy: "🔴 如果视觉越晚接入越难改变表示，那么应当更早、以更低比例加入，而不是最后突然用高比例视觉冲击模型。K2.5 随后用受控实验验证这一点。", formula: ["晚接入：表示固化 + 域偏移", "早接入：共同适应 + 梯度更平滑"], visual: "bridge-early" },
     ],
-    source: "🟢 K1.5 Technical Report；🟡 2023–2024 年多模态工程范式；🔴 演进路径分析。",
+    source: "K1.5 Technical Report；🟡 2023–2024 年多模态工程范式；🔴 演进路径分析。",
   },
   "text-only": {
     tab: "纯文本",
@@ -336,11 +336,11 @@ export const MULTIMODAL_CHAPTERS = {
     lead: "K2 不是多模态过渡版，而是纯文本 MoE+MLA 模型。它把变量收缩到语言建模、优化效率和大规模稳定性，为 K2.5 留下可复用的主干。",
     stages: ["纯文本 15.5T", "MuonClip", "1.04T/32B", "加载到 K2.5", "再接视觉"],
     sections: [
-      { title: "先把语言问题单独解决", copy: "🟢 K2 Technical Report：1.04T 总参数、32B 激活参数，15.5T token 全部是高质量文本；模型采用纯 MoE+MLA，不含图文配对数据。", formula: ["总参数 1.04T　激活参数 32B", "视觉 token = 0"], visual: "text-foundation" },
-      { title: "这次停顿换来了稳定底座", copy: "🟢 K2 在纯文本规模上验证 MuonClip 的 token efficiency 与 15.5T token 零 spike。K2.5 因此可以直接加载语言主干，只把实验变量放在视觉侧。", formula: ["K2：先验证语言主干与优化器", "K2.5：复用权重 + 接入视觉"], visual: "foundation-handoff" },
-      { title: "但它仍属于“先语言后视觉”", copy: "🟢 K2.5 直接加载 K2 权重，说明视觉仍然接入一个已形成的语言空间；只是接入时机和训练比例比 K1.5 更早、更系统。K3 随后才彻底推翻这一前提。", formula: ["K2 权重 → K2.5 联合训练", "K3：ViT 随整体训练从随机初始化开始"], visual: "text-to-native" },
+      { title: "先把语言问题单独解决", copy: "K2 Technical Report：1.04T 总参数、32B 激活参数，15.5T token 全部是高质量文本；模型采用纯 MoE+MLA，不含图文配对数据。", formula: ["总参数 1.04T　激活参数 32B", "视觉 token = 0"], visual: "text-foundation" },
+      { title: "这次停顿换来了稳定底座", copy: "K2 在纯文本规模上验证 MuonClip 的 token efficiency 与 15.5T token 零 spike。K2.5 因此可以直接加载语言主干，只把实验变量放在视觉侧。", formula: ["K2：先验证语言主干与优化器", "K2.5：复用权重 + 接入视觉"], visual: "foundation-handoff" },
+      { title: "但它仍属于“先语言后视觉”", copy: "K2.5 直接加载 K2 权重，说明视觉仍然接入一个已形成的语言空间；只是接入时机和训练比例比 K1.5 更早、更系统。K3 随后才彻底推翻这一前提。", formula: ["K2 权重 → K2.5 联合训练", "K3：ViT 随整体训练从随机初始化开始"], visual: "text-to-native" },
     ],
-    source: "🟢 K2 Technical Report；K2.5 与 K3 Technical Report 的承接描述。",
+    source: "K2 Technical Report；K2.5 与 K3 Technical Report 的承接描述。",
   },
   "early-fusion": {
     tab: "早期融合",
@@ -349,14 +349,14 @@ export const MULTIMODAL_CHAPTERS = {
     lead: "K2.5 固定视觉—文本总 token 预算，只改变接入时机和比例。结果不是“视觉越多越好”，而是越早让两种模态共同适应，所需视觉比例越低。",
     stages: ["固定总预算", "早/中/晚接入", "六项评测", "三阶段训练", "DEP 解耦"],
     sections: [
-      { title: "受控实验：只改变接入时机与比例", copy: "🟢 K2.5 Table 3：早期(0%) 10:90、中期(50%) 20:80、晚期(80%) 50:50。在视觉知识、视觉推理、OCR、文本知识、文本推理、代码六项上，早期低比例全部领先。", formula: ["早期：25.8 / 43.8 / 65.7 / 45.5 / 58.5 / 24.8", "中期：25.0 / 40.7 / 64.1 / 43.9 / 58.6 / 24.0", "晚期：24.2 / 39.0 / 61.5 / 43.1 / 57.8 / 24.0"], visual: "fusion-bars" },
-      { title: "为什么晚期 50% 仍然输", copy: "🟢 K2.5 Appendix B.1：晚期突然加入视觉会出现 dip-and-recover，loss 先跳升再恢复，说明新模态造成域偏移冲击；早期融合让模型从一开始共同调整，梯度景观更平滑。", formula: ["晚期：L ↓ → 视觉接入 → L 突升 → 恢复", "早期：两种模态共同塑形，避免突变"], visual: "dip-recover" },
-      { title: "三阶段训练把结论变成可执行管道", copy: "🟢 K2.5 §4.3：Stage 1 约 1T token 只训练 ViT；Stage 2 约 15T token 联合预训练 ViT+LLM；Stage 3 用 500B→200B token，把上下文从 32K 推到 262K。", formula: ["ViT ~1T → 联合 ~15T", "联合长上下文：500B→200B，32K→262K"], visual: "three-stage" },
-      { title: "视觉塔仍从 SigLIP 初始化，但目标改成生成", copy: "🟢 MoonViT-3D 从 400M 参数的 SigLIP-SO-400M 初始化，支持把时间维也 patch 化的视频理解；训练移除对比损失，只保留 caption cross-entropy，并进行两步对齐。", formula: ["Lcaption = −∑ₖ log P(tₖ|t<ₖ,I)", "对比排名目标移除 → token 级生成目标保留"], visual: "caption-ce" },
-      { title: "DEP 解决的是并行负载，而不是模型语义", copy: "🟢 Decoupled Encoder Process 将视觉编码器从 PP Stage-0 解耦，避免图片尺寸差异让某一流水段负载抖动。执行顺序为全局 batch 视觉前向 → 主干前向+反向 → 重算视觉前向+反向。", formula: ["① global batch ViT forward", "② Transformer forward/backward　③ ViT recompute/backward"], visual: "dep" },
-      { title: "这一步仍没有做到“从头原生”", copy: "🟢 K2.5 的语言主干来自 K2，视觉塔来自 SigLIP。两者虽然更早联合，但都带着各自旧目标形成的表示；K3 接下来同时移除这两个历史包袱。", formula: ["K2 权重 + SigLIP 权重 → 早期联合", "下一步：随机初始化 ViT + NTP 从头塑形"], visual: "bridge-native" },
+      { title: "受控实验：只改变接入时机与比例", copy: "K2.5 Table 3：早期(0%) 10:90、中期(50%) 20:80、晚期(80%) 50:50。在视觉知识、视觉推理、OCR、文本知识、文本推理、代码六项上，早期低比例全部领先。", formula: ["早期：25.8 / 43.8 / 65.7 / 45.5 / 58.5 / 24.8", "中期：25.0 / 40.7 / 64.1 / 43.9 / 58.6 / 24.0", "晚期：24.2 / 39.0 / 61.5 / 43.1 / 57.8 / 24.0"], visual: "fusion-bars" },
+      { title: "为什么晚期 50% 仍然输", copy: "K2.5 Appendix B.1：晚期突然加入视觉会出现 dip-and-recover，loss 先跳升再恢复，说明新模态造成域偏移冲击；早期融合让模型从一开始共同调整，梯度景观更平滑。", formula: ["晚期：L ↓ → 视觉接入 → L 突升 → 恢复", "早期：两种模态共同塑形，避免突变"], visual: "dip-recover" },
+      { title: "三阶段训练把结论变成可执行管道", copy: "K2.5 §4.3：Stage 1 约 1T token 只训练 ViT；Stage 2 约 15T token 联合预训练 ViT+LLM；Stage 3 用 500B→200B token，把上下文从 32K 推到 262K。", formula: ["ViT ~1T → 联合 ~15T", "联合长上下文：500B→200B，32K→262K"], visual: "three-stage" },
+      { title: "视觉塔仍从 SigLIP 初始化，但目标改成生成", copy: "MoonViT-3D 从 400M 参数的 SigLIP-SO-400M 初始化，支持把时间维也 patch 化的视频理解；训练移除对比损失，只保留 caption cross-entropy，并进行两步对齐。", formula: ["Lcaption = −∑ₖ log P(tₖ|t<ₖ,I)", "对比排名目标移除 → token 级生成目标保留"], visual: "caption-ce" },
+      { title: "DEP 解决的是并行负载，而不是模型语义", copy: "Decoupled Encoder Process 将视觉编码器从 PP Stage-0 解耦，避免图片尺寸差异让某一流水段负载抖动。执行顺序为全局 batch 视觉前向 → 主干前向+反向 → 重算视觉前向+反向。", formula: ["① global batch ViT forward", "② Transformer forward/backward　③ ViT recompute/backward"], visual: "dep" },
+      { title: "这一步仍没有做到“从头原生”", copy: "K2.5 的语言主干来自 K2，视觉塔来自 SigLIP。两者虽然更早联合，但都带着各自旧目标形成的表示；K3 接下来同时移除这两个历史包袱。", formula: ["K2 权重 + SigLIP 权重 → 早期联合", "下一步：随机初始化 ViT + NTP 从头塑形"], visual: "bridge-native" },
     ],
-    source: "🟢 K2.5 Technical Report §4.3、§4.5、Appendix B.1、Table 3、Figure 9。",
+    source: "K2.5 Technical Report §4.3、§4.5、Appendix B.1、Table 3、Figure 9。",
   },
   native: {
     tab: "原生 NTP",
@@ -365,14 +365,14 @@ export const MULTIMODAL_CHAPTERS = {
     lead: "MoonViT-V2 从随机初始化开始直接接受 next-token prediction 梯度。视觉不再继承对比学习偏差，也不再等待语言空间先定型。",
     stages: ["随机初始化", "NTP 梯度", "MoonViT-V2", "程序化数据", "双向映射"],
     sections: [
-      { title: "为什么放弃 SigLIP 初始化", copy: "🟢 K3 §2.4：SigLIP 初始化后转入联合 NTP 时，视觉编码器梯度范数持续偏高并频繁 spike，说明预训练目标之间存在迁移冲突。", formula: ["SigLIP：图文对比目标", "K3：next-token prediction 目标"], visual: "gradient-spike" },
-      { title: "从头训练同时解决稳定性和目标对齐", copy: "🟢 随机初始化的 MoonViT-V2 在 NTP 下梯度范数全程平稳；它不必先学整图检索，再迁移到 token 级生成，视觉与语言从第一步共同形成内部表示。", formula: ["θViT⁰ ~ random", "minθViT,θLLM −∑ log P(tokenₜ|token<ₜ,I)"], visual: "native-ntp" },
-      { title: "MoonViT-V2 用结构控制视觉 token 成本", copy: "🟢 K3：视觉编码器约 0.4B 参数、27 层；2×2 pixel shuffle 将四个相邻 patch 合并，视觉序列长度降为原来的 1/4。", formula: ["Npatch → Npatch/4", "更短视觉序列 → attention 与上下文成本下降"], visual: "pixel-shuffle" },
-      { title: "程序化数据把“识别”推进到“因果生成”", copy: "🟢 K3 §3.3：加入 SVG、3D、网页、游戏、CAD 的代码—视觉配对，训练哪段代码产生什么视觉结果，以及从结果反推代码结构。", formula: ["code → renderer → image", "image → layout/structure → code"], visual: "code-render" },
-      { title: "坐标双格式兼顾精确与泛化", copy: "🟢 绝对坐标支持像素级定位，归一化坐标支持跨分辨率迁移。程序化数据天然精确、可规模化生成，并直接提供空间关系监督。", formula: ["absolute：(200,160,600,400)", "normalized：(0.2,0.2,0.6,0.5)"], visual: "coordinates" },
-      { title: "“原生”的准确含义与边界", copy: "🟢 原生指视觉从第一个 token 起参与整体预训练，表示空间从一开始为双模态共同设计；它不等于完全不需要真实图文数据，程序化数据只是补强可验证的结构和空间推理。", formula: ["共同目标、共同时间起点、共同表示空间", "程序化监督 + 真实多模态分布"], visual: "native-boundary" },
+      { title: "为什么放弃 SigLIP 初始化", copy: "K3 §2.4：SigLIP 初始化后转入联合 NTP 时，视觉编码器梯度范数持续偏高并频繁 spike，说明预训练目标之间存在迁移冲突。", formula: ["SigLIP：图文对比目标", "K3：next-token prediction 目标"], visual: "gradient-spike" },
+      { title: "从头训练同时解决稳定性和目标对齐", copy: "随机初始化的 MoonViT-V2 在 NTP 下梯度范数全程平稳；它不必先学整图检索，再迁移到 token 级生成，视觉与语言从第一步共同形成内部表示。", formula: ["θViT⁰ ~ random", "minθViT,θLLM −∑ log P(tokenₜ|token<ₜ,I)"], visual: "native-ntp" },
+      { title: "MoonViT-V2 用结构控制视觉 token 成本", copy: "K3：视觉编码器约 0.4B 参数、27 层；2×2 pixel shuffle 将四个相邻 patch 合并，视觉序列长度降为原来的 1/4。", formula: ["Npatch → Npatch/4", "更短视觉序列 → attention 与上下文成本下降"], visual: "pixel-shuffle" },
+      { title: "程序化数据把“识别”推进到“因果生成”", copy: "K3 §3.3：加入 SVG、3D、网页、游戏、CAD 的代码—视觉配对，训练哪段代码产生什么视觉结果，以及从结果反推代码结构。", formula: ["code → renderer → image", "image → layout/structure → code"], visual: "code-render" },
+      { title: "坐标双格式兼顾精确与泛化", copy: "绝对坐标支持像素级定位，归一化坐标支持跨分辨率迁移。程序化数据天然精确、可规模化生成，并直接提供空间关系监督。", formula: ["absolute：(200,160,600,400)", "normalized：(0.2,0.2,0.6,0.5)"], visual: "coordinates" },
+      { title: "“原生”的准确含义与边界", copy: "原生指视觉从第一个 token 起参与整体预训练，表示空间从一开始为双模态共同设计；它不等于完全不需要真实图文数据，程序化数据只是补强可验证的结构和空间推理。", formula: ["共同目标、共同时间起点、共同表示空间", "程序化监督 + 真实多模态分布"], visual: "native-boundary" },
     ],
-    source: "🟢 K3 Technical Report §2.4、§3.3。",
+    source: "K3 Technical Report §2.4、§3.3。",
   },
 };
 
@@ -413,13 +413,13 @@ export const CONTEXT_CHAPTERS = {
     lead: "K1.5 没有结构性压缩历史，而是让不同训练样本分别承担全局检索和局部建模，再逐阶段拉长序列。",
     stages: ["4K", "32K", "131K", "40% 全局", "60% 局部"],
     sections: [
-      { title: "先让 RoPE 在远距离旋转得更慢", copy: "🟢 K1.5 Technical Report：把 RoPE 频率基从 10,000 提高到 θ=1,000,000，低频维度的旋转角变化更慢，长距离位置关系不易过早绕回。", formula: ["原：θᵢ=10000^(−2i/d)", "改：θᵢ=1000000^(−2i/d)"], visual: "rope-base" },
-      { title: "全注意力负责全文关系，局部窗口负责多数常规 token", copy: "🟢 全注意力让每个 token 看见全部历史，成本 O(n²)；部分注意力用固定窗口 w，只看邻域，成本 O(nw)。合同跨章节矛盾需要前者，句法和局部事实常由后者完成。", formula: ["Aglobal = softmax(QKᵀ/√d)V", "Alocal = softmax((QKᵀ+Mwindow)/√d)V"], visual: "global-local" },
-      { title: "40/60 的训练混合，不是 40/60 的网络层数", copy: "🟢 全注意力数据占 40%，来自自然长文与合成长上下文 Q&A；部分注意力数据占 60%，从 cooldown 均匀采样。它教模型在局部足够时不浪费全局容量。", formula: ["P(global data)=0.40", "P(partial data)=0.60"], visual: "mix-4060" },
-      { title: "长度和数据同步长大", copy: "🟢 课程按 4K→32K→131K 递进，每阶段同时增加序列长度与真正需要远距离检索的数据；合成 Q&A 把证据散布在长文不同位置。", formula: ["Stage 1：4K → Stage 2：32K → Stage 3：131K", "证据跨段分布 → 全局层获得远距梯度"], visual: "course-131k" },
-      { title: "边界仍然存在", copy: "🟢 全局部分仍是 O(n²)，KV Cache 仍随 n 线性增长。局部 mask 只减少一部分计算，并没有把历史压缩为固定状态。", formula: ["计算：O(n²) 与 O(nw) 混合", "存储：KV = O(n)"], visual: "cost-boundary" },
+      { title: "先让 RoPE 在远距离旋转得更慢", copy: "K1.5 Technical Report：把 RoPE 频率基从 10,000 提高到 θ=1,000,000，低频维度的旋转角变化更慢，长距离位置关系不易过早绕回。", formula: ["原：θᵢ=10000^(−2i/d)", "改：θᵢ=1000000^(−2i/d)"], visual: "rope-base" },
+      { title: "全注意力负责全文关系，局部窗口负责多数常规 token", copy: "全注意力让每个 token 看见全部历史，成本 O(n²)；部分注意力用固定窗口 w，只看邻域，成本 O(nw)。合同跨章节矛盾需要前者，句法和局部事实常由后者完成。", formula: ["Aglobal = softmax(QKᵀ/√d)V", "Alocal = softmax((QKᵀ+Mwindow)/√d)V"], visual: "global-local" },
+      { title: "40/60 的训练混合，不是 40/60 的网络层数", copy: "全注意力数据占 40%，来自自然长文与合成长上下文 Q&A；部分注意力数据占 60%，从 cooldown 均匀采样。它教模型在局部足够时不浪费全局容量。", formula: ["P(global data)=0.40", "P(partial data)=0.60"], visual: "mix-4060" },
+      { title: "长度和数据同步长大", copy: "课程按 4K→32K→131K 递进，每阶段同时增加序列长度与真正需要远距离检索的数据；合成 Q&A 把证据散布在长文不同位置。", formula: ["Stage 1：4K → Stage 2：32K → Stage 3：131K", "证据跨段分布 → 全局层获得远距梯度"], visual: "course-131k" },
+      { title: "边界仍然存在", copy: "全局部分仍是 O(n²)，KV Cache 仍随 n 线性增长。局部 mask 只减少一部分计算，并没有把历史压缩为固定状态。", formula: ["计算：O(n²) 与 O(nw) 混合", "存储：KV = O(n)"], visual: "cost-boundary" },
     ],
-    source: "🟢 K1.5 Technical Report，预训练阶段 3。",
+    source: "K1.5 Technical Report，预训练阶段 3。",
   },
   k2: {
     tab: "K2 · 128K",
@@ -428,12 +428,12 @@ export const CONTEXT_CHAPTERS = {
     lead: "高频维度在短序列中已经看过完整周期，可以保持；低频维度周期太长，需要 NTK-aware 缩放。YaRN 把这两端和中间过渡统一起来。",
     stages: ["4K 退火", "频率分段", "32K 校准", "YaRN 外推", "128K"],
     sections: [
-      { title: "YaRN 的直觉：不同频率不该同样拉伸", copy: "🟢 K2 §2.5：高频维度周期短，在训练长度内已经充分覆盖，因此保持不变；低频维度周期长，超出训练区间，采用 NTK-aware 插值；中间频段线性混合。", formula: ["高频：保持　低频：NTK-aware 缩放", "中频：按位置在线性权重间过渡"], visual: "yarn-bands" },
-      { title: "两段退火分别巩固质量和校准长度", copy: "🟢 先用 400B token@4K 做质量退火，稳定语言能力；再用 60B token@32K 校准长位置。学习率从 2e−5 余弦衰减到 7e−6。", formula: ["400B @ 4K → 60B @ 32K", "lr：2e−5 cosine→7e−6"], visual: "anneal-128k" },
-      { title: "128K 主要来自数学外推，不是完整看过 128K", copy: "🟢 训练退火只到 32K，最终能力靠 YaRN 外推到 128K。相比 K1.5，它不再依赖全/部分 attention 数据混合，但仍需要位置校准。", formula: ["Ltrain=32K", "Lserve=128K ≈ 4× 外推"], visual: "extrapolate" },
-      { title: "位置问题缓解，计算与显存问题原封不动", copy: "🟢 架构仍是标准 softmax attention 与线性 KV Cache，因此序列越长，O(n²) 计算和 O(n) 显存依旧增长。", formula: ["Attention scores：n×n", "KV entries：n×(K,V)"], visual: "same-cost" },
+      { title: "YaRN 的直觉：不同频率不该同样拉伸", copy: "K2 §2.5：高频维度周期短，在训练长度内已经充分覆盖，因此保持不变；低频维度周期长，超出训练区间，采用 NTK-aware 插值；中间频段线性混合。", formula: ["高频：保持　低频：NTK-aware 缩放", "中频：按位置在线性权重间过渡"], visual: "yarn-bands" },
+      { title: "两段退火分别巩固质量和校准长度", copy: "先用 400B token@4K 做质量退火，稳定语言能力；再用 60B token@32K 校准长位置。学习率从 2e−5 余弦衰减到 7e−6。", formula: ["400B @ 4K → 60B @ 32K", "lr：2e−5 cosine→7e−6"], visual: "anneal-128k" },
+      { title: "128K 主要来自数学外推，不是完整看过 128K", copy: "训练退火只到 32K，最终能力靠 YaRN 外推到 128K。相比 K1.5，它不再依赖全/部分 attention 数据混合，但仍需要位置校准。", formula: ["Ltrain=32K", "Lserve=128K ≈ 4× 外推"], visual: "extrapolate" },
+      { title: "位置问题缓解，计算与显存问题原封不动", copy: "架构仍是标准 softmax attention 与线性 KV Cache，因此序列越长，O(n²) 计算和 O(n) 显存依旧增长。", formula: ["Attention scores：n×n", "KV entries：n×(K,V)"], visual: "same-cost" },
     ],
-    source: "🟢 K2 Technical Report §2.5。",
+    source: "K2 Technical Report §2.5。",
   },
   k25: {
     tab: "K2.5 · 262K",
@@ -442,13 +442,13 @@ export const CONTEXT_CHAPTERS = {
     lead: "创新不在新 attention，而在联合 mid-training：高质量短数据负责防遗忘，长文本、长视频与 Long-CoT 同时激活远距离能力。",
     stages: ["高质量短数据", "32K", "长视频/Long-CoT", "渐进扩展", "262K"],
     sections: [
-      { title: "架构没有变，训练流程变了", copy: "🟢 K2.5 §4.3：继续使用标准 softmax attention 与 YaRN；新增专门 mid-training 阶段，把高质量数据提升和长上下文激活合并完成。", formula: ["模型：softmax attention + YaRN", "训练：quality mid-training + context activation"], visual: "joint-midtrain" },
-      { title: "从 32K 渐进训练到 262K", copy: "🟢 序列上限分阶段扩展到 262K。K2 只在 32K 校准后外推至 128K；K2.5 让模型实际见到更长序列，因此位置与优化外推压力更小。", formula: ["K2：train 32K → serve 128K", "K2.5：train 32K → … → 262K"], visual: "course-262k" },
-      { title: "短数据和长数据必须同时存在", copy: "🟢 高质量短数据持续巩固语言能力，防止模型为了适应长序列而遗忘基础能力；长文本、长视频、推理数据和 Long-CoT 则提供真实远距依赖。", formula: ["Lmix = λshortLshort + λlongLlong", "短数据防遗忘；长数据校准跨度"], visual: "short-long-mix" },
-      { title: "长视频与 Long-CoT 提供不同的长依赖", copy: "🟢 长视频天然产生跨帧视觉 token，训练非文本域的远距关联；Long-CoT 的推理链本身很长，要求模型在长 context 中维持逻辑一致。", formula: ["长视频：跨帧事件与实体", "Long-CoT：跨步骤假设与结论"], visual: "video-cot" },
-      { title: "边界：仍然没有改变 attention 的增长规律", copy: "🟢 实训到 262K 改善有效性，却不消除 O(n²) 计算和 O(n) KV Cache。K3 因此不再只调 RoPE，而是改写长记忆架构。", formula: ["位置外推压力 ↓", "Attention/KV 结构成本不变"], visual: "bridge-nope" },
+      { title: "架构没有变，训练流程变了", copy: "K2.5 §4.3：继续使用标准 softmax attention 与 YaRN；新增专门 mid-training 阶段，把高质量数据提升和长上下文激活合并完成。", formula: ["模型：softmax attention + YaRN", "训练：quality mid-training + context activation"], visual: "joint-midtrain" },
+      { title: "从 32K 渐进训练到 262K", copy: "序列上限分阶段扩展到 262K。K2 只在 32K 校准后外推至 128K；K2.5 让模型实际见到更长序列，因此位置与优化外推压力更小。", formula: ["K2：train 32K → serve 128K", "K2.5：train 32K → … → 262K"], visual: "course-262k" },
+      { title: "短数据和长数据必须同时存在", copy: "高质量短数据持续巩固语言能力，防止模型为了适应长序列而遗忘基础能力；长文本、长视频、推理数据和 Long-CoT 则提供真实远距依赖。", formula: ["Lmix = λshortLshort + λlongLlong", "短数据防遗忘；长数据校准跨度"], visual: "short-long-mix" },
+      { title: "长视频与 Long-CoT 提供不同的长依赖", copy: "长视频天然产生跨帧视觉 token，训练非文本域的远距关联；Long-CoT 的推理链本身很长，要求模型在长 context 中维持逻辑一致。", formula: ["长视频：跨帧事件与实体", "Long-CoT：跨步骤假设与结论"], visual: "video-cot" },
+      { title: "边界：仍然没有改变 attention 的增长规律", copy: "实训到 262K 改善有效性，却不消除 O(n²) 计算和 O(n) KV Cache。K3 因此不再只调 RoPE，而是改写长记忆架构。", formula: ["位置外推压力 ↓", "Attention/KV 结构成本不变"], visual: "bridge-nope" },
     ],
-    source: "🟢 K2.5 Technical Report §4.3、Table 3。",
+    source: "K2.5 Technical Report §4.3、Table 3。",
   },
   k3: {
     tab: "K3 · 1M",
@@ -457,23 +457,23 @@ export const CONTEXT_CHAPTERS = {
     lead: "69 层 KDA 用固定状态承载大部分历史，24 层 Gated MLA 保留全局 softmax 精确检索；两者都不依赖 RoPE/YaRN，课程从 8K 推到 1M。",
     stages: ["8K", "64K", "256K", "1M", "跨段任务"],
     sections: [
-      { title: "架构断裂：不再继续调 RoPE 频率", copy: "🟢 K3 §2.1、§2.2：模型完全 NoPE。位置信息由 KDA 的 α 衰减与内容更新隐式表达，Gated MLA 则保留无显式位置编码的全局 softmax。", formula: ["KDA：Sₜ = αₜSₜ₋₁ + write(kₜ,vₜ)", "Gated MLA：softmax(qₜK≤ₜᵀ)V≤ₜ"], visual: "nope-split" },
-      { title: "69 层 KDA：固定记事本，有损压缩历史", copy: "🟢 KDA 维护固定大小状态 S，随 token 递归写入与读取，计算随序列近似 O(n)，显存不再追加每个 token 的 K/V；代价是压缩有损，不能保证保存每个细节。", formula: ["S∈ℝᵈᵏˣᵈᵛ，大小与 n 无关", "history → 固定状态：精度换容量"], visual: "kda-state" },
-      { title: "24 层 Gated MLA：保留需要精确定位的全局通道", copy: "🟢 Gated MLA 仍做全局 softmax，但把 KV 压成 latent，缓存约缩小 3.4×；门控决定当前 token 需要多少精确全局读取。", formula: ["cτ = Wc xτ；用时重建 kτ,vτ", "KV latent compression ≈ 3.4×"], visual: "gated-mla" },
-      { title: "四阶段课程把接口推到 1M", copy: "🟢 8K→64K 在预训练阶段调好语言底座；256K→1M 在 cooldown 校准远距离参数。长序列只占较小预算，不承担全部基础学习。", formula: ["预训练：8K → 64K", "cooldown：256K → 1M"], visual: "course-1m" },
-      { title: "长数据流水线决定 1M 是否有学习价值", copy: "🟢 K3 §3.4：长文档先做精确/模糊去重、视频帧感知哈希与质量过滤，再上采样；随后合成证据跨段分散的任务，让忽略远处信息直接受到 loss 惩罚。", formula: ["清洗 → 上采样 → 跨段合成", "远处证据 A+B+C → 唯一可答问题"], visual: "long-pipeline" },
-      { title: "1M 是接口与训练上限，不是等效记忆保证", copy: "🟢 KDA 有损压缩不会精确保留所有细节；1M 也不表示每个位置都能被同等利用。真正指标应是跨距离检索与推理成功率，而不是输入框能塞多少 token。", formula: ["context limit ≠ effective context", "可输入 1M ≠ 可靠利用全部 1M"], visual: "effective-context" },
-      { title: "与 K1.5 的本质差异", copy: "🟢 K1.5 的部分 attention 仍通过 mask 控制 token 间点积；K3 的 KDA 不再做全历史点积，而是递归更新状态。变化从调度策略升级为记忆机制本身。", formula: ["K1.5：Attention(Q,K,V)+mask", "K3 KDA：read/write(S)，无全历史 score matrix"], visual: "mask-vs-state" },
+      { title: "架构断裂：不再继续调 RoPE 频率", copy: "K3 §2.1、§2.2：模型完全 NoPE。位置信息由 KDA 的 α 衰减与内容更新隐式表达，Gated MLA 则保留无显式位置编码的全局 softmax。", formula: ["KDA：Sₜ = αₜSₜ₋₁ + write(kₜ,vₜ)", "Gated MLA：softmax(qₜK≤ₜᵀ)V≤ₜ"], visual: "nope-split" },
+      { title: "69 层 KDA：固定记事本，有损压缩历史", copy: "KDA 维护固定大小状态 S，随 token 递归写入与读取，计算随序列近似 O(n)，显存不再追加每个 token 的 K/V；代价是压缩有损，不能保证保存每个细节。", formula: ["S∈ℝᵈᵏˣᵈᵛ，大小与 n 无关", "history → 固定状态：精度换容量"], visual: "kda-state" },
+      { title: "24 层 Gated MLA：保留需要精确定位的全局通道", copy: "Gated MLA 仍做全局 softmax，但把 KV 压成 latent，缓存约缩小 3.4×；门控决定当前 token 需要多少精确全局读取。", formula: ["cτ = Wc xτ；用时重建 kτ,vτ", "KV latent compression ≈ 3.4×"], visual: "gated-mla" },
+      { title: "四阶段课程把接口推到 1M", copy: "8K→64K 在预训练阶段调好语言底座；256K→1M 在 cooldown 校准远距离参数。长序列只占较小预算，不承担全部基础学习。", formula: ["预训练：8K → 64K", "cooldown：256K → 1M"], visual: "course-1m" },
+      { title: "长数据流水线决定 1M 是否有学习价值", copy: "K3 §3.4：长文档先做精确/模糊去重、视频帧感知哈希与质量过滤，再上采样；随后合成证据跨段分散的任务，让忽略远处信息直接受到 loss 惩罚。", formula: ["清洗 → 上采样 → 跨段合成", "远处证据 A+B+C → 唯一可答问题"], visual: "long-pipeline" },
+      { title: "1M 是接口与训练上限，不是等效记忆保证", copy: "KDA 有损压缩不会精确保留所有细节；1M 也不表示每个位置都能被同等利用。真正指标应是跨距离检索与推理成功率，而不是输入框能塞多少 token。", formula: ["context limit ≠ effective context", "可输入 1M ≠ 可靠利用全部 1M"], visual: "effective-context" },
+      { title: "与 K1.5 的本质差异", copy: "K1.5 的部分 attention 仍通过 mask 控制 token 间点积；K3 的 KDA 不再做全历史点积，而是递归更新状态。变化从调度策略升级为记忆机制本身。", formula: ["K1.5：Attention(Q,K,V)+mask", "K3 KDA：read/write(S)，无全历史 score matrix"], visual: "mask-vs-state" },
     ],
-    source: "🟢 K3 Technical Report §2.1、§2.2、§3.4。",
+    source: "K3 Technical Report §2.1、§2.2、§3.4。",
   },
 };
 
 const dataRows = {
-  k15: [["filter", "四层质量筛选", "inherit"], ["sampling", "动态采样", "new"], ["vision-five", "五类视觉", "new"], ["cooldown-synth", "Cooldown 合成 QA", "new"]],
-  k2: [["rephrasing", "知识 rephrasing", "new"], ["math-rephrasing", "数学学习笔记", "new"]],
-  k25: [["unique", "unique tokens", "new"], ["vision-seven", "七类视觉", "improve"], ["code-visual", "代码—视觉配对", "new"]],
-  k3: [["long-doc", "长文档清洗", "improve"], ["cross-span", "长上下文训练", "new"], ["native-vision", "视觉从头 NTP", "new"], ["programmatic", "程序化多模态", "improve"]],
+  k15: [["sampling", "动态采样", "new"], ["vision-five", "五类视觉", "new"]],
+  k2: [["math-rephrasing", "数学学习笔记", "new"]],
+  k25: [["unique", "unique tokens", "new"], ["vision-seven", "七类视觉", "improve"]],
+  k3: [["long-doc", "长文档清洗", "improve"], ["cross-span", "长上下文训练", "new"], ["programmatic", "程序化多模态", "improve"]],
 };
 
 export const DATA_LABELS = VERSIONS.flatMap((version) => dataRows[version.id].map(([suffix, text, lineType]) => ({
@@ -501,7 +501,7 @@ export const OVERVIEW_PIPELINES = {
     {
       id: "dimensions",
       items: [
-        { id: "objective-k2", eyebrow: "01 训练目标", text: "NTP", relation: "inherit" },
+        { id: "objective-k2", eyebrow: "01 训练目标", text: "NTP", relation: "inherit", jumpTo: "objective-k15" },
         { id: "optimizer-k2", eyebrow: "02 优化器", text: "MuonClip", relation: "redesign" },
         { id: "lr-k2", eyebrow: "03 LR 调度", text: "WSD", relation: "redesign" },
         { id: "data-k2", eyebrow: "04 数据", text: "知识 / 数学 rephrasing", relation: "improve" },
@@ -542,9 +542,9 @@ export const DATA_LINEAGES = [
     title: "先建立四层质量筛选，再把同一原则扩展到真实长文档与视频",
     lead: "K2 与 K2.5 沿用 K1.5 的质量底座；K3 面对超长内容，补上模糊去重、帧感知哈希与结构完整性检查。",
     cells: [
-      { version: "K1.5", text: "四层质量筛选", labelId: "data-k15-filter", toNext: "inherit" },
-      { version: "K2", text: "沿用质量筛选", note: "多数数据处理管线沿用 K1.5。", toNext: "inherit", jumpTo: "data-k15-filter" },
-      { version: "K2.5", text: "沿用先前", note: "质量底座不变，新增预算放在视觉数据与融合方式。", toNext: "improve", jumpTo: "data-k15-filter" },
+      { version: "K1.5", text: "四层质量筛选", note: "质量底座保留在谱系中，不再展开独立详情。", toNext: "inherit" },
+      { version: "K2", text: "沿用质量筛选", note: "多数数据处理管线沿用 K1.5。", toNext: "inherit" },
+      { version: "K2.5", text: "沿用先前", note: "质量底座不变，新增预算放在视觉数据与融合方式。", toNext: "improve" },
       { version: "K3", text: "长文档清洗", labelId: "data-k3-long-doc" },
     ],
   },
@@ -575,24 +575,12 @@ export const DATA_LINEAGES = [
   {
     id: "vision",
     tab: "视觉语料",
-    title: "视觉数据从五类基础任务，扩展到感知、视频与智能体，再转向原生 NTP",
-    lead: "K2 是纯文本中断点；K2.5 扩为七类视觉数据；K3 不再依赖 SigLIP 表示，让视觉编码器从随机参数开始接受 NTP。",
+    title: "视觉数据从五类基础任务，扩展到感知、视频与智能体，再进入程序化多模态",
+    lead: "K2 是纯文本中断点；K2.5 扩为七类视觉数据；K3 将视觉语料继续推进到代码与渲染结果的双向映射。",
     cells: [
       { version: "K1.5", text: "五类视觉", labelId: "data-k15-vision-five", toNext: "break" },
       { version: "K2", text: "沿用先前", note: "K2 不训练视觉，但语言主干随后由 K2.5 加载。", toNext: "redesign", jumpTo: "data-k15-vision-five" },
       { version: "K2.5", text: "七类视觉", labelId: "data-k25-vision-seven", toNext: "redesign" },
-      { version: "K3", text: "视觉从头 NTP", labelId: "data-k3-native-vision" },
-    ],
-  },
-  {
-    id: "augmentation",
-    tab: "合成扩增",
-    title: "合成数据从 cooldown 补强，演化为主训练改写与代码—视觉双向配对",
-    lead: "K1.5 只在 cooldown 使用合成 QA；K2 把 rephrasing 带入主预训练；K2.5 增加代码渲染配对；K3 将程序化多模态扩展到五类系统。",
-    cells: [
-      { version: "K1.5", text: "Cooldown 合成 QA", labelId: "data-k15-cooldown-synth", toNext: "improve" },
-      { version: "K2", text: "知识 rephrasing", labelId: "data-k2-rephrasing", toNext: "improve" },
-      { version: "K2.5", text: "代码—视觉配对", labelId: "data-k25-code-visual", toNext: "improve" },
       { version: "K3", text: "程序化多模态", labelId: "data-k3-programmatic" },
     ],
   },
@@ -653,28 +641,28 @@ const compactStories = {
     ["从随机参数开始做 next-token prediction；先建立语言底座，再分阶段接入视觉与长上下文。"],
     ["K1.5 形成语言训练 → 视觉语言联合 → cooldown → 长上下文激活的基础管线。"],
     ["Lₙₜₚ = −∑ₜ log P(xₜ | x₍<t₎)"],
-    "🟢 K1.5 Technical Report Appendix B",
+    "K1.5 Technical Report Appendix B",
   ),
   "objective-k2": story(
     ["高质量 token 有限，继续重复原文会过拟合；K2 要提高每个 token 的学习信号。"],
     ["保持纯文本 NTP，把创新放在 MuonClip 与知识 / 数学 rephrasing。"],
     ["15.5T token 主训练仍使用 NTP；SimpleQA 消融验证表面多样性优于机械重复。"],
     ["目标不变：Lₙₜₚ；改变的是优化路径与数据表达"],
-    "🟢 K2 Technical Report §2.1–§2.2",
+    "K2 Technical Report §2.1–§2.2",
   ),
   "objective-k25": story(
     ["SigLIP 的整图对比目标偏全局语义，而 NTP 需要 OCR、表格与布局的细粒度线索。"],
     ["ViT 独立训练只用 caption CE；联合阶段从早期让视觉 token 与文本共同参与 NTP。"],
     ["早期 10% 视觉比例在视觉与文本能力上全面优于晚期 50% 融合。"],
     ["Lcaption = −∑ₖ log P(tₖ | t₍<k₎, I)"],
-    "🟢 K2.5 Technical Report §4.2–§4.3、Appendix B",
+    "K2.5 Technical Report §4.2–§4.3、Appendix B",
   ),
   "objective-k3": story(
     ["K2.5 的视觉初始化与语言目标仍不一致；K3 需要从第一步统一监督。"],
     ["MoonViT-V2 从随机参数接受 NTP；主干增加 MTP 层，为多个未来 token 提供更密集监督。"],
     ["从头训练的视觉编码器梯度更平稳，不再出现 SigLIP 初始化版本的频繁 spike。"],
     ["L = Lₙₜₚ + λLₘₜₚ"],
-    "🟢 K3 Technical Report §2.4、§3.3",
+    "K3 Technical Report §2.4、§3.3",
   ),
   "lr-k15": story(
     ["K1.5 报告未披露预训练优化器与学习率日程。"],
@@ -688,21 +676,21 @@ const compactStories = {
     ["500 step warmup → 10T stable@2e−4 → 5.5T cosine 到 2e−5 → anneal 到 7e−6。"],
     ["15.5T token 全程 loss 平滑、没有 spike。"],
     ["warmup → stable → decay → anneal"],
-    "🟢 K2 Technical Report §2.1、§2.5",
+    "K2 Technical Report §2.1、§2.5",
   ),
   "lr-k25": story(
     ["K2.5 的关键变量是视觉接入时机，不需要同时更换已验证的语言训练日程。"],
     ["沿用 K2 的 MuonClip、WSD 与 weight decay，把消融集中在视觉侧。"],
     ["稳定底座让早期 / 中期 / 晚期融合实验可以归因。"],
     ["K2 WSD → K2.5 继承"],
-    "🟢 K2.5 Technical Report；K3 回顾性描述",
+    "K2.5 Technical Report；K3 回顾性描述",
   ),
   "lr-k3": story(
     ["模型形状与优化器改变后，K2 的 WSD 超参数不再保证最优。"],
     ["为 WSD 与 cosine 分别搜索 peak LR 和 batch size，再比较各自最优结果。"],
     ["公平调优后 cosine 的最终 loss 持续更低，因此采用 1% warmup + cosine decay。"],
     ["lrₜ = lrₘᵢₙ + ½(lrₘₐₓ−lrₘᵢₙ)(1+cos(πt/T))"],
-    "🟢 K3 Technical Report §3.2、Figure 7",
+    "K3 Technical Report §3.2、Figure 7",
   ),
   "compute-k15": story(
     ["K1.5 报告没有公开完整集群、并行或激活显存方案。"],
@@ -716,21 +704,21 @@ const compactStories = {
     ["EP16 分专家，interleaved 1F1B PP 分层，ZeRO-1 分优化器状态；再叠加重计算、FP8 与 CPU offload。"],
     ["系统支持任意 32 倍数节点，三项显存优化在小规模实验中未见可测 loss 增加。"],
     ["EP16 + PP + ZeRO-1；recompute + FP8-E4M3 + CPU offload"],
-    "🟢 K2 Technical Report §2.4",
+    "K2 Technical Report §2.4",
   ),
   "compute-k25": story(
     ["可变分辨率图像让 PP Stage-0 负载剧烈波动，整条流水线被视觉编码器拖慢。"],
     ["DEP 将视觉编码器解耦：全局视觉前向 → 主干前反向 → 重算视觉前向并回传。"],
     ["主干因此可以继续使用任意高效并行配置，不必为视觉尺寸定制 PP。"],
     ["vision F → trunk F/B → vision recompute B"],
-    "🟢 K2.5 Technical Report §4.5",
+    "K2.5 Technical Report §4.5",
   ),
   "compute-k3": story(
     ["K3 同时改变层数、专家数、注意力机制与激活函数，K2 的计算最优点已经失效。"],
     ["用 MoonEP 支撑更大专家规模，并联合搜索 batch size、LR、TPP 与 model shape。"],
     ["896 专家、Top-16；整体 scaling efficiency 约提升 2.5×，但报告未做单组件归因。"],
     ["TPP = 训练 token 总数 ÷ 参数总数"],
-    "🟢 K3 Technical Report §3.2、Figure 7",
+    "K3 Technical Report §3.2、Figure 7",
   ),
 };
 
@@ -779,7 +767,7 @@ Object.assign(DETAILS["optimizer-k2"], story(
     "若 Sₘₐₓʰ>τ：γ=τ/Sₘₐₓʰ；Wqc、Wkc 乘 √γ，Wqr 乘 γ，Wkr 不动。",
     "因为 logit=q·k，q 与 k 各缩 √γ，内积整体缩 γ；Wkr 多头共享，无法按 head 独立缩放。",
   ],
-  "🟢 K2 Technical Report §2.1、Figure 2、Algorithm 1；Moonlight",
+  "K2 Technical Report §2.1、Figure 2、Algorithm 1；Moonlight",
 ));
 
 Object.assign(DETAILS["optimizer-k25"], story(
@@ -798,7 +786,7 @@ Object.assign(DETAILS["optimizer-k25"], story(
   [
     "语言主干配方冻结后，K2.5 的消融才能更清楚地归因到早期融合、ViT 目标与 DEP。",
   ],
-  "🟢 K2.5 Technical Report；K3 Technical Report 回顾性描述",
+  "K2.5 Technical Report；K3 Technical Report 回顾性描述",
 ));
 
 Object.assign(DETAILS["optimizer-k3"], story(
@@ -821,7 +809,7 @@ Object.assign(DETAILS["optimizer-k3"], story(
     "TPP = 训练 token 总数 ÷ 参数总数，表示每个参数平均吃到多少数据。",
     "lrₜ=lrₘᵢₙ+0.5(lrₘₐₓ−lrₘᵢₙ)(1+cos(πt/T))",
   ],
-  "🟢 K3 Technical Report §2.5、§3.2、Figure 7、Table 1",
+  "K3 Technical Report §2.5、§3.2、Figure 7、Table 1",
 ));
 
 Object.assign(DETAILS["multimodal-k15"], story(
@@ -843,7 +831,7 @@ Object.assign(DETAILS["multimodal-k15"], story(
   [
     "这一局限直接产生 K2.5 的早期融合动机，并最终在 K3 演化为从零开始的原生多模态。",
   ],
-  "🟡 2023–2024 行业范式；🟢 K1.5 Technical Report 与演进路径",
+  "🟡 2023–2024 行业范式；K1.5 Technical Report 与演进路径",
 ));
 
 Object.assign(DETAILS["multimodal-k2"], story(
@@ -863,7 +851,7 @@ Object.assign(DETAILS["multimodal-k2"], story(
   [
     "这条“先语言、后视觉”的路线在 K3 被反转：MoonViT-V2 与语言主干从第一个 token 起共同训练。",
   ],
-  "🟢 K2 Technical Report",
+  "K2 Technical Report",
 ));
 
 Object.assign(DETAILS["multimodal-k25"], story(
@@ -889,7 +877,7 @@ Object.assign(DETAILS["multimodal-k25"], story(
     "MoonViT-3D 将时间维也 patch 化，因此支持视频理解。",
     "六指标柱状图中，早期组全面略高，视觉推理与 OCR 差异最明显。",
   ],
-  "🟢 K2.5 Technical Report §4.3、§4.5、Table 3、Figure 9、Appendix B.1",
+  "K2.5 Technical Report §4.3、§4.5、Table 3、Figure 9、Appendix B.1",
 ));
 
 Object.assign(DETAILS["multimodal-k3"], story(
@@ -913,7 +901,7 @@ Object.assign(DETAILS["multimodal-k3"], story(
     "Pixel shuffle 2×2：相邻 4 个 patch 合并，长图视觉序列长度降至 1/4。",
     "K2.5 仍依赖 SigLIP 初始化；K3 完全摆脱对比学习偏置。",
   ],
-  "🟢 K3 Technical Report §3.3、§2.4",
+  "K3 Technical Report §3.3、§2.4",
 ));
 
 Object.assign(DETAILS["context-k15"], story(
@@ -936,7 +924,7 @@ Object.assign(DETAILS["context-k15"], story(
     "合成长 Q&A 把证据散布在文档不同位置，强迫全注意力层学习远距离检索。",
     "RoPE 频率：θᵢ=10000^(−2i/d) 改为 1000000^(−2i/d)，低频维度旋转角变小。",
   ],
-  "🟢 K1.5 Technical Report，预训练阶段 3",
+  "K1.5 Technical Report，预训练阶段 3",
 ));
 
 Object.assign(DETAILS["context-k2"], story(
@@ -957,7 +945,7 @@ Object.assign(DETAILS["context-k2"], story(
   [
     "高频维度周期短，训练中已见过完整周期，不必插值；低频维度周期长、会超出训练窗口，最需要 NTK-aware 缩放。",
   ],
-  "🟢 K2 Technical Report §2.5",
+  "K2 Technical Report §2.5",
 ));
 
 Object.assign(DETAILS["context-k25"], story(
@@ -979,7 +967,7 @@ Object.assign(DETAILS["context-k25"], story(
     "与 K2 相比：K2 实训到 32K 后外推到 128K；K2.5 实训逐步推到 262K，外推压力显著降低。",
     "底层仍是标准 softmax attention + YaRN，架构本身没有改变。",
   ],
-  "🟢 K2.5 Technical Report §4.3、Table 3",
+  "K2.5 Technical Report §4.3、Table 3",
 ));
 
 Object.assign(DETAILS["context-k3"], story(
@@ -1003,7 +991,7 @@ Object.assign(DETAILS["context-k3"], story(
     "长度≠训练信号：1M 日志若无跨段依赖，模型仍可忽略远处；合成跨段任务才让 loss 惩罚这种忽略。",
     "K1.5 的局部 mask 仍在做 token 间 attention；K3 KDA 是递归写状态，不做全历史点积。",
   ],
-  "🟢 K3 Technical Report §3.4、§2.1、§2.2",
+  "K3 Technical Report §3.4、§2.1、§2.2",
 ));
 
 Object.assign(DETAILS["data-k15-filter"], story(
@@ -1023,7 +1011,7 @@ Object.assign(DETAILS["data-k15-filter"], story(
     "示例判断：Cosine>0.95 但表达有信息增量时，论文与科普改写都可保留；仅调换段落顺序的副本删除一个。",
   ],
   [],
-  "🟢 K1.5 Technical Report Appendix B.1；🔴 Cosine 阈值为机制示例",
+  "K1.5 Technical Report Appendix B.1；🔴 Cosine 阈值为机制示例",
 ));
 
 Object.assign(DETAILS["data-k15-sampling"], story(
@@ -1045,7 +1033,7 @@ Object.assign(DETAILS["data-k15-sampling"], story(
     "32 种编程语言在互联网中天然稀缺，却对代码能力关键。",
     "与 K3 长文档上采样动机相同：目标能力所需数据天然稀缺，不能服从原始频率。",
   ],
-  "🟢 K1.5 Technical Report；BigCode 数据方法",
+  "K1.5 Technical Report；BigCode 数据方法",
 ));
 
 Object.assign(DETAILS["data-k15-vision-five"], story(
@@ -1066,7 +1054,7 @@ Object.assign(DETAILS["data-k15-vision-five"], story(
     "HTML 中 DOM 顺序可能因 CSS 浮动或延迟加载不同于渲染位置；按 DOM 拼接会打乱图文对应，必须按视觉位置重排。",
     "🔴 合成数据限于 cooldown 的原因推测：合成分布有偏，低 LR、小预算阶段更容易控制偏差。",
   ],
-  "🟢 K1.5 Technical Report；🔴 cooldown 动机为演进路径推断",
+  "K1.5 Technical Report；🔴 cooldown 动机为演进路径推断",
 ));
 
 Object.assign(DETAILS["data-k15-cooldown-synth"], story(
@@ -1083,7 +1071,7 @@ Object.assign(DETAILS["data-k15-cooldown-synth"], story(
   [
     "真实高质量数据 → 生成 QA → 拒绝采样 → cooldown",
   ],
-  "🟢 K1.5 Technical Report Appendix B.3",
+  "K1.5 Technical Report Appendix B.3",
 ));
 
 Object.assign(DETAILS["data-k2-rephrasing"], story(
@@ -1103,7 +1091,7 @@ Object.assign(DETAILS["data-k2-rephrasing"], story(
     "SimpleQA：原文×10=23.76；单版改写×10=27.39；10 版改写×1=28.94",
     "Accuracy = correct ÷ all questions × 100；满分 100",
   ],
-  "🟢 K2 Technical Report §2.2、Table 1；OpenAI《Introducing SimpleQA》",
+  "K2 Technical Report §2.2、Table 1；OpenAI《Introducing SimpleQA》",
 ));
 
 Object.assign(DETAILS["data-k2-math-rephrasing"], story(
@@ -1120,7 +1108,7 @@ Object.assign(DETAILS["data-k2-math-rephrasing"], story(
   [
     "数学原文 → 学习笔记式重写 → 忠实度验证",
   ],
-  "🟢 K2 Technical Report §2.2",
+  "K2 Technical Report §2.2",
 ));
 
 Object.assign(DETAILS["data-k25-code-weight"], story(
@@ -1137,7 +1125,7 @@ Object.assign(DETAILS["data-k25-code-weight"], story(
   [
     "P(source)↑；epoch(source) ≤ budget(unique tokens)",
   ],
-  "🟢 K2.5 Technical Report §4.3",
+  "K2.5 Technical Report §4.3",
 ));
 
 Object.assign(DETAILS["data-k25-vision-seven"], story(
@@ -1155,7 +1143,7 @@ Object.assign(DETAILS["data-k25-vision-seven"], story(
   [
     "四类基础（Caption、交织、OCR、知识）+ 感知 + 视频 + 智能体 = 七类视觉数据",
   ],
-  "🟢 K2.5 Technical Report §4.2–§4.3",
+  "K2.5 Technical Report §4.2–§4.3",
 ));
 
 Object.assign(DETAILS["data-k25-unique"], story(
@@ -1175,7 +1163,7 @@ Object.assign(DETAILS["data-k25-unique"], story(
   [
     "🔴 推测实现：为每个 source 维护已见 token 计数，epoch×source_size 达上限后停止该源采样。",
   ],
-  "🟢 K2.5 Technical Report；🔴 计数实现细节为工程推断",
+  "K2.5 Technical Report；🔴 计数实现细节为工程推断",
 ));
 
 Object.assign(DETAILS["data-k25-code-visual"], story(
@@ -1192,7 +1180,7 @@ Object.assign(DETAILS["data-k25-code-visual"], story(
   [
     "HTML / React / SVG ↔ rendered screenshot",
   ],
-  "🟢 K2.5 Technical Report §4.3",
+  "K2.5 Technical Report §4.3",
 ));
 
 Object.assign(DETAILS["data-k25-vit-ce"], story(
@@ -1213,7 +1201,7 @@ Object.assign(DETAILS["data-k25-vit-ce"], story(
     "Lcontrast=−log[exp(sim(I,T)/τ) / ∑ⱼexp(sim(I,Tⱼ)/τ)]",
     "Lcaption=−∑ₖlog P(tₖ|t₁…tₖ₋₁,I)",
   ],
-  "🟢 K2.5 Technical Report §4.3；🔴 检索代价为目标函数推断",
+  "K2.5 Technical Report §4.3；🔴 检索代价为目标函数推断",
 ));
 
 Object.assign(DETAILS["data-k3-native-vision"], story(
@@ -1230,7 +1218,7 @@ Object.assign(DETAILS["data-k3-native-vision"], story(
   [
     "random ViT + LLM → shared NTP from step 1",
   ],
-  "🟢 K3 Technical Report §3.3、Figure 6",
+  "K3 Technical Report §3.3、Figure 6",
 ));
 
 Object.assign(DETAILS["data-k3-programmatic"], story(
@@ -1253,7 +1241,7 @@ Object.assign(DETAILS["data-k3-programmatic"], story(
     "Grounding 只标出已有物体；程序化多模态解释代码如何创造物体。",
     "Code review 可以不运行程序，先预判视觉后果。",
   ],
-  "🟢 K3 Technical Report §3.1",
+  "K3 Technical Report §3.1",
 ));
 
 Object.assign(DETAILS["data-k3-long-doc"], story(
@@ -1275,7 +1263,7 @@ Object.assign(DETAILS["data-k3-long-doc"], story(
     "感知哈希：帧缩放 → 灰度 → DCT 低频 → 二值指纹 → 汉明距离判重。",
     "🔴 上采样倍率推断：应由小模型消融动态调整，而非预设固定倍数。",
   ],
-  "🟢 K3 Technical Report §3.4；🔴 倍率选择为工程推断",
+  "K3 Technical Report §3.4；🔴 倍率选择为工程推断",
 ));
 
 Object.assign(DETAILS["data-k3-cross-span"], story(
@@ -1297,7 +1285,7 @@ Object.assign(DETAILS["data-k3-cross-span"], story(
     "🔴 推测生成流程：选 N 篇文档 → 各抽关键事实 → 设计必须组合 N 个事实的问题 → 打散到随机位置。",
     "多模态例：第50页图表 + 第200页代码输出共同构成答案。",
   ],
-  "🟢 K3 Technical Report §3.4；🔴 合成实现流程为工程推断",
+  "K3 Technical Report §3.4；🔴 合成实现流程为工程推断",
 ));
 
 export const TABLE_ROWS = [

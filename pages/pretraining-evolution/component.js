@@ -19,7 +19,7 @@ import {
   TABLE_ROWS,
   VERSIONS,
   getDetail,
-} from "./logic.js?build=20260805-data14";
+} from "./logic.js?build=20260805-data27";
 
 const fadeIn = (node) => {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -1047,7 +1047,7 @@ const buildSamplingStory = (state, persist, rerender) => {
   meaning.append(element("h3", "", "采样率的含义"), element("p", "", "采样率 = 该 epoch 进入 batch 的概率。0.3 → 长期梯度权重约为原始的 0.3×；>1.0 → 等效于多个 epoch 的重复训练。"));
   notes.append(benefit, meaning);
   lower.append(code, notes);
-  scroll.append(header, why, plot, lower, element("p", "pte-optimizer-source", "🟢 K1.5 Technical Report；BigCode 数据方法"));
+  scroll.append(header, why, plot, lower, element("p", "pte-optimizer-source", "K1.5 Technical Report；BigCode 数据方法"));
   side.append(buildDataTabs(state, persist, rerender), scroll);
   return side;
 };
@@ -1117,7 +1117,7 @@ const buildUniqueTokensStory = (state, persist, rerender) => {
     batches.append(card);
   });
   dilution.append(batches, element("p", "pte-data-warning", "视觉 token 体量增大 → 代码相对占比下降 → 代码逻辑信号变弱。代码比例下降不是代码数据变少，而是训练分母变大，因此需要 unique tokens + rephrasing 扩展有效权重：前者控制来源预算，后者增加同一知识的表达覆盖。"));
-  scroll.append(header, problem, middle, summary, dilution, element("p", "pte-optimizer-source", "🟢 K2.5 Technical Report；🔴 计数实现细节与示例数字、batch 占比为工程推断"));
+  scroll.append(header, problem, middle, summary, dilution, element("p", "pte-optimizer-source", "K2.5 Technical Report；🔴 计数实现细节与示例数字、batch 占比为工程推断"));
   side.append(buildDataTabs(state, persist, rerender), scroll);
   return side;
 };
@@ -1167,9 +1167,37 @@ const buildMathNotesStory = (state, persist, rerender) => {
     cards.append(card);
   });
   middle.append(flow, cards);
-  scroll.append(header, top, middle, element("p", "pte-optimizer-source", "🟢 K2 Technical Report §2.2（SwallowMath、learning-note style rephrasing）"));
+  scroll.append(header, top, middle, element("p", "pte-optimizer-source", "K2 Technical Report §2.2（SwallowMath、learning-note style rephrasing）"));
   side.append(buildDataTabs(state, persist, rerender), scroll);
   return side;
+};
+
+const buildCodeVisualPairCard = () => {
+  const card = element("section", "pte-vision-special");
+  const copy = element("div", "pte-vision-special-copy");
+  copy.append(
+    element("strong", "pte-vision-special-label", "◆ 特殊语料 · 代码—视觉配对"),
+    element("p", "", "Caption 和 OCR 训练的是“看图说话”。但视觉智能体还需要另一种能力：写出 HTML，能判断渲染结果对不对；看到截图，能推断背后的代码结构。"),
+    element("p", "", "做法：把 HTML / React / SVG 代码与对应渲染截图配对，双向训练——代码预测外观，截图推断结构。"),
+    element("small", "pte-vision-special-source", "K2.5 Technical Report Appendix B.3"),
+  );
+
+  const visual = svgElement("svg", { class: "pte-vision-special-visual", viewBox: "0 0 420 90", role: "img", "aria-label": "代码与渲染截图双向映射" });
+  visual.append(
+    svgElement("rect", { x: 4, y: 8, width: 142, height: 74, rx: 4, class: "code-box" }),
+    svgElement("text", { x: 16, y: 25, class: "code-line" }, "<div>"),
+    svgElement("text", { x: 27, y: 40, class: "code-line" }, "<h1/>"),
+    svgElement("text", { x: 27, y: 55, class: "code-line" }, "<p/>"),
+    svgElement("text", { x: 16, y: 70, class: "code-line" }, "</div>"),
+    svgElement("text", { x: 210, y: 43, class: "pair-arrow", "text-anchor": "middle" }, "↔"),
+    svgElement("text", { x: 210, y: 59, class: "pair-label", "text-anchor": "middle" }, "双向映射"),
+    svgElement("rect", { x: 274, y: 8, width: 142, height: 74, rx: 4, class: "render-box" }),
+    svgElement("rect", { x: 289, y: 20, width: 112, height: 50, rx: 2, class: "render-frame" }),
+    svgElement("text", { x: 300, y: 39, class: "render-title" }, "标题"),
+    svgElement("text", { x: 300, y: 57, class: "render-copy" }, "文字"),
+  );
+  card.append(copy, visual);
+  return card;
 };
 
 const buildVisionSevenStory = (state, persist, rerender) => {
@@ -1219,7 +1247,7 @@ const buildVisionSevenStory = (state, persist, rerender) => {
     cards.append(card);
   });
   lower.append(overview, cards);
-  scroll.append(header, blind, additions, lower, element("p", "pte-optimizer-source", "🟢 K2.5 Technical Report §4.2–§4.3（七类视觉数据、感知 / 视频 / 智能体新增）"));
+  scroll.append(header, blind, additions, lower, buildCodeVisualPairCard(), element("p", "pte-optimizer-source", "K2.5 Technical Report §4.2–§4.3（七类视觉数据、感知 / 视频 / 智能体新增）"));
   side.append(buildDataTabs(state, persist, rerender), scroll);
   return side;
 };
@@ -1301,7 +1329,7 @@ const buildLongDocStory = (state, persist, rerender) => {
   });
   phash.append(pipeline, buildPerceptualHashVisual(), element("p", "pte-hash-emphasis", "重编码改变了每一个字节，但没有改变任何一个像素的含义。"));
 
-  scroll.append(header, methods, routes, comparison, phash, element("p", "pte-optimizer-source", "🟢 K3 Technical Report §3.1–§3.3；🔴 算法机械过程与示例为工程解释"));
+  scroll.append(header, methods, routes, comparison, phash, element("p", "pte-optimizer-source", "K3 Technical Report §3.1–§3.3；🔴 算法机械过程与示例为工程解释"));
   side.append(buildDataTabs(state, persist, rerender), scroll);
   return side;
 };
@@ -1344,7 +1372,7 @@ const buildCrossSpanStory = (state, persist, rerender) => {
   middle.append(flow, cards);
   const standard = element("section", "pte-data-standard");
   standard.append(element("strong", "", "核心验收标准：漏掉任一远处关键段落，答案就会错。"), element("p", "", "只有这样，忽略远处证据才会直接增加 loss，迫使模型放弃局部阅读捷径。"));
-  scroll.append(header, top, middle, standard, element("p", "pte-optimizer-source", "🟢 K3 Technical Report §3.4（跨段合成任务）；🔴 合成流程为工程推断"));
+  scroll.append(header, top, middle, standard, element("p", "pte-optimizer-source", "K3 Technical Report §3.4（跨段合成任务）；🔴 合成流程为工程推断"));
   side.append(buildDataTabs(state, persist, rerender), scroll);
   return side;
 };
@@ -1394,7 +1422,7 @@ const buildNativeVisionStory = (state, persist, rerender) => {
   middle.append(design, cards);
   const summary = element("section", "pte-data-summary");
   summary.append(element("strong", "", "预训练视觉编码器不一定是更好的起点，也可能是一套需要被覆盖的旧目标。"), element("p", "", "从随机参数开始，视觉编码器和语言主干从第一步就为同一个 NTP 目标服务。"));
-  scroll.append(header, top, middle, summary, element("p", "pte-optimizer-source", "🟢 K3 Technical Report §3.3、Figure 6（MoonViT-V2、随机初始化 vs SigLIP、pixel shuffle）"));
+  scroll.append(header, top, middle, summary, element("p", "pte-optimizer-source", "K3 Technical Report §3.3、Figure 6（MoonViT-V2、随机初始化 vs SigLIP、pixel shuffle）"));
   side.append(buildDataTabs(state, persist, rerender), scroll);
   return side;
 };
@@ -1404,7 +1432,7 @@ const buildProgrammaticStory = (state, persist, rerender) => {
   const scroll = element("div", "pte-optimizer-scroll");
   scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
   const header = element("header", "pte-optimizer-heading");
-  header.append(element("span", "pte-optimizer-eyebrow", "数据谱系 · 合成扩增"), element("h2", "", "K3 程序化多模态：代码与渲染结果天然配对"), element("p", "", "代码直接决定视觉结果，因此同一批数据可以训练代码→画面与画面→代码两个方向。"));
+  header.append(element("span", "pte-optimizer-eyebrow", "数据谱系 · 视觉语料"), element("h2", "", "K3 程序化多模态：代码与渲染结果天然配对"), element("p", "", "代码直接决定视觉结果，因此同一批数据可以训练代码→画面与画面→代码两个方向。"));
 
   const top = element("section", "pte-data-story-section");
   top.append(element("h3", "", "Caption 描述内容，程序化数据描述因果"));
@@ -1441,7 +1469,7 @@ const buildProgrammaticStory = (state, persist, rerender) => {
   coverage.append(grounding);
   middle.append(directions, coverage);
 
-  scroll.append(header, top, middle, element("p", "pte-optimizer-source", "🟢 K3 Technical Report §3.1（程序化多模态、双向映射、坐标归一化）"));
+  scroll.append(header, top, middle, element("p", "pte-optimizer-source", "K3 Technical Report §3.1（程序化多模态、双向映射、坐标归一化）"));
   side.append(buildDataTabs(state, persist, rerender), scroll);
   return side;
 };
@@ -1464,7 +1492,7 @@ const buildVisionFiveStory = (state, persist, rerender) => {
   });
   const details = element("section", "pte-k15-vision-details");
   details.append(element("h3", "", "两个实现边界"), element("p", "", "图文交织额外执行 data reordering：按浏览器实际渲染位置排列图文，而非 DOM 顺序，确保图文对应正确。"), element("p", "", "合成数据限于 cooldown：合成分布有偏，主训练阶段保持真实分布，最后再用小预算控制收敛落点。"));
-  scroll.append(header, ladder, details, element("p", "pte-optimizer-source", "🟢 K1.5 Technical Report；🔴 cooldown 动机为演进路径推断"));
+  scroll.append(header, ladder, details, element("p", "pte-optimizer-source", "K1.5 Technical Report；🔴 cooldown 动机为演进路径推断"));
   side.append(buildDataTabs(state, persist, rerender), scroll);
   return side;
 };
@@ -1485,7 +1513,7 @@ const buildCooldownStory = (state, persist, rerender) => {
   });
   const result = element("section", "pte-k15-cooldown-result");
   result.append(element("strong", "", "效果"), element("p", "", "合成 QA 集中巩固数学推理、知识任务和代码生成能力。"));
-  scroll.append(header, why, decisions, result, element("p", "pte-optimizer-source", "🟢 K1.5 Technical Report Appendix B.3"));
+  scroll.append(header, why, decisions, result, element("p", "pte-optimizer-source", "K1.5 Technical Report Appendix B.3"));
   side.append(buildDataTabs(state, persist, rerender), scroll);
   return side;
 };
@@ -1497,28 +1525,21 @@ const buildDataDetail = (state, persist, rerender) => {
   if (state.selectedLabel === "data-k25-vision-seven") return buildVisionSevenStory(state, persist, rerender);
   if (state.selectedLabel === "data-k3-long-doc") return buildLongDocStory(state, persist, rerender);
   if (state.selectedLabel === "data-k3-cross-span") return buildCrossSpanStory(state, persist, rerender);
-  if (state.selectedLabel === "data-k3-native-vision") return buildNativeVisionStory(state, persist, rerender);
   if (state.selectedLabel === "data-k3-programmatic") return buildProgrammaticStory(state, persist, rerender);
   if (state.selectedLabel === "data-k15-vision-five") return buildVisionFiveStory(state, persist, rerender);
-  if (state.selectedLabel === "data-k15-cooldown-synth") return buildCooldownStory(state, persist, rerender);
   const chapters = Object.fromEntries(DATA_LINEAGES.map((lineage) => {
-    const cells = lineage.id === "quality"
-      ? lineage.cells.filter((cell) => cell.labelId)
-      : lineage.id === "augmentation" && state.selectedLabel === "data-k2-rephrasing"
-        ? lineage.cells.filter((cell) => ["data-k2-rephrasing", "data-k25-code-visual"].includes(cell.labelId))
-        : lineage.cells;
+    const cells = lineage.id === "quality" ? lineage.cells.filter((cell) => cell.labelId) : lineage.cells;
     return [lineage.id, {
     tab: lineage.tab,
     eyebrow: `数据谱系 · ${lineage.tab}`,
     title: lineage.title,
     lead: lineage.lead,
-    hideHeader: lineage.id === "augmentation" && state.selectedLabel === "data-k2-rephrasing",
     stages: cells.map((cell) => cell.text),
     highlightStages: false,
     sections: cells.map((cell) => {
       if (!cell.labelId) return {
         title: `${cell.version} · ${cell.text}`,
-        copy: `🟢 ${cell.note}`,
+        copy: `${cell.note}`,
         formula: [cell.toNext === "inherit"
           ? "沿用上一代数据底座；本代只验证新增改动"
           : cell.toNext === "break"
@@ -1544,8 +1565,610 @@ const buildDataDetail = (state, persist, rerender) => {
   return buildSequenceDetail({ chapters, stateKey: "dataTab", labelByTab: DATA_LABEL_BY_TAB, scrollToSelected: true }, state, persist, rerender);
 };
 
+const buildK15RopeChart = () => {
+  const svg = svgElement("svg", { class: "pte-k15-rope-chart", viewBox: "0 0 660 120", role: "img", "aria-label": "RoPE 频率基提高前后的远距离旋转角对比" });
+  svg.append(
+    svgElement("line", { x1: 48, y1: 92, x2: 636, y2: 92, class: "axis" }),
+    svgElement("line", { x1: 48, y1: 14, x2: 48, y2: 92, class: "axis" }),
+    svgElement("line", { x1: 94, y1: 14, x2: 94, y2: 92, class: "train-cut" }),
+    svgElement("path", { d: "M48 86 C152 82 270 64 382 40 S540 18 636 8", class: "legacy" }),
+    svgElement("path", { d: "M48 86 C170 84 306 78 432 66 S562 50 636 42", class: "extended" }),
+    svgElement("text", { x: 98, y: 20, class: "cut-label" }, "4K 训练截止"),
+    svgElement("text", { x: 628, y: 17, class: "legacy-label", "text-anchor": "end" }, "θ=10,000，超出训练分布"),
+    svgElement("text", { x: 628, y: 56, class: "extended-label", "text-anchor": "end" }, "θ=1,000,000，仍在训练分布内"),
+    svgElement("text", { x: 48, y: 112, class: "axis-label" }, "0"),
+    svgElement("text", { x: 636, y: 112, class: "axis-label", "text-anchor": "end" }, "token 位置 131K"),
+    svgElement("text", { x: 12, y: 64, class: "axis-label", transform: "rotate(-90 12 64)" }, "低频旋转角"),
+  );
+  return svg;
+};
+
+const buildK15AttentionMatrix = (local = false) => {
+  const svg = svgElement("svg", { class: `pte-k15-attention-matrix ${local ? "local" : "global"}`, viewBox: "0 0 180 132", role: "img", "aria-label": local ? "局部窗口注意力矩阵" : "全局注意力矩阵" });
+  svg.append(svgElement("text", { x: 90, y: 14, class: "matrix-title", "text-anchor": "middle" }, local ? "局部层" : "全局层"));
+  for (let row = 0; row < 8; row += 1) {
+    for (let col = 0; col < 8; col += 1) {
+      svg.append(svgElement("rect", { x: 34 + col * 14, y: 24 + row * 10, width: 13, height: 9, class: !local || Math.abs(row - col) <= 1 ? "active" : "inactive" }));
+    }
+  }
+  svg.append(svgElement("text", { x: 90, y: 122, class: "complexity", "text-anchor": "middle" }, local ? "O(nw)" : "O(n²)"));
+  return svg;
+};
+
+const buildK15CourseChart = () => {
+  const svg = svgElement("svg", { class: "pte-k15-course-chart", viewBox: "0 0 660 86", role: "img", "aria-label": "4K 到 32K 再到 131K 的三阶段序列课程" });
+  [[16, "4K", "建立基础"], [240, "32K", "引入中等长度数据"], [464, "131K", "激活全局检索能力"]].forEach(([x, label, note], index) => {
+    svg.append(
+      svgElement("rect", { x, y: 24, width: 180, height: 48, rx: 6 }),
+      svgElement("text", { x: x + 90, y: 44, class: "course-label", "text-anchor": "middle" }, label),
+      svgElement("text", { x: x + 90, y: 62, class: "course-note", "text-anchor": "middle" }, note),
+    );
+    if (index < 2) svg.append(
+      svgElement("text", { x: x + 202, y: 53, class: "course-arrow", "text-anchor": "middle" }, "→"),
+      svgElement("text", { x: x + 202, y: 14, class: "course-rise", "text-anchor": "middle" }, "长度 ↑ · 数据同步升级"),
+    );
+  });
+  return svg;
+};
+
+const buildK15ContextDetail = () => {
+  const side = element("aside", "pte-detail pte-k15-context-detail");
+  const scroll = element("div", "pte-k15-context-scroll");
+  scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+  const source = (copy) => element("p", "pte-k15-context-source", `${copy}`);
+
+  const header = element("header", "pte-k15-context-header");
+  header.append(
+    element("span", "pte-k15-context-chip", "K1.5 · 预训练"),
+    element("h2", "", "底层仍是标准 attention，K1.5 用频率、mask 和课程把它推到 131K"),
+    element("p", "", "不改架构，让不同训练样本分别承担全局检索和局部建模，再逐阶段拉长序列"),
+  );
+  const stages = element("div", "pte-k15-context-stages");
+  ["4K", "→", "32K", "→", "131K", "40% 全局", "60% 局部"].forEach((label, index) => {
+    stages.append(element(index === 1 || index === 3 ? "b" : "span", index === 5 ? "global" : index === 6 ? "local" : "", label));
+  });
+  header.append(stages);
+
+  const rope = element("section", "pte-k15-context-section rope");
+  rope.append(
+    element("h3", "", "❶ 先让 RoPE 在远距离旋转得更慢"),
+    element("p", "", "RoPE 把位置 p 编码为旋转角。训练时最远只见过第 4096 个位置。推理时遇到第 50000 个位置，旋转角进入从未校准过的区间，模型不知道这代表什么距离。"),
+    element("p", "", "把频率基 θ 从 10,000 提高到 1,000,000。θ 越大，每步旋转角增量越小；原来走 4096 步转了 N 圈，现在同样 4096 步只转 N/100 圈。同样的训练长度覆盖更宽的角度空间，使 131K 位置仍落在已校准范围。"),
+  );
+  const ropeFormula = element("div", "pte-k15-context-formula");
+  ropeFormula.append(element("code", "", "原：θᵢ = 10000^(−2i/d)"), element("code", "", "改：θᵢ = 1000000^(−2i/d)"));
+  const ropeFigure = element("figure", "pte-k15-rope-figure");
+  ropeFigure.append(buildK15RopeChart(), source("K1.5 Technical Report Appendix B §B.4"));
+  rope.append(ropeFormula, ropeFigure);
+
+  const attention = element("section", "pte-k15-context-section attention");
+  attention.append(element("h3", "", "❷ 全注意力负责全文，局部窗口负责多数 token"));
+  const attentionGrid = element("div", "pte-k15-attention-grid");
+  const narrative = element("div", "pte-k15-attention-copy");
+  narrative.append(
+    element("p", "", "标准 attention 中，每个 query 与全部 n 个 key 做点积。序列从 4K 扩到 131K，计算量约翻 1000 倍。"),
+    element("p", "", "▸ 判断词性、翻译一句话，只需要看周围几个 token。"),
+    element("p", "", "▸ 在合同里找两处条款是否矛盾，必须看全文。"),
+    element("p", "", "不改架构，只改 mask：全局注意力看全部 n 个位置，成本 O(n²)；局部窗口只看附近固定窗口 w，成本 O(nw)。"),
+  );
+  const clarification = element("aside", "pte-k15-context-clarification");
+  clarification.append(
+    element("strong", "", "重要澄清"),
+    element("p", "", "报告中的“40% 全局，60% 局部”是训练数据采样比例，不是网络层比例。"),
+    element("p", "", "40% = 高质量自然长文档 + 合成长上下文 Q&A"),
+    element("p", "", "60% = 从 cooldown 阶段均匀采样的常规数据"),
+    element("p", "", "网络有多少层使用全局或局部注意力，报告未披露。"),
+  );
+  const matrices = element("figure", "pte-k15-matrices");
+  const matrixRow = element("div", "pte-k15-matrix-row");
+  matrixRow.append(buildK15AttentionMatrix(), buildK15AttentionMatrix(true));
+  matrices.append(matrixRow, element("figcaption", "", "w 固定时，序列翻倍，局部窗口计算量线性增长。"));
+  attentionGrid.append(narrative, matrices);
+  const attentionFormula = element("div", "pte-k15-context-formula attention-formula");
+  attentionFormula.append(
+    element("code", "", "Aglobal = softmax(QKᵀ/√d)V"),
+    element("code", "", "Alocal = softmax((QKᵀ + Mwindow)/√d)V"),
+    element("small", "", "Mwindow：窗口外位置设为 −∞，softmax 后权重归零"),
+  );
+  attention.append(attentionGrid, clarification, attentionFormula, source("K1.5 Technical Report Appendix B §B.4"));
+
+  const course = element("section", "pte-k15-context-section course");
+  course.append(
+    element("h3", "", "❸ 三段课程，序列长度逐步拉长"),
+    element("p", "", "位置编码和计算量都解决后，仍不能直接从 4K 跳到 131K：从未见过的长序列会带来梯度震荡，注意力分布也需要逐步校准。"),
+    element("p", "", "▸ 梯度不稳定：训练初期 loss 剧烈震荡。"),
+    element("p", "", "▸ 注意力跨度需要校准：短序列上的典型跨度远小于 131K。"),
+    element("p", "", "报告原文：序列长度从 4,096 → 32,768 → 131,072 逐步扩展；每段具体 token 量和数据配比未披露。"),
+    buildK15CourseChart(),
+    source("K1.5 Technical Report Appendix B §B.4"),
+  );
+
+  const boundary = element("section", "pte-k15-context-section boundary");
+  boundary.append(element("h3", "", "◆ 遗留边界——这套方案降低了成本，没有消除根本问题"));
+  const boundaryGrid = element("div", "pte-k15-boundary-grid");
+  [["solved", "已解决", "位置外推", "RoPE 频率基从 10,000 → 1,000,000"], ["partial", "部分缓解", "Attention 计算", "O(n²) 与 O(nw) 混合，全局部分仍是平方"], ["open", "未解决", "KV 显存", "仍随序列线性增长，131K 需存 131K 组键值对"]].forEach(([tone, label, title, copy]) => {
+    const card = element("article", tone);
+    card.append(element("span", "", label), element("strong", "", title), element("p", "", copy));
+    boundaryGrid.append(card);
+  });
+  boundary.append(boundaryGrid, element("p", "pte-k15-context-bridge", "K2 的问题转向：不再混合 attention mask，而是从 RoPE 频率分段入手——高频和低频维度应该用不同策略处理。"));
+
+  scroll.append(header, rope, attention, course, boundary);
+  side.append(scroll);
+  return side;
+};
+
+const buildK2InterpolationChart = () => {
+  const svg = svgElement("svg", {
+    class: "pte-k2-interpolation-chart",
+    viewBox: "0 0 640 170",
+    role: "img",
+    "aria-label": "线性插值与 NTK-aware 对相邻 token 角度差的影响",
+  });
+  const group = (y, tone, title, delta, note) => {
+    svg.append(
+      svgElement("text", { x: 18, y: y - 22, class: `group-title ${tone}` }, title),
+      svgElement("line", { x1: 30, y1: y, x2: 360, y2: y, class: "axis" }),
+    );
+    [0, 1, 2, 16, 17].forEach((position, index) => {
+      const x = [48, 96, 144, 278, 330][index];
+      svg.append(
+        svgElement("line", { x1: x, y1: y - 7, x2: x, y2: y + 7, class: position > 2 ? tone : "tick" }),
+        svgElement("text", { x, y: y + 22, class: "tick-label", "text-anchor": "middle" }, `p=${position}`),
+      );
+    });
+    svg.append(
+      svgElement("line", { x1: 282, y1: y - 15, x2: 326, y2: y - 15, class: `delta ${tone}` }),
+      svgElement("text", { x: 304, y: y - 20, class: `delta-label ${tone}`, "text-anchor": "middle" }, delta),
+      svgElement("text", { x: 388, y: y - 2, class: `group-note ${tone}` }, note),
+    );
+  };
+  group(52, "bad", "线性插值（有问题）", "Δφ = ω/4", "训练时 Δφ = ω；缩小 4 倍后近处关系失真");
+  group(132, "good", "NTK-aware（保持近处关系）", "Δφ = ω′", "不缩放位置 p，相邻 token 仍使用稳定角度差");
+  return svg;
+};
+
+const buildK2YarnBandsChart = () => {
+  const svg = svgElement("svg", {
+    class: "pte-k2-yarn-chart",
+    viewBox: "0 0 720 118",
+    role: "img",
+    "aria-label": "YaRN 按波长划分高频、中频和低频维度",
+  });
+  const bands = [
+    [16, 200, "high", "高频", "λ < Ltrain", "完整周期已见过 → 保持 ωᵢ"],
+    [216, 250, "mid", "中频", "Ltrain ≤ λ ≤ Lserve", "部分覆盖 → 线性混合"],
+    [466, 238, "low", "低频", "λ > Lserve", "几乎未覆盖 → NTK-aware"],
+  ];
+  bands.forEach(([x, width, tone, title, range, note]) => {
+    svg.append(
+      svgElement("rect", { x, y: 16, width, height: 76, rx: 6, class: tone }),
+      svgElement("text", { x: x + 12, y: 38, class: `band-title ${tone}` }, title),
+      svgElement("text", { x: x + 12, y: 58, class: "band-range" }, range),
+      svgElement("text", { x: x + 12, y: 78, class: "band-note" }, note),
+    );
+  });
+  svg.append(
+    svgElement("line", { x1: 18, y1: 106, x2: 702, y2: 106, class: "axis" }),
+    svgElement("text", { x: 360, y: 116, class: "axis-label", "text-anchor": "middle" }, "波长 λ 增大 →"),
+  );
+  return svg;
+};
+
+const buildK25MidTrainingChart = () => {
+  const svg = svgElement("svg", {
+    class: "pte-k25-midtraining-chart",
+    viewBox: "0 0 520 224",
+    role: "img",
+    "aria-label": "K2 两步退火与 K2.5 联合 mid-training 对比",
+  });
+  svg.append(
+    svgElement("text", { x: 18, y: 18, class: "chart-title legacy" }, "K2（两步分离）"),
+    svgElement("rect", { x: 18, y: 28, width: 170, height: 38, rx: 5, class: "quality" }),
+    svgElement("text", { x: 103, y: 51, class: "box-label", "text-anchor": "middle" }, "质量退火 400B@4K"),
+    svgElement("text", { x: 208, y: 50, class: "note" }, "只稳质量，不扩长度"),
+    svgElement("text", { x: 103, y: 86, class: "arrow", "text-anchor": "middle" }, "↓"),
+    svgElement("rect", { x: 18, y: 96, width: 170, height: 38, rx: 5, class: "length" }),
+    svgElement("text", { x: 103, y: 119, class: "box-label", "text-anchor": "middle" }, "长度退火 60B@32K"),
+    svgElement("text", { x: 208, y: 118, class: "note" }, "只校位置，已稳质量"),
+    svgElement("text", { x: 18, y: 158, class: "chart-title merged" }, "K2.5（合并）"),
+    svgElement("rect", { x: 18, y: 166, width: 472, height: 46, rx: 5, class: "merged-box" }),
+    svgElement("text", { x: 32, y: 185, class: "box-label" }, "联合 mid-training"),
+    svgElement("text", { x: 194, y: 185, class: "note" }, "高质量短数据 · 防遗忘"),
+    svgElement("text", { x: 194, y: 203, class: "note" }, "长文本 / 视频 / CoT · 校准远距"),
+  );
+  return svg;
+};
+
+const buildK25TrainingChart = () => {
+  const svg = svgElement("svg", {
+    class: "pte-k25-training-chart",
+    viewBox: "0 0 700 86",
+    role: "img",
+    "aria-label": "K2 外推到 128K 与 K2.5 真实训练到 262K 的边界对比",
+  });
+  svg.append(
+    svgElement("text", { x: 16, y: 26, class: "k2-label" }, "K2"),
+    svgElement("line", { x1: 66, y1: 21, x2: 222, y2: 21, class: "k2-solid" }),
+    svgElement("line", { x1: 222, y1: 21, x2: 606, y2: 21, class: "k2-dashed" }),
+    svgElement("text", { x: 144, y: 13, class: "value", "text-anchor": "middle" }, "train 32K"),
+    svgElement("text", { x: 414, y: 13, class: "k2-label", "text-anchor": "middle" }, "外推（YaRN）"),
+    svgElement("text", { x: 610, y: 26, class: "value" }, "128K"),
+    svgElement("text", { x: 16, y: 66, class: "k25-label" }, "K2.5"),
+    svgElement("line", { x1: 66, y1: 61, x2: 660, y2: 61, class: "k25-solid" }),
+    svgElement("text", { x: 360, y: 53, class: "k25-label", "text-anchor": "middle" }, "真实训练"),
+    svgElement("text", { x: 664, y: 66, class: "value" }, "262K"),
+  );
+  return svg;
+};
+
+const buildK3ArchitectureChart = () => {
+  const svg = svgElement("svg", {
+    class: "pte-k3-architecture-chart",
+    viewBox: "0 0 680 230",
+    role: "img",
+    "aria-label": "K3 使用 KDA、Gated MLA 与 NoPE 降低长上下文成本",
+  });
+  svg.append(
+    svgElement("text", { x: 16, y: 18, class: "row-title" }, "KV Cache 成本"),
+    svgElement("text", { x: 212, y: 18, class: "legacy" }, "K1.5 / K2 / K2.5：O(n)"),
+    svgElement("rect", { x: 216, y: 28, width: 18, height: 12, class: "legacy-box" }),
+    svgElement("rect", { x: 244, y: 24, width: 24, height: 16, class: "legacy-box" }),
+    svgElement("rect", { x: 278, y: 18, width: 34, height: 22, class: "legacy-box" }),
+    svgElement("rect", { x: 322, y: 8, width: 50, height: 32, class: "legacy-box" }),
+    svgElement("text", { x: 396, y: 28, class: "kda" }, "K3 KDA：固定状态 O(1)"),
+    svgElement("rect", { x: 572, y: 14, width: 42, height: 26, class: "kda-box" }),
+    svgElement("line", { x1: 16, y1: 58, x2: 664, y2: 58, class: "rule" }),
+    svgElement("text", { x: 16, y: 80, class: "row-title" }, "Attention 计算"),
+    svgElement("rect", { x: 170, y: 68, width: 120, height: 24, rx: 4, class: "legacy-box" }),
+    svgElement("text", { x: 230, y: 84, class: "in-box", "text-anchor": "middle" }, "全局 softmax O(n²)"),
+    svgElement("rect", { x: 308, y: 68, width: 108, height: 24, rx: 4, class: "kda-box" }),
+    svgElement("text", { x: 362, y: 84, class: "in-box", "text-anchor": "middle" }, "KDA ≈O(n)"),
+    svgElement("rect", { x: 434, y: 68, width: 170, height: 24, rx: 4, class: "mla-box" }),
+    svgElement("text", { x: 519, y: 84, class: "in-box", "text-anchor": "middle" }, "Gated MLA：O(n²)，仅 24 层"),
+    svgElement("line", { x1: 16, y1: 110, x2: 664, y2: 110, class: "rule" }),
+    svgElement("text", { x: 16, y: 132, class: "row-title" }, "位置编码"),
+    svgElement("rect", { x: 170, y: 120, width: 180, height: 28, rx: 4, class: "legacy-box" }),
+    svgElement("text", { x: 260, y: 138, class: "in-box", "text-anchor": "middle" }, "RoPE / YaRN：有外推上限"),
+    svgElement("rect", { x: 370, y: 120, width: 232, height: 28, rx: 4, class: "kda-box" }),
+    svgElement("text", { x: 486, y: 138, class: "in-box", "text-anchor": "middle" }, "NoPE + KDA 衰减：直接到 1M"),
+    svgElement("text", { x: 18, y: 178, class: "caption" }, "69 层 KDA：有损递归记忆，状态大小不随序列长度增长"),
+    svgElement("text", { x: 18, y: 202, class: "caption" }, "24 层 Gated MLA：完整 softmax，保留精确全局检索"),
+    svgElement("text", { x: 18, y: 222, class: "caption" }, "NoPE：由 KDA 的 α 衰减隐式表达距离，摆脱 RoPE / YaRN 外推"),
+  );
+  return svg;
+};
+
+const buildK3CourseChart = () => {
+  const svg = svgElement("svg", {
+    class: "pte-k3-course-chart",
+    viewBox: "0 0 720 132",
+    role: "img",
+    "aria-label": "K3 从预训练 8K 到 64K，再从 cooldown 256K 到 1M 的四段序列课程",
+  });
+  svg.append(
+    svgElement("rect", { x: 16, y: 20, width: 258, height: 86, rx: 6, class: "pretrain" }),
+    svgElement("text", { x: 28, y: 40, class: "pretrain-title" }, "预训练"),
+    svgElement("rect", { x: 42, y: 52, width: 82, height: 30, rx: 4, class: "pretrain-step" }),
+    svgElement("text", { x: 83, y: 72, class: "step-label", "text-anchor": "middle" }, "8K"),
+    svgElement("text", { x: 144, y: 72, class: "arrow", "text-anchor": "middle" }, "→"),
+    svgElement("rect", { x: 164, y: 52, width: 82, height: 30, rx: 4, class: "pretrain-step" }),
+    svgElement("text", { x: 205, y: 72, class: "step-label", "text-anchor": "middle" }, "64K"),
+    svgElement("text", { x: 145, y: 98, class: "note", "text-anchor": "middle" }, "大量 token，建立语言底座"),
+    svgElement("line", { x1: 300, y1: 16, x2: 300, y2: 108, class: "divider" }),
+    svgElement("text", { x: 300, y: 14, class: "gap-label", "text-anchor": "middle" }, "预训练结束"),
+    svgElement("text", { x: 387, y: 64, class: "gap-label", "text-anchor": "middle" }, "gap（报告未描述）"),
+    svgElement("rect", { x: 472, y: 20, width: 232, height: 86, rx: 6, class: "cooldown" }),
+    svgElement("text", { x: 484, y: 40, class: "cooldown-title" }, "cooldown"),
+    svgElement("rect", { x: 492, y: 52, width: 78, height: 30, rx: 4, class: "cooldown-step" }),
+    svgElement("text", { x: 531, y: 72, class: "step-label", "text-anchor": "middle" }, "256K"),
+    svgElement("text", { x: 586, y: 72, class: "arrow", "text-anchor": "middle" }, "→"),
+    svgElement("rect", { x: 604, y: 52, width: 76, height: 30, rx: 4, class: "cooldown-step" }),
+    svgElement("text", { x: 642, y: 72, class: "step-label", "text-anchor": "middle" }, "1M"),
+    svgElement("text", { x: 588, y: 98, class: "note", "text-anchor": "middle" }, "少量高质量数据，推长度极限"),
+    svgElement("text", { x: 16, y: 125, class: "axis-label" }, "序列长度（对数刻度）：8K   64K   256K   1M"),
+  );
+  return svg;
+};
+
+const buildK2ContextDetail = () => {
+  const side = element("aside", "pte-detail pte-k15-context-detail pte-k2-context-detail");
+  const scroll = element("div", "pte-k15-context-scroll");
+  scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+  const source = (copy) => element("p", "pte-k15-context-source", `${copy}`);
+
+  const header = element("header", "pte-k15-context-header");
+  header.append(
+    element("span", "pte-k15-context-chip", "K2 · 预训练"),
+    element("h2", "", "K2 不再统一拉大频率基，而是按维度频率分段处理 RoPE"),
+    element("p", "", "高频维度已充分校准，保持不变；低频维度周期超出训练范围，按比例压缩角频率"),
+  );
+  const stages = element("div", "pte-k15-context-stages pte-k2-context-stages");
+  [
+    ["baseline", "质量退火 400B@4K"], ["arrow", "→"], ["", "长度退火 60B@32K"],
+    ["arrow", "→"], ["", "YaRN 外推"], ["arrow", "→"], ["", "128K"],
+  ].forEach(([tone, label]) => stages.append(element(tone === "arrow" ? "b" : "span", tone, label)));
+  header.append(stages);
+
+  const legacy = element("section", "pte-k15-context-section pte-k2-legacy");
+  legacy.append(
+    element("h3", "", "❶ K1.5 的做法哪里不够精细"),
+    element("p", "", "K1.5 把所有维度的频率基统一乘以 100，等于用同一把尺子压缩高频和低频。"),
+    element("p", "", "▸ 高频维度旋转周期短，4K 训练内已经走过许多完整周期，角度规律已充分校准。"),
+    element("p", "", "▸ 低频维度旋转周期可达数万 token，4K 内只见过极小一段，直接外推会进入未知角度。"),
+    element("p", "", "统一缩放会扰动高频维度本来可靠的位置关系，造成不必要的损失。"),
+    element("p", "pte-k2-legacy-question", "K2 的问题：能不能只压缩需要压缩的维度，不动不需要压缩的维度？"),
+  );
+
+  const interpolation = element("section", "pte-k15-context-section pte-k2-interpolation");
+  interpolation.append(element("h3", "", "❷ 线性插值压缩了位置，也压缩了相邻 token 的角度差"));
+  const interpolationGrid = element("div", "pte-k2-interpolation-grid");
+  const interpolationCopy = element("div", "pte-k2-interpolation-copy");
+  interpolationCopy.append(
+    element("p", "", "线性插值把位置缩小 s 倍：p′ = p/s。所有维度的旋转角随之等比压缩。"),
+    element("p", "", "attention 的位置信息来自 qᵀk，等价于两位置旋转角之差的余弦。插值后相邻角度差 Δφ 也缩小 s 倍，模型会把距离为 1 的 token 看得更近。"),
+    element("p", "", "NTK-aware 不缩小位置 p，而是调整频率基 θ。近处位置关系由已校准的高频维度保留，低频维度负责承接更远距离。"),
+  );
+  const interpolationFigure = element("figure", "pte-k2-interpolation-figure");
+  interpolationFigure.append(buildK2InterpolationChart());
+  interpolationGrid.append(interpolationCopy, interpolationFigure);
+  const interpolationFormula = element("div", "pte-k15-context-formula pte-k2-formula");
+  interpolationFormula.append(
+    element("code", "", "线性插值：φ(p) = (p/s) · ωᵢ　→　Δφ = ωᵢ/s　← 相邻角度差缩小"),
+    element("code", "", "NTK-aware：θ′ = θ · s^(d/(d−2))，ω′ᵢ = θ′^(−2i/d)　→　不缩放位置 p"),
+  );
+  interpolation.append(interpolationGrid, interpolationFormula);
+
+  const yarn = element("section", "pte-k15-context-section pte-k2-yarn");
+  yarn.append(
+    element("h3", "", "❸ YaRN：按波长把维度分三段，分别处理"),
+    element("p", "", "每个维度的波长 λᵢ = 2π/ωᵢ，代表完整旋转一周需要多少个 token。波长相对于训练长度 Ltrain 和服务长度 Lserve 的大小，决定该维度采用哪种策略。"),
+    buildK2YarnBandsChart(),
+  );
+  const yarnFormula = element("div", "pte-k15-context-formula pte-k2-yarn-formula");
+  yarnFormula.append(
+    element("code", "", "最终角频率：ω̃ᵢ = (1−γ)·ω′ᵢ + γ·ωᵢ"),
+    element("small", "", "γ=0 → 完全 NTK-aware；γ=1 → 保持原始；中间平滑过渡"),
+  );
+  yarn.append(yarnFormula, source("K2 Technical Report §2.5；YaRN: Peng et al. 2023"));
+
+  const anneal = element("section", "pte-k15-context-section pte-k2-anneal");
+  anneal.append(element("h3", "", "❹ 两阶段退火：先稳质量，再校位置"));
+  const annealGrid = element("div", "pte-k2-anneal-grid");
+  [
+    ["quality", "第一阶段 · 质量退火", "400B token @ 4K", "把 K2 新引入的知识 rephrasing 与数学数据吸收稳，确认语言能力没有退化。新数据分布和序列长度不同时改变，才能判断每个变量的影响。", "序列长度维持 4K，不做长度扩展"],
+    ["length", "第二阶段 · 长度退火", "60B token @ 32K", "给 YaRN 修改后的位置编码做实际校准。模型在 32K 真实长序列上更新参数，让 attention 对新的位置关系形成记忆。", "学习率从 2×10⁻⁵ 余弦衰减到 7×10⁻⁶"],
+  ].forEach(([tone, label, spec, copy, note]) => {
+    const card = element("article", tone);
+    card.append(element("span", "", label), element("strong", "", spec), element("p", "", copy), element("small", "", note));
+    annealGrid.append(card);
+  });
+  anneal.append(annealGrid, source("K2 Technical Report §2.5"));
+
+  const boundary = element("section", "pte-k15-context-section boundary pte-k2-boundary");
+  boundary.append(
+    element("h3", "", "◆ train 32K，serve 128K——外推而非真实训练"),
+    element("p", "", "YaRN 允许 K2 从 32K 训练长度外推到 128K，节省极长序列训练的计算；代价是边界附近依赖数学外推，不如真实训练见过的位置可靠。K2.5 因此真正训练到 262K。"),
+  );
+  const boundaryGrid = element("div", "pte-k15-boundary-grid");
+  [["solved", "已解决", "位置外推", "YaRN 分段处理：高频保持，低频压缩"], ["partial", "部分缓解", "外推可靠性", "train 32K，128K 靠外推，边界附近不如真实训练"], ["open", "未解决", "计算与显存", "标准 softmax 与线性 KV Cache 的 O(n²) 和 O(n) 不变"]].forEach(([tone, label, title, copy]) => {
+    const card = element("article", tone);
+    card.append(element("span", "", label), element("strong", "", title), element("p", "", copy));
+    boundaryGrid.append(card);
+  });
+  boundary.append(boundaryGrid, element("p", "pte-k15-context-bridge", "K2.5 的问题转向：与其依赖外推，不如真正训练到更长序列——把高质量 mid-training 与长上下文激活合并为一个阶段，直接推到 262K。"));
+
+  scroll.append(header, legacy, interpolation, yarn, anneal, boundary);
+  side.append(scroll);
+  return side;
+};
+
+const buildK25ContextDetail = () => {
+  const side = element("aside", "pte-detail pte-k15-context-detail pte-k25-context-detail");
+  const scroll = element("div", "pte-k15-context-scroll");
+  scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+  const source = (copy) => element("p", "pte-k15-context-source", `${copy}`);
+
+  const header = element("header", "pte-k15-context-header");
+  header.append(
+    element("span", "pte-k15-context-chip", "K2.5 · 预训练"),
+    element("h2", "", "K2.5 不再依赖外推，让模型真正训练到 262K"),
+    element("p", "", "把质量巩固和长度扩展合并成一个 mid-training 阶段，短数据防遗忘，长数据校准远距注意力"),
+  );
+  const stages = element("div", "pte-k15-context-stages pte-k25-context-stages");
+  [["baseline", "高质量短数据"], ["arrow", "→"], ["", "32K 起点"], ["arrow", "→"], ["", "长文本 · 长视频 · Long-CoT"], ["arrow", "→"], ["", "渐进扩展"]]
+    .forEach(([tone, label]) => stages.append(element(tone === "arrow" ? "b" : "span", tone, label)));
+  const finalStage = element("span", "pte-k25-final-stage");
+  finalStage.append(element("b", "", "→"), element("span", "final", "262K"));
+  stages.append(finalStage);
+  header.append(stages);
+
+  const legacy = element("section", "pte-k15-context-section pte-k25-legacy");
+  legacy.append(
+    element("h3", "", "❶ K2 的外推在边界附近不可靠"),
+    element("p", "", "K2 的策略是 train 32K，再靠 YaRN 数学性质外推到 128K。外推是对未见位置的估计，不是实际训练；128K 边界附近的能力因此折损。"),
+    element("p", "", "更根本的是，K2 从未真正处理过超过 32K 的序列。长上下文能力都在 32K 内学习，再由公式投影到更远位置。"),
+    element("p", "pte-k2-legacy-question", "K2.5 的判断：与其精心设计外推公式，不如让模型真正见过更长的序列。"),
+  );
+
+  const mid = element("section", "pte-k15-context-section pte-k25-midtraining");
+  mid.append(element("h3", "", "❷ 联合长上下文 mid-training"));
+  const midGrid = element("div", "pte-k25-midtraining-grid");
+  const midCopy = element("div", "pte-k25-midtraining-copy");
+  midCopy.append(
+    element("p", "", "K2 把质量巩固和长度校准拆成两步：400B@4K 质量退火稳定语言能力，再用 60B@32K 校准位置编码。"),
+    element("p", "", "K2.5 把两步合并成一个 mid-training 阶段：▸ 混入高质量数据，持续巩固语言能力；▸ 逐步拉长序列，校准长距离注意力。"),
+    element("p", "", "基础模型已足够稳定，高质量长数据同时提供能力巩固和真实长程依赖信号，两个目标因此能一起推进。"),
+  );
+  const midFigure = element("figure", "pte-k25-midtraining-figure");
+  midFigure.append(buildK25MidTrainingChart(), source("K2.5 Technical Report §4.3"));
+  midGrid.append(midCopy, midFigure);
+  mid.append(midGrid);
+
+  const signals = element("section", "pte-k15-context-section pte-k25-signals");
+  signals.append(element("h3", "", "❸ 短数据防遗忘，长数据校准远距——缺一不可"));
+  const signalsGrid = element("div", "pte-k25-signals-grid");
+  const short = element("article", "short");
+  short.append(
+    element("span", "", "短数据 · 防遗忘"),
+    element("p", "", "如果 mid-training 全换成长序列，模型会为适应长上下文调整参数，短序列基础能力随之退化。高质量通用文本持续混入，让模型始终保持基础能力。"),
+    element("small", "", "来源：高质量预训练子集"),
+  );
+  const long = element("article", "long");
+  long.append(element("span", "", "长数据 · 三类来源"));
+  [["长文本", "学术全文、法律文书；跨章节逻辑依赖"], ["长视频", "帧序列 token；跨帧时序关联"], ["Long-CoT", "多步推理链；引用早期引理并维持一致性"]]
+    .forEach(([label, copy]) => long.append(element("p", "", `▸ ${label}：${copy}`)));
+  long.append(element("small", "", "三类来源覆盖不同域的长依赖，比单一文本更广"));
+  signalsGrid.append(short, long);
+  signals.append(signalsGrid, source("K2.5 Technical Report §4.3"));
+
+  const progress = element("section", "pte-k15-context-section pte-k25-progress");
+  progress.append(
+    element("h3", "", "❹ 从 32K 渐进训练到 262K，不是一步跳到"),
+    element("p", "", "突然扩大序列长度会让梯度行为不稳定。每段先在当前长度稳定训练，再进入下一段。最终 K2.5 让模型真正见过 262K 的序列：不是外推，是实际训练。"),
+    buildK25TrainingChart(),
+  );
+  const course = element("div", "pte-k25-course-grid");
+  [["32K", "起点，继承 K2"], ["……", "渐进扩展（具体节点未披露）"], ["262K", "真实训练边界"]].forEach(([label, copy], index) => {
+    const card = element("article", "");
+    card.append(element("strong", "", label), element("small", "", copy));
+    course.append(card);
+    if (index < 2) course.append(element("b", "", "→"));
+  });
+  progress.append(course, source("K2.5 Technical Report §4.3"));
+
+  const boundary = element("section", "pte-k15-context-section boundary pte-k25-boundary");
+  boundary.append(
+    element("h3", "", "◆ 外推问题解决了，架构成本问题还在"),
+    element("p", "", "K2.5 把真实训练推到 262K，外推可靠性不再是问题。但标准 softmax attention 仍是 O(n²)：从 32K 到 262K，全局注意力计算量约翻 64 倍，1M 在这个架构下几乎不可能。"),
+  );
+  const boundaryGrid = element("div", "pte-k15-boundary-grid");
+  [["solved", "已解决", "外推可靠性", "真实训练到 262K，不再依赖数学外推"], ["open", "未解决", "Attention 计算", "标准 softmax，O(n²)，262K→1M 不可行"], ["open", "未解决", "KV 显存", "线性增长，262K 显存压力已很大"]].forEach(([tone, label, title, copy]) => {
+    const card = element("article", tone);
+    card.append(element("span", "", label), element("strong", "", title), element("p", "", copy));
+    boundaryGrid.append(card);
+  });
+  boundary.append(boundaryGrid, element("p", "pte-k15-context-bridge", "K3 的问题转向：不再只调 RoPE 或换数据，直接改写架构。用 KDA 的固定状态递归替换大部分全局注意力，才能真正推到 1M。"));
+
+  scroll.append(header, legacy, mid, signals, progress, boundary);
+  side.append(scroll);
+  return side;
+};
+
+const buildK3ContextDetail = () => {
+  const side = element("aside", "pte-detail pte-k15-context-detail pte-k3-context-detail");
+  const scroll = element("div", "pte-k15-context-scroll");
+  scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+  const source = (copy) => element("p", "pte-k15-context-source", `${copy}`);
+
+  const header = element("header", "pte-k15-context-header");
+  header.append(
+    element("span", "pte-k15-context-chip", "K3 · 预训练"),
+    element("h2", "", "K3 不再调 RoPE——改写架构，四段课程推到 1M"),
+    element("p", "", "KDA 固定状态承载大部分历史，Gated MLA 保留精确检索，彻底 NoPE，课程分两个阶段推进"),
+  );
+  const stages = element("div", "pte-k15-context-stages pte-k3-context-stages");
+  [["pretrain", "预训练 · 8K"], ["arrow", "→"], ["pretrain", "预训练 · 64K"]].forEach(([tone, label]) => stages.append(element(tone === "arrow" ? "b" : "span", tone, label)));
+  stages.append(element("i", "pte-k3-stage-divider"));
+  [["cooldown", "cooldown · 256K"], ["arrow", "→"], ["cooldown final", "cooldown · 1M"]].forEach(([tone, label]) => stages.append(element(tone === "arrow" ? "b" : "span", tone, label)));
+  header.append(stages);
+
+  const legacy = element("section", "pte-k15-context-section pte-k3-legacy");
+  legacy.append(
+    element("h3", "", "❶ K2.5 的路走不下去"),
+    element("p", "", "K2.5 真实训练到 262K，外推问题解决了。但 softmax attention 是 O(n²)：从 262K 再翻到 1M，全局注意力计算量约翻 14 倍。这不是更贵一点，而是工程上根本不可行。"),
+    element("p", "", "继续调 RoPE、继续换数据，物理上撞墙了。"),
+    element("p", "pte-k2-legacy-question", "必须改架构。位置编码、注意力计算、KV Cache，三个问题要一起解决。"),
+  );
+
+  const architecture = element("section", "pte-k15-context-section pte-k3-architecture");
+  architecture.append(element("h3", "", "❷ 两类层分工：有损递归记忆 + 精确全局检索"));
+  const architectureGrid = element("div", "pte-k3-architecture-grid");
+  const architectureCopy = element("div", "pte-k3-architecture-copy");
+  architectureCopy.append(
+    element("p", "", "93 层分两类，承担不同职责：69 层 KDA 维护固定大小状态矩阵 S。每个 token 写入新信息，旧信息按通道衰减；S 的大小与序列长度无关，但这是有损压缩。"),
+    element("p", "", "24 层 Gated MLA 仍让每个 token 看全局，保留必须精确回忆远处具体信息的能力。它仍是 O(n²)，但只有 24 层。"),
+    element("p", "", "两类层都不用 RoPE。位置信息由 KDA 的 α 衰减隐式表达：距离越远，连乘衰减越大，贡献越小。"),
+  );
+  const architectureFigure = element("figure", "pte-k3-architecture-figure");
+  architectureFigure.append(buildK3ArchitectureChart());
+  architectureGrid.append(architectureCopy, architectureFigure);
+  const architectureFormula = element("div", "pte-k15-context-formula pte-k3-formula");
+  architectureFormula.append(
+    element("code", "", "KDA：Sₜ = Diag(αₜ)(I − βₜkₜkₜᵀ)Sₜ₋₁ + βₜkₜvₜᵀ"),
+    element("small", "", "αₜ∈(0,1)ᵈᵏ，每通道独立衰减；S 大小固定，与 n 无关"),
+  );
+  architecture.append(architectureGrid, architectureFormula, source("K3 Technical Report §2.1、§3.4"));
+
+  const course = element("section", "pte-k15-context-section pte-k3-course");
+  course.append(
+    element("h3", "", "❸ 四段课程，分两个阶段——贵的计算集中在短序列"),
+    element("p", "", "预训练早期处理 1M 序列极度低效：模型参数尚未收敛，超长序列上的每步梯度质量很差。先用大量 token 在短序列上把模型训好，再用少量高质量数据把长度界限推开。"),
+    element("p", "", "报告原文：预训练做 8K→64K，cooldown 做 256K→1M；各段具体 token 量未披露。"),
+    buildK3CourseChart(),
+    source("K3 Technical Report §3.4"),
+  );
+
+  const data = element("section", "pte-k15-context-section pte-k3-data");
+  data.append(element("h3", "", "❹ 开了 1M 的门——但门后必须有真正需要跨 1M 推理的信号"));
+  const dataGrid = element("div", "pte-k3-data-grid");
+  const cleaning = element("article", "cleaning");
+  cleaning.append(
+    element("span", "", "清洗管线"),
+    element("p", "", "长文档和视频原始数据有近重复、截断文件、无效日志。▸ 文本：精确 hash + MinHash 去重；▸ 视频：帧感知哈希（DCT pHash）去重；▸ 启发式 + 分类器质量过滤；▸ 结构完整性验证。清洗后再上采样，让长序列不被短文本压倒。"),
+    element("small", "", "来源：K3 Technical Report §3.4"),
+  );
+  const crossSpan = element("article", "cross-span");
+  crossSpan.append(
+    element("span", "", "跨段合成任务"),
+    element("p", "", "长度本身不是信号。如果答案总在固定位置，模型会学会忽略远处。K3 合成 Q&A 时主动把多处证据散布到文档各处，强制相距很远；忽略任何一处，问题答不上来，loss 上升。"),
+    element("small", "", "来源：K3 Technical Report §3.4"),
+  );
+  dataGrid.append(cleaning, crossSpan);
+  data.append(dataGrid);
+
+  const boundary = element("section", "pte-k15-context-section pte-k3-boundary");
+  boundary.append(element("h3", "", "◆ 1M 是输入接口，不是等效记忆保证"));
+  const meaningGrid = element("div", "pte-k3-meaning-grid");
+  const means = element("article", "means");
+  means.append(element("span", "", "1M 意味着"), element("p", "", "▸ 可以把 1M token 的文档塞进去处理\n▸ 模型真实训练过 1M 长度的序列\n▸ NoPE 架构无外推上限"));
+  const notMeans = element("article", "not-means");
+  notMeans.append(element("span", "", "1M 不意味着"), element("p", "", "▸ 每个位置都被同等有效利用\n▸ 极远处历史被完整保留\n▸ 检索成功率与位置无关"));
+  meaningGrid.append(means, notMeans);
+  boundary.append(
+    meaningGrid,
+    element("p", "pte-k3-boundary-conclusion", "真正的衡量指标：1M 范围内跨距离检索和推理的成功率，不是输入框能塞多少 token。"),
+    source("K3 Technical Report §3.4；KDA 机制详见架构模块"),
+  );
+
+  scroll.append(header, legacy, architecture, course, data, boundary);
+  side.append(scroll);
+  return side;
+};
+
+const buildUndisclosedLrDetail = () => {
+  const detail = getDetail("lr-k15");
+  const side = element("aside", "pte-detail pte-undisclosed-detail");
+  const heading = element("header", "pte-detail-heading");
+  heading.append(element("span", "pte-version-badge", detail.version), element("h2", "", detail.title));
+  const boundary = element("section", "pte-undisclosed-boundary");
+  const disclosed = element("article", "disclosed");
+  disclosed.append(element("span", "pte-story-label", "已公开"), element("strong", "", "4K → 32K → 131K 序列课程"));
+  const missing = element("article", "missing");
+  missing.append(element("span", "pte-story-label", "未公开"), element("strong", "", "学习率曲线、峰值、warmup 与衰减参数"));
+  boundary.append(disclosed, missing);
+  side.append(
+    heading,
+    element("p", "pte-oneliner", "报告没有公开 K1.5 的学习率日程，因此不能把 WSD、cosine 或具体峰值学习率写成事实。"),
+    boundary,
+    element("p", "pte-detail-source", "K1.5 Technical Report：仅披露序列课程，未披露学习率日程。"),
+  );
+  return side;
+};
+
 const buildWsdDetail = (inherited = false) => {
-  const side = element("aside", `pte-detail pte-wsd-onepage ${inherited ? "inherited" : ""}`);
+  const side = element("aside", `pte-detail pte-lr-story pte-wsd-onepage ${inherited ? "inherited" : ""}`);
+  const scroll = element("div", "pte-wsd-scroll");
   const header = element("header", "pte-lr-story-heading");
   header.append(
     element("span", "pte-version-badge", inherited ? "K2.5" : "K2"),
@@ -1570,9 +2193,10 @@ const buildWsdDetail = (inherited = false) => {
   const k3 = element("article", "pte-wsd-k3-note");
   k3.append(element("h3", "", "K3 为何换回 cosine"), element("p", "", "Per-Head Muon 改变训练动态，旧的最优超参不再保证最优。K3 Figure 7 显示，分别调优后 cosine 的最终 loss 更低。"), element("small", "", "这不是 WSD 本身失效，而是换了优化器后最优日程随之改变。"), element("code", "", "lrₜ = lrₘᵢₙ + 0.5(lrₘₐₓ−lrₘᵢₙ)(1+cos(πt/T))　｜　warmup 1%"));
   bottom.append(reuse, k3);
-  if (inherited) side.append(header, element("p", "pte-wsd-inherit-banner", "调度方案不重设计：K2.5 直接复用 K2 的 warmup → stable → decay → anneal。"));
-  else side.append(header);
-  side.append(top, bottom, element("p", "pte-lr-story-source", "来源：K2 Technical Report §2.1、§2.5；K2.5 Technical Report；K3 Technical Report §3.1–§3.4。"));
+  if (inherited) scroll.append(header, element("p", "pte-wsd-inherit-banner", "调度方案不重设计：K2.5 直接复用 K2 的 warmup → stable → decay → anneal。"));
+  else scroll.append(header);
+  scroll.append(top, bottom, element("p", "pte-lr-story-source", "来源：K2 Technical Report §2.1、§2.5；K2.5 Technical Report；K3 Technical Report §3.1–§3.4。"));
+  side.append(scroll);
   return side;
 };
 
@@ -1643,7 +2267,7 @@ const buildK25ObjectiveDetail = () => {
   result.append(element("h3", "", "实验结论"), element("strong", "", "早期 10% 视觉比例 > 晚期 50% 融合"), element("p", "", "先缩小目标空间偏差，再让视觉 token 从联合训练早期参与 NTP。"));
   notes.append(why, signal, result);
   lower.append(timeline, notes);
-  scroll.append(header, mismatch, lower, element("p", "pte-objective-source", "🟢 来源：K2.5 Technical Report §4.2–§4.3。"));
+  scroll.append(header, mismatch, lower, element("p", "pte-objective-source", "来源：K2.5 Technical Report §4.2–§4.3。"));
   side.append(scroll);
   return side;
 };
@@ -1687,7 +2311,41 @@ const buildK3ObjectiveDetail = () => {
   result.append(element("h3", "", "实验结论"), element("strong", "", "从头训练的视觉编码器梯度更平稳"), element("p", "", "不再出现 SigLIP 初始化版本的频繁 spike。"));
   notes.append(why, mtp, result);
   lower.append(timeline, notes);
-  scroll.append(header, decision, lower, element("p", "pte-objective-source", "🟢 来源：K3 Technical Report §2.4、§3.3。"));
+  scroll.append(header, decision, lower, element("p", "pte-objective-source", "来源：K3 Technical Report §2.4、§3.3。"));
+  side.append(scroll);
+  return side;
+};
+
+const buildK15ObjectiveDetail = () => {
+  const detail = getDetail("objective-k15");
+  const side = element("aside", "pte-detail pte-objective-onepage");
+  const scroll = element("div", "pte-objective-onepage-scroll");
+  scroll.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+
+  const header = element("header", "pte-objective-onepage-header");
+  header.append(
+    element("span", "pte-version-badge", detail.version),
+    element("h2", "", detail.title),
+    element("p", "", detail.oneliner),
+  );
+
+  const section = (title, items) => {
+    const block = element("section", "pte-objective-onepage-section");
+    block.append(element("h3", "", title));
+    items.forEach((item) => block.append(element("p", "", item)));
+    return block;
+  };
+
+  const formula = element("div", "pte-objective-onepage-formula");
+  detail.deepDive.forEach((item) => formula.append(element("code", "", item)));
+  scroll.append(
+    header,
+    section("目标", detail.why),
+    section("训练方式", detail.how),
+    section("训练演进", detail.evidence),
+    formula,
+    element("p", "pte-detail-source", detail.source),
+  );
   side.append(scroll);
   return side;
 };
@@ -1695,11 +2353,17 @@ const buildK3ObjectiveDetail = () => {
 const buildDetail = (id, state, persist, rerender, navigate) => {
   if (state.optimizerTab) return buildSequenceDetail({ chapters: OPTIMIZER_CHAPTERS, stateKey: "optimizerTab", labelByTab: OPTIMIZER_LABEL_BY_TAB }, state, persist, rerender);
   if (state.multimodalTab) return buildSequenceDetail({ chapters: MULTIMODAL_CHAPTERS, stateKey: "multimodalTab", labelByTab: MULTIMODAL_LABEL_BY_TAB }, state, persist, rerender);
+  if (id === "context-k15") return buildK15ContextDetail();
+  if (id === "context-k2") return buildK2ContextDetail();
+  if (id === "context-k25") return buildK25ContextDetail();
+  if (id === "context-k3") return buildK3ContextDetail();
   if (state.contextTab) return buildSequenceDetail({ chapters: CONTEXT_CHAPTERS, stateKey: "contextTab", labelByTab: CONTEXT_LABEL_BY_TAB }, state, persist, rerender);
   if (state.dataTab) return buildDataDetail(state, persist, rerender);
+  if (id === "lr-k15") return buildUndisclosedLrDetail();
   if (id === "lr-k2") return buildWsdDetail();
   if (id === "lr-k25") return buildWsdDetail(true);
   if (id === "lr-k3") return buildCosineDetail();
+  if (id === "objective-k15") return buildK15ObjectiveDetail();
   if (id === "objective-k25") return buildK25ObjectiveDetail();
   if (id === "objective-k3") return buildK3ObjectiveDetail();
   const detail = getDetail(id);
@@ -1771,7 +2435,7 @@ const makePipelineItem = (item, state, select) => {
   node.dataset.label = item.id;
   node.classList.toggle("selected", state.selectedLabel === item.id);
   node.setAttribute("aria-pressed", String(state.selectedLabel === item.id));
-  node.addEventListener("click", () => select(item.id));
+  node.addEventListener("click", () => select(item.jumpTo || item.id));
   return node;
 };
 
@@ -1861,8 +2525,8 @@ const buildViewSegments = (state, selectView) => {
 };
 
 const DATA_ENTRY_BY_OVERVIEW = {
-  "data-k15": "data-k15-filter",
-  "data-k2": "data-k2-rephrasing",
+  "data-k15": "data-k15-sampling",
+  "data-k2": "data-k2-math-rephrasing",
   "data-k25": "data-k25-vision-seven",
   "data-k3": "data-k3-programmatic",
 };
