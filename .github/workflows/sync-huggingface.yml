@@ -29,6 +29,7 @@ jobs:
           python -m pip install --disable-pip-version-check huggingface_hub
           python <<'PY'
           import os
+          import re
           from pathlib import Path
           from huggingface_hub import CommitOperationAdd, HfApi
 
@@ -37,6 +38,17 @@ jobs:
           front_matter = "---\ntitle: Kimi K3\nemoji: ⚡\ncolorFrom: pink\ncolorTo: green\nsdk: static\napp_file: index.html\n---\n\n"
           if not readme.read_text(encoding="utf-8").startswith("---\n"):
             readme.write_text(front_matter + readme.read_text(encoding="utf-8"), encoding="utf-8")
+
+          build_id = os.environ["GITHUB_SHA"]
+          def version_entry(file, pattern):
+            source = file.read_text(encoding="utf-8")
+            output = re.sub(pattern, rf"\g<1>{build_id}", source, count=1)
+            if output == source:
+              raise RuntimeError(f"Version marker not found in {file}")
+            file.write_text(output, encoding="utf-8")
+
+          version_entry(root / "index.html", r"(\.\/app\/main\.js\?build=)[^\"]+")
+          version_entry(root / "app/main.js", r"(\.\.\/deck\.js\?build=)[^\"]+")
 
           excluded_dirs = {".git", "node_modules", "qa"}
           excluded_files = {".DS_Store", "AGENTS.md"}

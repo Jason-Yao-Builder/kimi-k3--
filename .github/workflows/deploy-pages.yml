@@ -19,6 +19,24 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v6
+      - name: Version browser entry modules
+        env:
+          BUILD_ID: ${{ github.sha }}
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
+          const version = process.env.BUILD_ID;
+
+          const versionEntry = (file, pattern) => {
+            const source = fs.readFileSync(file, "utf8");
+            const output = source.replace(pattern, `$1${version}`);
+            if (output === source) throw new Error(`Version marker not found in ${file}`);
+            fs.writeFileSync(file, output);
+          };
+
+          versionEntry("index.html", /(\.\/app\/main\.js\?build=)[^"]+/);
+          versionEntry("app/main.js", /(\.\.\/deck\.js\?build=)[^"]+/);
+          NODE
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v4
         with:
