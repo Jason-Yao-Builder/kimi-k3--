@@ -1,0 +1,59 @@
+name: Sync personal site to Hugging Face
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-personal-site-huggingface
+  cancel-in-progress: true
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Upload Static Space files
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python -m pip install --disable-pip-version-check huggingface_hub
+          python <<'PY'
+          import os
+          from pathlib import Path
+          from huggingface_hub import CommitOperationAdd, HfApi
+
+          root = Path(".")
+          readme = root / "README.md"
+          front_matter = "---\ntitle: Kimi K3\nemoji: ⚡\ncolorFrom: pink\ncolorTo: green\nsdk: static\napp_file: index.html\n---\n\n"
+          if not readme.read_text(encoding="utf-8").startswith("---\n"):
+            readme.write_text(front_matter + readme.read_text(encoding="utf-8"), encoding="utf-8")
+
+          excluded_dirs = {".git", "node_modules", "qa"}
+          excluded_files = {".DS_Store", "AGENTS.md"}
+          operations = []
+          for path in sorted(root.rglob("*")):
+            if not path.is_file():
+              continue
+            relative = path.relative_to(root)
+            if any(part in excluded_dirs for part in relative.parts) or path.name in excluded_files:
+              continue
+            operations.append(CommitOperationAdd(path_in_repo=relative.as_posix(), path_or_fileobj=str(path)))
+
+          HfApi(token=os.environ["HF_TOKEN"]).create_commit(
+            repo_id="elegacode/kimi-k3-v2-1-person",
+            repo_type="space",
+            operations=operations,
+            commit_message=f"Sync GitHub main ({os.environ['GITHUB_SHA'][:7]})",
+          )
+          print(f"Uploaded {len(operations)} files to Hugging Face Space")
+          PY
